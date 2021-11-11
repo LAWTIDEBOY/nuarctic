@@ -1,0 +1,66 @@
+1D TestBed for development of aggregation-disaggregation model
+
+Iris Kriest, 12.10.2018
+
+
+TestBed.fpp            : main 1D Testbed routine. Have a look at the 
+                         routine itself, which contains lots of information. 
+                         The routine uses BGC_BUDGET.h, to pass information
+                         relevant for mass conservation checks, which are
+                         fully consistent with stoichiometry (even in terms of H!), 
+                         i.e. all elements involved explicitly or implicitly (in my model world :))
+ 
+BGC_BUDGET.h            : see above, required for mass conservation checks
+
+In the following are the basic BGC routines of the MOPS model. These
+will be called/used by TestBed.fpp, and are almost entirely untouched
+compared to the original (TMM) routines, except that the first 2
+(BGC_INI.F, BGC_MODEL.F) include file "BGC_BUDGET.h". 
+
+If the code is compiled with option -DBUDGET, it will compute the
+budgets for mass conservation. This is the default for use in TestBed.
+For use within the TMM, don't apply this option (not tested so far).
+
+Thus, one can attach these routines to either TestBed.fpp or the TMM
+framework without alterations. But note: If, during model development
+within this 1D framework you added "write" statements to the code (such
+as "write(6,*)") you should comment these out before running the code
+within TMM.
+
+BGC_INI.F                  
+BGC_MODEL.F             
+BGC_CONTROL.h             
+BGC_DIAGNOSTICS.h         
+BGC_MISFIT.h              
+BGC_PARAMS.h              
+CAR_PARAMS.h              
+
+These are two ways to compile the code with gfortran: either you link
+files BGC_INI.F and BGC_MODEL.F to files with extension ".fpp" instead
+of ".f" (as done here):
+BGC_INI.fpp -> BGC_INI.F
+BGC_MODEL.fpp -> BGC_MODEL.F
+
+Then you can compile the code with 
+
+"gfortran -DBUDGET -o testbed TestBed.fpp BGC_INI.fpp BGC_MODEL.fpp"
+
+this is done by script
+
+compilemodel
+
+Alternatively, you can also compile the code with
+
+"gfortran -cpp -DBUDGET -o testbed TestBed.fpp BGC_INI.F BGC_MODEL.F"
+
+Both ways ensure that the preprocessor is invoked. The compilation will
+produce the executable "testbed", which you can invoke by typing
+
+"./testbed".
+
+The executable will the produce the following files:
+
+testbed.log       : diagnostic output and mass balance
+testbed.txt       : tracer concentrations at the end of each year; tracer order given by BGC_PARAMS.h
+testbed.zax       : the vertical axis of the underlying grid
+

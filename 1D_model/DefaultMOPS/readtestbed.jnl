@@ -1,0 +1,10 @@
+ ! NOAA/PMEL TMAP
+ ! FERRET v6.93  
+ ! Darwin 13.4.0 - 01/26/15
+ !  1-Nov-16 18:46     
+
+file/var=zu,dz,center testbed.zax
+def ax/from_data/name=zax/depth/unit=m center[d=1]
+def ax/t=1:$1:1/unit=years tax
+def g/t=tax/z=zax ztg
+file/g=ztg/order=zt/var=iy,po4,dop,phy,zoo,det,oxy,din testbed.txt

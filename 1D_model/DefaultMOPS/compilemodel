@@ -1,0 +1,3 @@
+#compile code
+gfortran -cpp -o testbed -DBUDGET TestBed.fpp BGC_INI.F BGC_MODEL.F
+ 
