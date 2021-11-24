@@ -8,6 +8,11 @@ MODULE io_RESTART
   use i_arrays
   use g_cvmix_tke
   use g_cvmix_idemix
+#if defined(__recom)
+  use REcoM_GloVar
+  use recom_config
+  use REcoM_ciso
+#endif
   implicit none
 #include "netcdf.inc"
 !
@@ -29,7 +34,6 @@ MODULE io_RESTART
     integer        :: ndim
     integer        :: dims(2) !<=2; assume there are no variables with dimension more than 2xNLxT
     real(kind=WP), pointer :: pt1(:), pt2(:,:)
-    logical        :: is_in_restart !if the variable is in the restart file
   end type nc_vars
 !
 !--------------------------------------------------------------------------------------------
@@ -42,7 +46,7 @@ MODULE io_RESTART
     integer :: rec, Tid, Iid
     integer :: ncid
     integer :: rec_count=0
-    integer :: error_status(250), error_count
+    integer :: error_status(2000), error_count
     logical :: is_in_use=.false.
   end type nc_file
 !
@@ -54,13 +58,13 @@ MODULE io_RESTART
 !
 !--------------------------------------------------------------------------------------------
 ! id will keep the IDs of all required dimentions and variables
-  type(nc_file), save       :: oid, iid
+  type(nc_file), save       :: oid, iid, bid
   integer,       save       :: globalstep=0
   type(nc_file), save       :: ip_id
   real(kind=WP)             :: ctime !current time in seconds from the beginning of the year
 
   PRIVATE
-  PUBLIC :: restart, oid, iid
+  PUBLIC :: restart, oid, iid, bid
   PUBLIC :: ip_id, def_dim, def_variable_1d, def_variable_2d 
 !
 !--------------------------------------------------------------------------------------------
@@ -142,8 +146,10 @@ subroutine ini_ocean_io(year, mesh)
          longname='salinity'
          units='psu'
        CASE DEFAULT
-         write(trname,'(A3,i1)') 'tra_', j
-         write(longname,'(A15,i1)') 'passive tracer ', j
+!         write(trname,'(A3,i1)') 'tra_', j
+!         write(longname,'(A15,i1)') 'passive tracer ', j
+  	 write(trname,'(A3,i4.4)') 'tra', j		 ! OG i1 -> i4
+         write(longname,'(A15,i4.4)') 'passive tracer ', j
          units='none'
      END SELECT
      call def_variable(oid, trim(trname),       (/nl-1, nod2D/), trim(longname), trim(units), tr_arr(:,:,j));
@@ -194,6 +200,49 @@ subroutine ini_ice_io(year, mesh)
 #endif /* (__oifs) */
 
 end subroutine ini_ice_io
+#if defined(__recom)
+!
+!--------------------------------------------------------------------------------------------
+! ini_bio_io initializes bid datatype which contains information of all variables need to be written into 
+! the bio restart file. This is the only place need to be modified if a new variable is added!
+subroutine ini_bio_io(year, mesh)
+  implicit none
+
+  integer, intent(in)       :: year
+  integer                   :: ncid, j
+  integer                   :: varid
+  character(500)            :: longname
+  character(500)            :: filename
+  character(500)            :: trname, units
+  character(4)              :: cyear
+  type(t_mesh), intent(in) , target :: mesh
+
+#include  "associate_mesh.h"
+
+  write(cyear,'(i4)') year
+  ! create an ocean restart file; serial output implemented so far
+  bid%filename=trim(ResultPath)//trim(runid)//'.'//cyear//'.bio.restart.nc'
+  if (bid%is_in_use) return
+  bid%is_in_use=.true.
+  call def_dim(bid, 'node', nod2d)
+
+  !===========================================================================
+  !===================== Definition part =====================================
+  !===========================================================================
+  !___Define the netCDF variables for 2D fields_______________________________
+  call def_variable(bid, 'BenN',       (/nod2D/), 'Benthos Nitrogen', 'mmol/m3',   Benthos(:,1));
+  call def_variable(bid, 'BenC',       (/nod2D/), 'Benthos Carbon',   'mmol/m3',   Benthos(:,2));
+  call def_variable(bid, 'BenSi',      (/nod2D/), 'Benthos Silicate', 'mmol/m3',   Benthos(:,3));
+  call def_variable(bid, 'BenCalc',    (/nod2D/), 'Benthos Calcite',  'mmol/m3',   Benthos(:,4));
+  call def_variable(bid, 'HPlus',      (/nod2D/), 'Conc. of H-plus ions in the surface water', 'mol/kg',   GloHplus);
+  if (ciso) then
+    call def_variable(bid, 'BenC_13',       (/nod2D/), 'Benthos Carbon-13',   'mmol/m3',   Benthos(:,5));
+    call def_variable(bid, 'BenC_14',       (/nod2D/), 'Benthos Carbon-14',   'mmol/m3',   Benthos(:,6));
+    call def_variable(bid, 'BenCalc_13',    (/nod2D/), 'Benthos Calcite-13',  'mmol/m3',   Benthos(:,7)); 
+    call def_variable(bid, 'BenCalc_14',    (/nod2D/), 'Benthos Calcite-14',  'mmol/m3',   Benthos(:,8)); 
+  end if
+end subroutine ini_bio_io
+#endif
 !
 !--------------------------------------------------------------------------------------------
 !
@@ -218,12 +267,22 @@ subroutine restart(istep, l_write, l_read, mesh)
   if (.not. l_read) then
                call ini_ocean_io(yearnew, mesh)
   if (use_ice) call ini_ice_io  (yearnew, mesh)
+#if defined(__recom)
+  if (use_REcoM) then
+               call ini_bio_io  (yearnew, mesh)
+  end if 
+#endif
 #if defined(__icepack)
   if (use_ice) call init_restart_icepack(yearnew, mesh)
 #endif
   else
                call ini_ocean_io(yearold, mesh)
   if (use_ice) call ini_ice_io  (yearold, mesh)
+#if defined(__recom)
+  if (REcoM_restart) then
+               call ini_bio_io(yearold, mesh)
+  end if 
+#endif
 #if defined(__icepack)
   if (use_ice) call init_restart_icepack(yearold, mesh)
 #endif
@@ -240,6 +299,15 @@ subroutine restart(istep, l_write, l_read, mesh)
       call read_restart(ip_id, mesh); call was_error(ip_id)
 #endif
     end if
+#if defined(__recom)
+!RECOM restart
+!read here
+if(mype==0)  write(*,*) 'REcoM_restart= ',REcoM_restart 
+   if (REcoM_restart) then
+      call assoc_ids(bid);          call was_error(bid)
+      call read_restart(bid, mesh); call was_error(bid)
+   end if 
+#endif
   end if
 
   if (istep==0) return
@@ -280,7 +348,14 @@ subroutine restart(istep, l_write, l_read, mesh)
      call write_restart(ip_id, istep, mesh); call was_error(ip_id)
 #endif
   end if
-  
+#if defined(__recom)
+!RECOM restart
+!write here
+   if (REcoM_restart .or. use_REcoM) then
+     call assoc_ids(bid);                  call was_error(bid)
+     call write_restart(bid, istep, mesh); call was_error(bid)
+   end if
+#endif     
   ! actualize clock file to latest restart point
   if (mype==0) then
 		write(*,*) ' --> actualize clock file to latest restart point'
@@ -561,9 +636,9 @@ subroutine read_restart(id, mesh, arg)
   integer, optional, intent(in)    :: arg
   real(kind=WP), allocatable       :: aux(:), laux(:)
   integer                          :: i, lev, size1, size2, size_gen, size_lev, shape
-  integer                          :: rec2read, c, order, ierror
+  integer                          :: rec2read, c, order
   real(kind=WP)                    :: rtime !timestamp of the record
-  logical                          :: file_exist=.False., var_exist
+  logical                          :: file_exist=.False.
   type(t_mesh), intent(in)        , target :: mesh
 
 #include  "associate_mesh.h"
@@ -606,17 +681,10 @@ subroutine read_restart(id, mesh, arg)
   end if
 
   call was_error(id); c=1
-
+ 
   do i=1, id%nvar
      shape=id%var(i)%ndim
-     var_exist=id%var(i)%is_in_restart
-     call MPI_BCast(var_exist, 1, MPI_INTEGER, 0, MPI_COMM_FESOM, ierror)
-     if (var_exist) then
-        if (mype==0) write(*,*) 'reading restart for ', trim(id%var(i)%name)
-     else
-        if (mype==0) write(*,*) '...skip reading for ', trim(id%var(i)%name)
-        cycle
-     end if
+     if (mype==0) write(*,*) 'reading restart for ', trim(id%var(i)%name)
 !_______writing 2D fields________________________________________________
      if (shape==1) then
         size1=id%var(i)%dims(1)
@@ -689,7 +757,7 @@ subroutine assoc_ids(id)
 
   type(nc_file),  intent(inout) :: id
   character(500)                :: longname
-  integer                       :: c, j, k, status
+  integer                       :: c, j, k
   real(kind=WP)                 :: rtime !timestamp of the record
   ! Serial output implemented so far
   if (mype/=0) return
@@ -738,11 +806,7 @@ subroutine assoc_ids(id)
   id%rec_count=max(id%rec_count, 1)
 !___Associate physical variables____________________________________________
   do j=1, id%nvar
-     status = nf_inq_varid(id%ncid, id%var(j)%name, id%var(j)%code); c=c+1
-     id%var(j)%is_in_restart=(status .eq. nf_noerr) !does the requested variable exist in the file
-     if (.not. id%var(j)%is_in_restart) then        !if not give the error message
-         write(*,*) 'WARNING: entry ', trim(id%var(j)%name), ' does not exist in the restart file!'
-     end if
+     id%error_status(c) = nf_inq_varid(id%ncid, id%var(j)%name, id%var(j)%code); c=c+1
   end do
   id%error_status(c)=nf_close(id%ncid); c=c+1
   id%error_count=c-1

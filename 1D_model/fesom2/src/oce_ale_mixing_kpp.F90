@@ -70,9 +70,7 @@ MODULE o_mixing_KPP_mod
   real(KIND=WP), dimension(0:nni+1,0:nnj+1) :: wst ! lookup table for ws, the turbulent velocity scale scalars
   logical                    :: smooth_blmc=.true.
   logical                    :: smooth_hbl =.false.
-  logical                    :: smooth_Ri_hor  =.false.
-  logical                    :: smooth_Ri_ver  =.false.
-  logical                    :: limit_hbl_ekmmob =.false. !.true.
+  logical                    :: smooth_Ri  =.false.
 
 contains
 
@@ -339,8 +337,7 @@ contains
   DO node=1, myDim_nod2D !+eDim_nod2D
      nzmin = ulevels_nod2D(node)
      ustar(node) = sqrt( sqrt( stress_atmoce_x(node)**2 + stress_atmoce_y(node)**2 )*density_0_r ) ! @ the surface (eqn. 2)
-!!PS      ustar(node) = sqrt( sqrt( stress_node_surf(1,node)**2 + stress_node_surf(2,node)**2 )*density_0_r ) ! @ the surface (eqn. 2)
-     
+    
 ! Surface buoyancy forcing (eqns. A2c & A2d & A3b & A3d)
      !!PS Bo(node)  = -g * ( sw_alpha(1,node) * heat_flux(node)  / vcpw             &   !heat_flux & water_flux: positive up
      !!PS                  + sw_beta (1,node) * water_flux(node) * tr_arr(1,node,2))
@@ -400,8 +397,7 @@ contains
   ! only at the end should save some time
   call exchange_nod(diffK(:,:,1))
   call exchange_nod(diffK(:,:,2))
-  call exchange_nod(ghats)
-  
+
 ! OVER ELEMENTS 
   call exchange_nod(viscA) !Warning: don't forget to communicate before averaging on elements!!!
   minmix=3.0e-3_WP
@@ -772,7 +768,7 @@ contains
 
 ! smooth Richardson number in the vertical using a 1-2-1 filter
         !!PS IF(smooth_richardson_number .and. nlevels_nod2d(node)>2) then
-        IF(smooth_Ri_ver .and. nzmax>2) then
+        IF(smooth_richardson_number .and. nzmax>2) then
            DO mr=1,num_smoothings
               ri_prev = 0.25_WP * diffK(1, node, 1)
               !!PS DO nz=2,nlevels_nod2d(node)-1
@@ -785,7 +781,7 @@ contains
         END IF
      END DO
 
-    if (smooth_Ri_hor) then
+    if (smooth_Ri) then
        call smooth_nod(diffK(:,:,1), 3, mesh)
     end if
 
