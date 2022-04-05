@@ -1,28 +1,31 @@
+module recom_init
 
-
+  use mod_mesh
+  use recom_clock
+  use recom_declarations
+  use recom_GloVar
+  use recom_locVar
+  use recom_config
+  use ocean_module
 ! CONTENT:
 ! ------------
 !    subroutine recom_init
 !
 ! written by V. Schourup-Kristensen, 
 ! adapted to fesom2.0 by ozgur gurses, 22.05.2020
-! adapted to REcoM1D by F.Birrien 21.12.2020   
+! adapted to REcoM1D by F.Birrien 21.12.2021   
+
+contains
 !===============================================================================
 ! allocate & initialise arrays for REcoM
-subroutine recom_init(mesh)
-    use mod_mesh
-    use recom_clock
-    use recom_declarations
-    use recom_GloVar
-    use recom_locVar
-    use recom_config
-    use ocean_module
+subroutine recom_initialization(mesh)
+
 
     ! fesom modules
     !use o_ARRAYS
     !use o_MESH
     implicit none
-#include "netcdf.inc"
+!#include "netcdf.inc"
 
     integer     :: n
     type(t_mesh), intent(in) , target :: mesh
@@ -67,6 +70,14 @@ end if
 
 
     !___initialize______________________________________________________________
+    ! Dust surface deposition
+    GloFeDust = 0.d0
+    AtmFeInput = 0.d0
+
+    GloNDust = 0.d0
+    AtmNInput = 0.d0
+    
+    ! 
     cosAI = 0.d0
 
     ! initialise 2d field of CO2 related diagnostics
@@ -156,5 +167,7 @@ endif
 !---------------------------------------------------------------------------------------------------------
 write(*,*) 'Tracers have been initialized as spinup from WOA/glodap netcdf files'
 
-end subroutine recom_init
+end subroutine recom_initialization
+
+end module recom_init
 

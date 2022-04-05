@@ -1,21 +1,3 @@
-module read_mesh_interface
-  interface
-    subroutine read_mesh(mesh)
-      use mod_mesh
-      type(t_mesh), intent(inout)  , target :: mesh
-    end subroutine
-  end interface
-end module
-
-module get_spatial_configuration_step_interface
-  interface
-    subroutine get_spatial_configuration_step_mesh(istep,mesh)
-      use mod_mesh
-      integer, intent(in) :: istep
-      type(t_mesh), intent(in)  , target :: mesh
-    end subroutine
-  end interface
-end module
 ! ==============================================================
 module REcoM_setup
 
@@ -182,8 +164,8 @@ subroutine get_run_steps(nsteps)
   use recom_clock
   
   implicit none
-
-  integer      :: i, temp_year, temp_mon, temp_fleapyear, nsteps
+  integer, intent(out) :: nsteps
+  integer      :: i, temp_year, temp_mon, temp_fleapyear
 
   ! clock should have been inialized before calling this routine
 
@@ -231,8 +213,12 @@ subroutine get_spatial_configuration_step(istep,mesh)
   geo_coords(:) = mesh%geo_coords(:,istep)
   ! set number of vertical levels concerned for vertical column computation (varies along the track)
   nlevels=mesh%nlevels(istep)
+  ! set the depth of the different vertical nodes
+  hnode=0.d0
+  hnode(1:nlevels-1) = zbar(1:nlevels-1) - zbar(2:nlevels)
 
 end subroutine
+
 ! ==============================================================
 end module
   

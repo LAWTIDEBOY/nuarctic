@@ -11,15 +11,20 @@ program main
 use general_config
 use mod_mesh
 use REcoM_config
+use REcoM_clock
 use ocean_module
 use ice_module
+use atm_module
 use forcing_module
+use atm_deposition_module
+use REcoM_init
 use REcoM_setup
-use REcoM_clock
+use REcoM_main
 
 !=============================================================================!    
 ! local variables
 type(t_mesh),             target, save :: mesh
+integer				       :: istep
 !=============================================================================! 
 !
 ! initialization step
@@ -38,35 +43,46 @@ call read_mesh(mesh)
 
 
 ! declare, allocate and initialize ocean arrays
-call ocean_array_setup(mesh)
+call ocean_setup(mesh)
 
 ! declare, allocate and initialize ice arrays
-call ice_array_setup(mesh)
+call ice_setup
+
+! declare, allocate and initialize atm arrays
+call atm_setup
 
 ! initialize REcoM arrays
-call recom_init(mesh)
+call recom_initialization(mesh)
 
 ! initial conditions
 
-! Read forcing
+! Read (ice, turbulence, PAR, wind, ...) forcing
 call read_forcing(mesh)
 
+! read atm (CO2, Fe, N) deposition
+call read_deposition(mesh)
+
+! check if new year
+call clock_newyear
+
 !=============================================================================!
-!
+! 
 ! main loop of the model 
-!
-istep=7000
-call get_spatial_configuration_step(istep,mesh)
-print*, 'nb of levels', nlevels
-call get_forcing(istep)
+! 
+do istep=1,nsteps
+	! update time
+	call clock
+	! run main 
+	call recom(istep,mesh)
 
+enddo
 
 
 
 !=============================================================================!
-!
+! 
 ! postprocessing diagnostics and deallocation steps
-!
+! 
 
 
 end program

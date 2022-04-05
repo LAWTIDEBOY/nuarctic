@@ -179,4 +179,19 @@ contains
   !
   !----------------------------------------------------------------------------
   !
+  subroutine monthly_event(do_output)
+  !decides whether it's time to do output
+  implicit none
+
+  logical,intent(inout) :: do_output
+
+  if (day_in_month==num_day_in_month(fleapyear,month) .and. &
+       timenew==86400.) then
+     do_output=.true.
+  else
+     do_output=.false.
+  end if
+
+  end subroutine monthly_event
+
 end module recom_clock

@@ -14,6 +14,7 @@
 !! @par Origin
 !!   2014: original implementation (V. Schourup-Kristensen)
 !!   2019: ongoing
+!!   12/2021: adapted to REcoM1D
 !
 !==========================================================================================================
 module general_config
@@ -52,14 +53,16 @@ module general_config
   namelist /meshproperties/ meshname
   !_____________________________________________________________________________
   ! *** forcing ***  
-  character(len=4096)   :: forcingname='MOSAiC_forcing'  ! file name which contains REcoM forcing
-  namelist /forcingproperties/ forcingname
+  character(len=4096)   :: forcingname='MOSAiC_forcing'                ! file name which contains REcoM forcing
+  character(len=4096)   :: atmdepositionname='MOSAiC_atm_deposition'  ! file name which contains atm deposition to prescribe
+  namelist /forcingproperties/ forcingname, atmdepositionname
   !_____________________________________________________________________________
   ! *** Paths for all in and out ***
   character(len=4096)        :: grid_path='./grid/'
+  character(len=4096)        :: forcing_path='./forcing/'  
   character(len=4096)        :: data_path='./data/'
   character(len=4096)        :: result_path='./result/'
-  namelist /paths/  grid_path, data_path, result_path
+  namelist /paths/  grid_path, forcing_path, data_path, result_path
   
   !_____________________________________________________________________________
   ! *** fleap_year ***
@@ -150,48 +153,44 @@ module recom_config
   Real(kind=8)           :: VDet_zoo2             = 200.d0   ! Sinking velocity, constant through the water column 
   Real(kind=8)           :: VPhy                  = 0.d0    !!! If the number of sinking velocities are different from 3, code needs to be changed !!!
   Real(kind=8)           :: VDia                  = 0.d0 
-  Logical                :: allow_var_sinking     = .true.   
+  logical                :: allow_var_sinking     = .true.   
   Integer                :: biostep               = 1                    ! Number of times biology should be stepped forward for each time step		 
-  Logical                :: REcoM_Geider_limiter  = .false.              ! Decides what routine should be used to calculate limiters in sms
-  Logical                :: REcoM_Grazing_Variable_Preference = .true.  ! Decides if grazing should have preference for phyN or DiaN
-  Logical                :: REcoM_Second_Zoo      = .false.    ! Decides whether having macrozooplankton and second detritus or not
-  Logical                :: Grazing_detritus     = .false.    ! Decides grazing on detritus                            
-  Logical                :: zoo2_fecal_loss     = .false.    ! Decides fecalloss for the second zooplankton            
-  Logical                :: zoo2_initial_field     = .false.    ! Decides initialization of secondzoo        ! NOT CODED YET OG
-  Logical                :: het_resp_noredfield    = .true.    ! Decides respiratation of copepods              
-  Logical                :: diatom_mucus    = .true.    ! Effect of nutrient limitation on the aggregation
-  Logical                :: Graz_pref_new    = .true.    ! If it is true Fasham et 1990, otherwise original recom variable preference
-  Logical                :: Diags                 = .true.    !!!!!!!!!!!!!!!!!!!!!!Change in recom.F90 Diagnostics -> Diags
-  Logical                :: constant_CO2          = .true.
-  Logical                :: use_Fe2N              = .true.               ! use Fe2N instead of Fe2C, as in MITgcm version
-  Logical                :: use_photodamage       = .false.             ! use Alvarez et al (2018) for chlorophyll degradation
+  logical                :: REcoM_Geider_limiter  = .false.              ! Decides what routine should be used to calculate limiters in sms
+  logical                :: REcoM_Grazing_Variable_Preference = .true.  ! Decides if grazing should have preference for phyN or DiaN
+  logical                :: REcoM_Second_Zoo      = .false.    ! Decides whether having macrozooplankton and second detritus or not
+  logical                :: Grazing_detritus     = .false.    ! Decides grazing on detritus                            
+  logical                :: zoo2_fecal_loss     = .false.    ! Decides fecalloss for the second zooplankton            
+  logical                :: zoo2_initial_field     = .false.    ! Decides initialization of secondzoo        ! NOT CODED YET OG
+  logical                :: het_resp_noredfield    = .true.    ! Decides respiratation of copepods              
+  logical                :: diatom_mucus    = .true.    ! Effect of nutrient limitation on the aggregation
+  logical                :: Graz_pref_new    = .true.    ! If it is true Fasham et 1990, otherwise original recom variable preference
+  logical                :: Diags                 = .true.    !!!!!!!!!!!!!!!!!!!!!!Change in recom.F90 Diagnostics -> Diags
+  logical                :: constant_CO2          = .true.
+  logical                :: useAeolianN           = .false.   ! When set to true, aeolian nitrogen  deposition is activated
+  logical                :: UseFeDust             = .false.    ! Turns dust input of iron off when set to.false.
+  logical                :: use_Fe2N              = .false.    ! use Fe2N instead of Fe2C, as in MITgcm version
+  logical                :: use_photodamage       = .false.    ! use Alvarez et al (2018) for chlorophyll degradation
   logical                :: HetRespFlux_plus      = .true.     !MB More stable computation of zooplankton respiration fluxes adding a small number to HetN
   character(100)         :: REcoMDataPath         = ''
   logical                :: restore_alkalinity    = .true.
-  logical                :: NitrogenSS            = .false.   ! This one only activates rivers! And in principle denitrification, but denitrification is commented out. When set to true, external sources and sinks of nitrogen are activated (Riverine, aeolian and denitrification)
-  logical                :: useAeolianN           = .false.   ! When set to true, aeolian nitrogen deposition is activated
-  integer                :: firstyearoffesomcycle = 1948      ! The first year of the actual physical forcing (e.g. JRA-55) used
-  integer                :: lastyearoffesomcycle  = 2009      ! Last year of the actual physical forcing used
-  integer                :: numofCO2cycles        = 1         ! Number of cycles of the forcing planned 
-  integer                :: currentCO2cycle       = 1         ! Which CO2 cycle we are currently running
-  Logical                :: DIC_PI                = .true.
+  logical                :: DIC_PI                = .true.
   integer                :: Nmocsy                = 1         ! Length of the vector that is passed to mocsy (always one for recom)
   logical                :: recom_debug           =.true.
   integer                :: benthos_num           = 4
 
-  namelist /pavariables/ REcoM_restart,         recom_binary_write,      &
-                       recom_binary_init,                 bgc_num,               diags3d_num,             &
+  namelist /pavariables/ REcoM_restart,         recom_binary_write,     &
+                       recom_binary_init,       REcoMDataPath,		&            
+                       bgc_num,                 diags3d_num,              &
                        VDet,          VDet_zoo2,     &
                        VPhy,                              VDia,                    &
                        allow_var_sinking,                 biostep,               REcoM_Geider_limiter,    &
                        REcoM_Grazing_Variable_Preference, REcoM_Second_Zoo,      Grazing_detritus,        &
                        zoo2_fecal_loss,                   zoo2_initial_field,    het_resp_noredfield,     &
-                       diatom_mucus,                      Graz_pref_new,                &
-                       Diags      ,                       constant_CO2,            &
-                       use_Fe2N,                          use_photodamage,       HetRespFlux_plus,        &
-                       REcoMDataPath,                     restore_alkalinity,    			  &
-                       NitrogenSS,                        useAeolianN,           firstyearoffesomcycle,   &
-                       lastyearoffesomcycle,              numofCO2cycles,        currentCO2cycle,         &
+                       diatom_mucus,                      Graz_pref_new,          &
+                       Diags      ,                       constant_CO2,           &
+                       useAeolianN,			  UseFeDust,              & 
+                       use_Fe2N,                          use_photodamage,        &
+                       restore_alkalinity,                HetRespFlux_plus,       &         
                        DIC_PI,                            Nmocsy,                recom_debug,             &
                        benthos_num
 !!------------------------------------------------------------------------------
@@ -373,7 +372,8 @@ module recom_config
   Real(kind=8)                 :: Fe2C          = 0.005d0
   Real(kind=8)                 :: Fe2C_benthos  = 0.02125       !0.68d0/32.d0       ! [umol/m2/day]
   Real(kind=8)                 :: kScavFe       = 0.07d0
-  namelist /pairon/ Fe2N, Fe2N_benthos, Fe2C, Fe2C_benthos, kScavFe
+  Real(kind=8)                 :: dust_sol      = 0.02d0          !Dissolution of Dust for bioavaliable
+  namelist /pairon/ Fe2N, Fe2N_benthos, Fe2C, Fe2C_benthos, kScavFe, dust_sol
 !!------------------------------------------------------------------------------
 !! *** Calcification ***
   Real(kind=8)                 :: calc_prod_ratio = 0.02d0
@@ -444,7 +444,7 @@ Module REcoM_declarations
 !-------------------------------------------------------------------------------
 ! For limiter function
   Real(kind=8)          :: qlimitFac, qlimitFacTmp !            Factor that regulates photosynthesis
-  Real(kind=8),external :: recom_limiter           !            Function calculating qlimitFac
+!  Real(kind=8),external :: recom_limiter           !            Function calculating qlimitFac
   Real(kind=8)          :: FeLimitFac              ! [Mumol/m3] Half sat constant for iron  
   Real(kind=8)          :: pMax, pMax_dia          ! [1/day]    Maximum rate of C-specific photosynthesis 
 !-------------------------------------------------------------------------------
@@ -473,7 +473,7 @@ Module REcoM_declarations
   Real(kind=8)  :: KOchl, KOchl_dia                 ! coefficient for damage to the photosynthetic apparatus 
 !-------------------------------------------------------------------------------
 ! Iron chemistry
-  Real(kind=8),external :: iron_chemistry 
+!  Real(kind=8),external :: iron_chemistry 
 !-------------------------------------------------------------------------------
 ! Zooplankton
   Real(kind=8)  :: DiaNsq  
@@ -548,9 +548,13 @@ Module REcoM_GloVar
   implicit none
   save
 	
-  Real(kind=8),allocatable,dimension(:)   :: Benthos          ! 4 types of benthos-tracers with size [4 n2d]
+  Real(kind=8),allocatable,dimension(:)   :: Benthos          ! 4 types of benthos-tracers with size [4]
+  Real(kind=8),allocatable		  :: GloFeDust        ! [umol/m2/s] Monthly 2D field of iron soluted in surface water from dust
+  Real(kind=8),allocatable      	  :: GloNDust         ! [mmol/m2/s] 10-year mean 2D fields of nitrogen soluted in surface water from dust
   Real(kind=8),dimension(12)              :: AtmCO2           ! [uatm] Atmospheric CO2 partial pressure. One value for the whole planet for each month
-
+  
+  Real(kind=8),allocatable                :: AtmFeInput       ! [umol/m2/s] Includes ice, but is, other than that identlical to GloFeDust
+  Real(kind=8),allocatable                :: AtmNInput        ! [umol/m2/s] Includes ice, but is, other than that identlical to GloNDust
   Real(kind=8) 				  :: GloPCO2surf      ! [uatm] Surface ocean CO2 partial pressure
   Real(kind=8)				  :: GloCO2flux       ! [mmol/m2/day] Positive downwards
   Real(kind=8)				  :: GloCO2flux_seaicemask       ! [mmol/m2/day] Positive downwards
@@ -568,14 +572,14 @@ Module REcoM_GloVar
   Real(kind=8),allocatable,dimension(:,:) :: auxy 
 
 !  Real(kind=8),allocatable,dimension(:,:)   :: GlowFlux         ! 
-  Real(kind=8),allocatable,dimension(:)   :: diags2D          ! Diagnostics in 2D [8 n2d]
-  Real(kind=8),allocatable,dimension(:,:) :: diags3D          ! Diagnostics in 3D [2 nl-1 n2d]
-  Real(kind=8)				  :: DenitBen         ! Benthic denitrification Field in 2D [n2d 1]
+  Real(kind=8),allocatable,dimension(:)   :: diags2D          ! Diagnostics in 2D [8]
+  Real(kind=8),allocatable,dimension(:,:) :: diags3D          ! Diagnostics in 3D [2 nl-1]
+  Real(kind=8)				  :: DenitBen         ! Benthic denitrification Field in 2D
 
   Real(kind=8)				  :: Alk_surf         ! Surface alkalinity field used for restoring
   Real(kind=8)				  :: relax_alk
   Real(kind=8)                            :: virtual_alk
-  real(kind=8), allocatable,dimension(:)  :: PAR3D           ! Light in the water column [nl-1 n2d]
+  real(kind=8), allocatable,dimension(:)  :: PAR3D           ! Light in the water column [nl-1]
 
 !! Cobeta, Cos(Angle of incidence)
   Real(kind=8) ::  cosAI
@@ -589,37 +593,39 @@ Module REcoM_locVar
 
   Real(kind=8),allocatable,dimension(:) :: LocBenthos ! Storing the values for benthos in current watercolumn: N,C,Si and Calc
   Real(kind=8) :: Hplus                     ! [mol/kg] Concentrations of H-plus ions in the surface node
-  Real(kind=8) :: pCO2surf(1)                  ! [uatm] Partial pressure of CO2 in surface layer at current 2D node	
-  Real(kind=8) :: dflux(1)                     ! [mmol/m2/day] Flux of CO2 into the ocean
-  Real(kind=8) :: o2ex(1)                     ! [mmol/m2/s] Flux of O2 into the ocean
-  Real(kind=8) :: ULoc(1)                      ! Wind strength above current 2D node, change array size if used with mocsy input vector longer than one
-  Real(kind=8) :: dpCO2surf(1)              ! [uatm] difference of oceanic pCO2 minus atmospheric pCO2
+  Real(kind=8) :: pco2surf                  ! [uatm] Partial pressure of CO2 in surface layer at current 2D node	
+  Real(kind=8) :: dflux                     ! [mmol/m2/day] Flux of CO2 into the ocean
+  Real(kind=8) :: o2ex                     ! [mmol/m2/s] Flux of O2 into the ocean
+  Real(kind=8) :: ULoc                      ! Wind strength above current 2D node, change array size if used with mocsy input vector longer than one
+  Real(kind=8) :: dpco2surf              ! [uatm] difference of oceanic pCO2 minus atmospheric pCO2
 
 ! mocsy output -----------------------------------------------------------------------------------------------------------------------------
-  Real(kind=8) :: co2flux(1)                   ! air-to-sea flux of CO2 [mol/(m^2 * s)]
-  Real(kind=8) :: co2ex(1)                     ! time rate of change of surface CO2 due to gas exchange [mol/(m^3 * s)]
-  Real(kind=8) :: dpco2(1)                     ! difference of oceanic pCO2 minus atmospheric pCO2 [uatm]
-  Real(kind=8) :: ph(1)                        ! pH on total scale
-  Real(kind=8) :: pco2(1)                      ! oceanic partial pressure of CO2 (uatm)
-  Real(kind=8) :: fco2(1)                      ! oceanic fugacity of CO2 (uatm)
-  Real(kind=8) :: co2(1)                       ! aqueous CO2 concentration [mol/m^3]
-  Real(kind=8) :: hco3(1)                      ! bicarbonate (HCO3-) concentration [mol/m^3]
-  Real(kind=8) :: co3(1)                       ! carbonate (CO3--) concentration [mol/m^3]
-  Real(kind=8) :: OmegaA(1)                    ! Omega for aragonite, i.e., the aragonite saturation state
-  Real(kind=8) :: OmegaC(1)                    ! Omega for calcite, i.e., the   calcite saturation state
-  Real(kind=8) :: BetaD(1)                     ! BetaD = Revelle factor   dpCO2/pCO2 / dDIC/DIC
-  Real(kind=8) :: rhoSW(1)                     ! rhoSW  = in-situ density of seawater; rhoSW = f(s, t, p)
-  Real(kind=8) :: p(1)                         ! pressure [decibars]; p = f(depth, latitude) if computed from depth [m] OR p = depth if [db]
-  Real(kind=8) :: tempis(1)                    ! in-situ temperature [degrees C]
-  Real(kind=8) :: kw660(1)                     ! gas transfer velocity (piston velocity) for CO2 [m/s] 
-  Real(kind=8) :: co2flux_seaicemask(1)        ! air-to-sea flux of CO2 [mmol/m2/s]
-  Real(kind=8) :: o2flux_seaicemask(1)        ! air-to-sea flux of CO2 [mmol/m2/s]
+  Real(kind=8) :: co2flux                   ! air-to-sea flux of CO2 [mol/(m^2 * s)]
+  Real(kind=8) :: co2ex                     ! time rate of change of surface CO2 due to gas exchange [mol/(m^3 * s)]
+  Real(kind=8) :: dpco2                     ! difference of oceanic pCO2 minus atmospheric pCO2 [uatm]
+  Real(kind=8) :: ph                         ! pH on total scale
+  Real(kind=8) :: pco2                      ! oceanic partial pressure of CO2 (uatm)
+  Real(kind=8) :: fco2                      ! oceanic fugacity of CO2 (uatm)
+  Real(kind=8) :: co2                       ! aqueous CO2 concentration [mol/m^3]
+  Real(kind=8) :: hco3                      ! bicarbonate (HCO3-) concentration [mol/m^3]
+  Real(kind=8) :: co3                       ! carbonate (CO3--) concentration [mol/m^3]
+  Real(kind=8) :: OmegaA                    ! Omega for aragonite, i.e., the aragonite saturation state
+  Real(kind=8) :: OmegaC                    ! Omega for calcite, i.e., the   calcite saturation state
+  Real(kind=8) :: BetaD                     ! BetaD = Revelle factor   dpCO2/pCO2 / dDIC/DIC
+  Real(kind=8) :: rhoSW                     ! rhoSW  = in-situ density of seawater; rhoSW = f(s, t, p)
+  Real(kind=8) :: p                         ! pressure [decibars]; p = f(depth, latitude) if computed from depth [m] OR p = depth if [db]
+  Real(kind=8) :: tempis                    ! in-situ temperature [degrees C]
+  Real(kind=8) :: kw660                     ! gas transfer velocity (piston velocity) for CO2 [m/s] 
+  Real(kind=8) :: co2flux_seaicemask        ! air-to-sea flux of CO2 [mmol/m2/s]
+  Real(kind=8) :: o2flux_seaicemask        ! air-to-sea flux of CO2 [mmol/m2/s]
 !-------------------------------------------------------------------------------
 
   Real(kind=8) :: bt, dic_molal, talk_molal ! Common block: Species
   Real(kind=8) :: k1, k2, kw, kb, ff        ! Common block: Equilibrium_constants
-  Real(kind=8) :: Loc_ice_conc(1)           ! Used to calculate flux of DIC in REcoM 0 -> 1
-  Real(kind=8) :: LocAtmCO2(1)              ! [uatm]
+  Real(kind=8) :: FeDust                    ! [umol/m2/s]
+  Real(kind=8) :: NDust                     ! [mmol/m2/s]
+  Real(kind=8) :: Loc_ice_conc           ! Used to calculate flux of DIC in REcoM 0 -> 1
+  Real(kind=8) :: LocAtmCO2              ! [uatm]
   Real(kind=8) :: LocDiags2D(8)
   Real(kind=8) :: LocDenit
 !  if (REcoM_Second_Zoo) then
