@@ -5,6 +5,7 @@ This is the namelist recom
 	recom_binary_write    =.false.      ! Determines if tracervalue snapshots are saved. For fine grids it may crash the model to set this to true
 
 	recom_binary_init     = .false.     ! Restart from binary
+	REcoMDataPath         = '/home/fbirrien/NuArctic/nuarctic/REcoM1D/data/'
 	bgc_num               = 28 !24 !38
 	diags3d_num           = 8           ! Number of diagnostic 3d tracers to be saved
 	VDet                  = 20.d0       ! Sinking velocity, constant through the water column and positive downwards
@@ -24,17 +25,12 @@ This is the namelist recom
 	Graz_pref_new         = .true.    ! If it is true Fasham 1990, if not recom original variable preference
 	Diags                 = .true.
 	constant_CO2          = .true.
+	useAeolianN           = .false.      ! When set to true, aeolian nitrogen deposition is activated
+	UseFeDust             = .false.      ! Turns dust input of iron off when set to.false.
 	use_Fe2N              = .true.      ! use Fe2N instead of Fe2C, as in MITgcm version
 	use_photodamage       = .true.      ! use Alvarez et al (2018) for chlorophyll degradation
+        restore_alkalinity    = .true.
 	HetRespFlux_plus      = .true.      !MB More stable computation of zooplankton respiration fluxes adding a small number to HetN
-	REcoMDataPath         = '/work/ollie/ogurses/input/mesh_CORE2_finaltopo_mean/' !'/work/ollie/projects/MarESys/forcing/CORE2mesh/'
-	restore_alkalinity    = .true.
-	NitrogenSS            = .false.     ! When set to true, external sources and sinks of nitrogen are activated (Riverine, aeolian and denitrification)
-	useAeolianN           = .false.      ! When set to true, aeolian nitrogen deposition is activated
-	firstyearoffesomcycle = 1851        ! The first year of the actual physical forcing (e.g. JRA-55) used
-	lastyearoffesomcycle  = 1957        ! Last year of the actual physical forcing used
-	numofCO2cycles        = 1           ! Number of cycles of the forcing planned 
-	currentCO2cycle       = 1           ! Which CO2 cycle we are currently running
 	DIC_PI                = .true.
 	Nmocsy                = 1           ! Length of the vector that is passed to mocsy (always one for recom)
 	recom_debug           =.false.
