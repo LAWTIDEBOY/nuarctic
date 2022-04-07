@@ -25,30 +25,36 @@ EXECUTABLE=recom1D.exe
 ## Liste des sources
 SOURCES=recom_modules.F90        \
 	recom_clock.F90          \
-	ocean_ice_modules.F90        \
+	forcing_modules.F90      \
 	recom_setup.F90          \
 	recom_init.F90	         \
+	recom_extra.F90          \
+	recom_sms.F90		 \
+	recom_forcing.F90        \
+	recom_main.F90           \
 					REcoM1D_main.F90 
-
+	
 ## Liste des objets a partir des sources (changement .f90 en .o)               
 OBJETS=$(SOURCES:.f90=.o)
 
 ## Librairies
 LIB_NETCDF_PATH=/usr/include
-LIBS=-L$(LIB_NETCDF_PATH) -lnetcdf -lnetcdff
-#LIBS = -L/usr/lib -llapack -lblas
-#LIBS = /usr/lib64/atlas/liblapack.so.3 /usr/lib64/libblas.so.3
-#LIBS = -L/usr/lib -llapack.so.3 -lblas.so.3
+LIB_RECOM_PATH=/home/fbirrien/NuArctic/nuarctic/REcoM1D/src
+#RLIBS=-L$(LIB_RECOM_PATH) -lrecomlib.so
+NLIBS=-L$(LIB_NETCDF_PATH) -lnetcdf -lnetcdff
+
 ## Regle 0 de make, tout compiler 
 all: $(EXECUTABLE)
 ## Regle 1 de make, liens et creation de l'executable
 $(EXECUTABLE): $(OBJETS)
-	$(COMPILATEUR) $(OPTIONS) $^ -o $@ $(LIBS)
+	$(COMPILATEUR) $(OPTIONS) $^ -o $@ $(NLIBS) 
+#$(RLIBS)
  
       
 ## Regle 2 de make, compilation des objets separement
 %.o: %.f90
-	$(COMPILATEUR) -c $(OPTIONS) $^ -I$(LIB_NETCDF_PATH)
+	$(COMPILATEUR) -c $(OPTIONS) $^ -I$(LIB_NETCDF_PATH) 
+#$(RLIBS)
                
 
 clean:
