@@ -232,15 +232,15 @@ subroutine read_forcing(mesh)
    integer		:: Kz_varid, PAR_varid, sw_varid 
    integer		:: slp_varid, uw_varid, vw_varid
    integer		:: ndims, nvars
-   character(len=4096) :: variable_name
+   character(len=4096) :: variable_name, forcing_path
    character(len=4096) :: dname='time', lname='level'
    character(len=4096) :: iname = 'aice', Tname='temperature', Sname = 'salinity'
    character(len=4096) :: Pname = 'PAR', Swname='shortwave', Kname='Kz'
    character(len=4096) :: uwname= 'uatm', vwname='vatm', slpname='sea_level_pressure'
    !---------------------------------------------
+   call get_environment_variable("RECOM_FORCING_PATH", forcing_path)
    filename = trim(forcing_path) // trim(forcingname)
    
-
    ! initialization 
    ! dimensions
    nl=mesh%nl
@@ -452,11 +452,12 @@ subroutine read_deposition(mesh)
    integer		:: ndims_in, nvars_in, ngatts_in, unlimdimid_in
    integer		:: CO2_varid, Fe_varid, N_varid, dim_id
    integer		:: ndims, nvars
-   character(len=4096) :: variable_name
+   character(len=4096) :: variable_name, data_path
    character(len=4096) :: dname='time'
    character(len=4096) :: CO2name = 'CO2_deposition', Fename='Fe_deposition', Nname = 'N_deposition'
 
    !---------------------------------------------
+   call get_environment_variable("RECOM_DATA_PATH", data_path)
    filename = trim(data_path) // trim(atmdepositionname)
    
 

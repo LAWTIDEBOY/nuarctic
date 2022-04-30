@@ -70,14 +70,17 @@ contains
     implicit none
     integer          :: i, daystart, yearstart
     real(kind=8)    :: aux1, aux2, timestart
- 
+    character(len=4096) :: result_path, file_name
+
     ! the model initialized at
     timestart=timenew
     daystart=daynew
     yearstart=yearnew
 
     ! init clock for this run
-    open(99,file=trim(result_path)//trim(runid)//'.clock',status='unknown')
+    call get_environment_variable("RECOM_RESULT_PATH", result_path)
+    file_name=trim(result_path)//trim(runid)//'.clock'
+    open(99,file=file_name, status='unknown')
     read(99,*) timeold, dayold, yearold
     read(99,*) timenew, daynew, yearnew
     close(99)
@@ -132,6 +135,7 @@ contains
     real(kind=8)            :: dum_timenew     !time in a day, unit: sec
     integer                  :: dum_daynew       !day in a year
     integer                  :: dum_yearnew     !year before and after time step
+    character(len=4096) :: result_path, file_name
     
     dum_timenew = timenew
     dum_daynew  = daynew
@@ -141,8 +145,10 @@ contains
        dum_daynew=1
        dum_yearnew=yearold+1
     endif
-
-    open(99,file=trim(result_path)//trim(runid)//'.clock',status='unknown')
+    
+    call get_environment_variable("RECOM_RESULT_PATH", result_path)
+    file_name=trim(result_path)//trim(runid)//'.clock'
+    open(99,file=file_name,status='unknown')
     write(99,*) timeold, dayold, yearold
     write(99,*) dum_timenew, dum_daynew, dum_yearnew
     close(99)

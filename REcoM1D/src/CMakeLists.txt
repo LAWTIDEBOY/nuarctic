@@ -6,14 +6,11 @@ project(REcoM1D Fortran)
 
 # define work directory from which REcoM1D is compiled from (containing CMakeList.txt)
 set(src_home ${CMAKE_CURRENT_LIST_DIR}) 
-set(bin_dir  ${CMAKE_CURRENT_LIST_DIR}/../bin)
-#message(STATUS "bin dir: ${bin_dir}")
 
 # define path to and gather source file
 file(GLOB sources_Fortran ${src_home}/*.F90  
                           ${src_home}/recom/*.F90)
 
-add_subdirectory(${src_home}/async_threads_cpp)
 
 # include netcdf libraries                          
 include(${CMAKE_CURRENT_LIST_DIR}/../cmake/FindNETCDF.cmake)
@@ -55,15 +52,15 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE ${NETCDF_Fortran_INCLUDE_DIRECTORIES})
 # link to librairies
 target_link_libraries(${PROJECT_NAME} ${NETCDF_Fortran_LIBRARIES})
-target_link_libraries(${PROJECT_NAME} async_threads_cpp)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE Fortran)
 
 # executable
 # set path and
-#set(RECOM1D_INSTALL_FILEPATH "${CMAKE_CURRENT_LIST_DIR}/../bin/REcoM1D.exe" CACHE FILEPATH "file path to executable required")
-set(RECOM1D_INSTALL_FILEPATH "${bin_dir}/REcoM1D.exe" CACHE FILEPATH "file path to executable required")
+set(RECOM1D_INSTALL_FILEPATH "${CMAKE_CURRENT_LIST_DIR}/../bin/REcoM1D.x" CACHE FILEPATH "path where the executable is stored")
+
 get_filename_component(RECOM1D_INSTALL_PATH  ${RECOM1D_INSTALL_FILEPATH} DIRECTORY)
 get_filename_component(RECOM1D_INSTALL_NAME ${RECOM1D_INSTALL_FILEPATH} NAME)
+
 #create executable
-install(PROGRAMS ${PROJECT_BINARY_DIR}/${PROJECT_NAME} DESTINATION ${RECOM1D_INSTALL_PATH} RENAME ${RECOM1D_INSTALL_NAME})
+install(PROGRAMS ${PROJECT_BINARY_DIR}/${PROJECT_NAME} DESTINATION ${RECOM1D_INSTALL_PATH}/ RENAME ${RECOM1D_INSTALL_NAME})

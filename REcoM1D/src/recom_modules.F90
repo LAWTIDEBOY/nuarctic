@@ -58,11 +58,11 @@ module general_config
   namelist /forcingproperties/ forcingname, atmdepositionname
   !_____________________________________________________________________________
   ! *** Paths for all in and out ***
-  character(len=4096)        :: grid_path='./grid/'
-  character(len=4096)        :: forcing_path='./forcing/'  
-  character(len=4096)        :: data_path='./data/'
-  character(len=4096)        :: result_path='./result/'
-  namelist /paths/  grid_path, forcing_path, data_path, result_path
+  !character(len=4096)        :: grid_path='./grid/'
+  !character(len=4096)        :: forcing_path='./forcing/'  
+  !character(len=4096)        :: data_path='./data/'
+  !character(len=4096)        :: result_path='./result/'
+  !namelist /paths/  grid_path, forcing_path, data_path, result_path
   
   !_____________________________________________________________________________
   ! *** fleap_year ***

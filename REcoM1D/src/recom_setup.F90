@@ -18,30 +18,34 @@ subroutine read_namelist
                 
   implicit none
 
-  character(len=4096)   :: nmlfile
+  character(len=4096)   :: nml_file, nml_path
+  
   
   namelist /clockinit/ timenew, daynew, yearnew
+  
   !----------------------------------------
+  call get_environment_variable("RECOM_NAMELIST_PATH", nml_path)
   ! configuration namelist
-  nmlfile ='namelist.config'    ! name of general configuration namelist file
-  open (20,file=nmlfile)
+  nml_file =trim(nml_path)//trim('namelist.config')    ! name of general configuration namelist file
+  open (20,file=nml_file)
   read (20,NML=simulationname)
   read (20,NML=timestep)
   read (20,NML=clockinit)
   read (20,NML=meshproperties)
   read (20,NML=forcingproperties)  
-  read (20,NML=paths)
+  !read (20,NML=paths)
   close (20)
   dt=86400./real(step_per_day)
 
   ! ocean namelist (tracers related)
-  nmlfile='namelist.ocean'
-  open (20,file=nmlfile)
+  nml_file =trim(nml_path)//trim('namelist.ocean')
+  open (20,file=nml_file)
   read (20,NML=ocean_tracers)
   close(20)  
+  
   ! recom specific namelist
-  nmlfile ='namelist.recom' ! name of recom namelist file   !read (20,NML=precom_diag_list)
-  open (20,file=nmlfile)
+  nml_file =trim(nml_path)//trim('namelist.recom') ! name of recom namelist file   !read (20,NML=precom_diag_list)
+  open (20,file=nml_file)
   read (20,NML=pavariables)
   read (20,NML=pasinking)
   read (20,NML=painitialization_N)
@@ -100,10 +104,11 @@ subroutine read_mesh(mesh)
   integer		:: ndims, nvars
   real(kind=8) 		:: pi, puny
   !real (kind=8), dimension(:), allocatable :: lon, lat, dpth
-     
+  character(len=4096) :: grid_path
   character(len=4096) :: variable_name, lon_name, lat_name, dpth_name
   character(len=4096) :: dname='time', lname='nl'
    !---------------------------------------------
+  call get_environment_variable("RECOM_GRID_PATH", grid_path)
   filename = trim(grid_path) // trim(meshname)
   
   ! general 1D mesh characteristics
