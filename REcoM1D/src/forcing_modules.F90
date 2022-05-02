@@ -240,7 +240,7 @@ subroutine read_forcing(mesh)
    !---------------------------------------------
    call get_environment_variable("RECOM_FORCING_PATH", forcing_path)
    filename = trim(forcing_path) // trim(forcingname)
-   
+   print*, 'filename forcing: ', trim(filename)
    ! initialization 
    ! dimensions
    nl=mesh%nl
@@ -255,7 +255,9 @@ subroutine read_forcing(mesh)
    call forcing_setup
    
    ! read forcing from netcdf dedicated forcing file (pre-processed before simulation)
-   ! 
+   !
+   ! open file 
+   status=nf_open(trim(filename), nf_nowrite, ncid)
    ! check forcing array dimension
    ! 
    ! inquire time dimension
@@ -268,8 +270,8 @@ subroutine read_forcing(mesh)
    ! inquire level dimension
    status=nf_inq_dimid(ncid,trim(lname),dim_id)
    status=nf_inq_dim(ncid,dim_id,trim(lname),nlf)
-   if (nlf .ne. nl) then
-   	write(*,*) 'forcing and mesh nb of vertical levels are different, please check', nlf, nl
+   if (nlf .ne. nl-1) then
+   	write(*,*) 'forcing and mesh nb of vertical levels are different, please check', nlf, nl-1
    	return
    endif  
    !----------------------------------------------------------------------------
@@ -281,6 +283,7 @@ subroutine read_forcing(mesh)
    	!call handle_err(status)
    	write(*,*) 'no ice cover specified as forcing'
    endif
+   print*, size(aice_forcing)
    !----------------------------------------------------------------------------
    ! read wind
    ! u-wind    
@@ -291,6 +294,7 @@ subroutine read_forcing(mesh)
    	!call handle_err(status)
    	write(*,*) 'no wind specified as forcing'
    endif
+   print*, size(uatm_forcing)
    ! v-wind
    status=nf_inq_varid(ncid, trim(vwname), vw_varid)
    if (status .eq. NF_NOERR) then
@@ -413,6 +417,7 @@ subroutine forcing_setup
   allocate(temperature_forcing(nl, npt), salinity_forcing(nl, npt))
   allocate(Kz_forcing(nl, npt), PAR_forcing(nl,npt))
   allocate(shortwave_forcing(npt))
+  allocate(uatm_forcing(npt), vatm_forcing(npt), pressure_forcing(npt))
  
   ! array initialization
   aice_forcing = 0.d0
@@ -421,7 +426,9 @@ subroutine forcing_setup
   Kz_forcing = 0.d0
   PAR_forcing = 0.d0
   shortwave_forcing = 0.d0 
-
+  uatm_forcing = 0.d0
+  vatm_forcing = 0.d0  
+  pressure_forcing = 0.d0
 end subroutine
 
 end module
@@ -459,7 +466,6 @@ subroutine read_deposition(mesh)
    !---------------------------------------------
    call get_environment_variable("RECOM_DATA_PATH", data_path)
    filename = trim(data_path) // trim(atmdepositionname)
-   
 
    ! initialization 
    ! dimensions
