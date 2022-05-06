@@ -148,8 +148,7 @@ class FESOM_variables:
 
   def extract_variable(self, path_output, mesh):
     # extract variable on user-defined mesh
-    self.var = pf.get_data(path_output, self.varname, self.year, mesh, how='ori', compute=False)
-    print(self.var)  
+    self.var = pf.get_data(path_output, self.varname, self.year, mesh, how='ori', compute=False) 
 
   def extract_time(self, path_output):
     # extract associated output time (python ordinal dates)
@@ -161,7 +160,7 @@ def define_list_of_output_files(path):
   # variable of interest
   var_name = ['a_ice', 'Alk', 'benC', 'benN', 'benSi', 'pCO2','DetCalc', 'DetC', 'DetN', 'DetSi', 'DFe' , 'DiaC', 'DiaChl', 'DiaN', 'DiaSi', 'DIC', 'DIN', 'DOC' , 'DON' , 'HetC', 'HetN', 'idetz2calc', 'idetz2c', 'idetz2n', 'idetz2si', 'Kv', 'O2', 'PAR', 'pCO2s', 'PhyCalc', 'PhyC', 'PhyChl', 'PhyN', 'runoff', 'salt', 'temp', 'u', 'uice', 'v','vice','w', 'Zoo2C', 'Zoo2N']
 
-  #var_name = ['a_ice', 'DIC', 'DIN', 'DOC' , 'DON']
+  var_name = ['a_ice']
   # list of output file o be processed
 
   for vr in var_name:
@@ -268,7 +267,6 @@ for filename_FESOM in filelist:
   # store transect data
   #
   filename_transect = filename_FESOM.replace('/Outputs/','/Transects/').replace('.fesom.', '.transect.')
-  print(filename_transect)
   transect_outputs.to_netcdf(filename_transect)
 
   
