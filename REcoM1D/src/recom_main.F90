@@ -77,7 +77,7 @@ subroutine recom(istep,mesh)
 ! ======================================================================================
 !**************************gather variables for recom_forcing *****************************************				
   ! number of computation level
-  nzmax = nlevels-1
+  nzmax = nlevel-1
   
   ! local ice concentration and mean sea level pressure
   Loc_ice_conc = aice 
@@ -102,6 +102,9 @@ subroutine recom(istep,mesh)
   if (flag_PAR) then 
      SW = 0.d0
   else
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     !!!!!!!!!! regarder ici pour inclure la neige
+     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      SW = parFrac * shortwave
      SW = SW * (1.d0 - aice)
      PAR(1:nzmax) = 0.d0 

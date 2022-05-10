@@ -20,6 +20,7 @@ subroutine REcoM_computation(zNodes, Nn, state, SurfSW, Loc_slp, Temp, Sali, PAR
   use forcing_module
   use recom_extra
   use gasx, only : pistonvel, flxco2, o2flux
+  use recom_sms
 
 
   Implicit none
@@ -224,6 +225,87 @@ subroutine REcoM_computation(zNodes, Nn, state, SurfSW, Loc_slp, Temp, Sali, PAR
 deallocate(zF, SinkVel, thick, recipthick, sms, aux)
 
 end subroutine REcoM_computation
+
+!######################################################################################
+subroutine REcoM_mixing
+
+!--------------------------------------------------------------------
+! routine to solve vertical mixing of tracers due to turbulence 
+! The mixing  solves the equation: d/dz(kv*d(tracers)/dz (cf. MOPS)
+!--------------------------------------------------------------------
+
+  use recom_config
+  use ocean_module
+  Implicit none
+  
+  Integer                                       :: j, k
+  Integer         				:: nzmin, nzmax
+  Real(kind=8)                                  :: deepscale  
+  Real(kind=8), dimension(:), allocatable       :: dz_trr, flux
+  Real(kind=8), dimension(:), allocatable       :: deepflux, bc_bottom_tracers
+  
+  
+  nzmin = ulevel
+  nzmax = nlevel
+  
+  allocate (dz_trr(nzmax), flux(nzmax), deepflux(num_tracers), bc_bottom_tracers(num_tracers))
+  ! compute vertical discretization step (between center of each cell
+  dz_trr                = 0.0d0
+  dz_trr(nzmin+1:nzmax) = abs(Z(nzmin:nzmax-1) - Z(nzmin+1:nzmax))
+  dz_trr(nzmin)         = hnode(nzmin)/2.0d0
+
+  ! perform the mixing on each tracer  
+  do j = 3,num_tracers
+    flux=0.d0
+    ! compute the mixing flux in the water column
+    do k = max(2,nzmin), nzmax
+    	flux(k) = kz(k) * (tr_arr(k,j) - tr_arr(k-1,j))/dz_trr(k)
+    enddo 
+    !!!!!!
+    !!!!!!!!!!!!!!!!
+    !!!! and the flux with the surface ??????
+    !!!!!!!!!!!!!!!!
+    !!!!!!
+    
+    ! update the tracers accordingly
+    do k = max(2,nzmin), nzmax
+    	tr_arr(k-1,j) = tr_arr(k-1,j) + flux(k) / dz_trr(k-1)
+        tr_arr(k,j)   = tr_arr(k,j)   - flux(k) / dz_trr(k)
+    enddo
+  enddo
+
+  ! compute the residual flux across the lower boundary (might be negligible for significant depth)
+   bc_bottom_tracers = 0.d0
+   ! set boundary conditions at the bottom
+   do j = 6, num_tracers
+      if (j .eq. 6 .or. j .eq. 15) then
+  	  bc_bottom_tracers(j) = tiny_chl/chl2N_max
+      elseif (j .eq. 7 .or. j .eq. 16) then
+  	  bc_bottom_tracers(j) = tiny_chl/chl2N_max/NCmax
+      elseif (j .eq. 8 .or. j .eq. 17) then
+  	  bc_bottom_tracers(j) = tiny_chl
+      elseif (j .eq. 12 .or. j .eq. 26) then
+      	  bc_bottom_tracers(j) = tiny * Redfield  
+      elseif (j .eq. 18) then
+  	  bc_bottom_tracers(j) = tiny_chl/chl2N_max_d/NCmax_d/SiCmax
+      else
+          bc_bottom_tracers(j) = tiny
+      endif
+   enddo 
+   ! scale deep diffusion coefficient for cross-boundary flux, (0-> closed lower boundary) 
+   deepscale = 0.d0
+   ! compute flux at lower boundary   
+   do j = 3, num_tracers
+        ! flux
+        deepflux(j) = deepscale * kz(nzmax) *    &
+                     (bc_bottom_tracers(j) - tr_arr(nzmax,j)) / dz_trr(nzmax) 
+         ! tracer update at bottom boundary
+         tr_arr(nzmax,j) = tr_arr(nzmax,j) + deepflux(j)/dz_trr(nzmax)                    
+    enddo
+
+  deallocate (dz_trr, flux, deepflux, bc_bottom_tracers)
+  
+end subroutine
 
 end module REcoM_forcing
 

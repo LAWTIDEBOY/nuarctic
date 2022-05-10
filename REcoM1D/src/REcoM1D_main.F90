@@ -74,9 +74,13 @@ do istep=1,nsteps
 	call clock
 	! run main 
 	call recom(istep,mesh)
+	! update tracers
+	! 1) perform mixing (due to turbulence)
+	call recom_mixing
+	! 2) vertical diffusion and sinking
 
+	
 enddo
-
 
 
 !=============================================================================!

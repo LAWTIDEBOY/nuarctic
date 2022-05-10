@@ -38,10 +38,10 @@ subroutine read_namelist
   dt=86400./real(step_per_day)
 
   ! ocean namelist (tracers related)
-  nml_file =trim(nml_path)//trim('namelist.ocean')
-  open (20,file=nml_file)
-  read (20,NML=ocean_tracers)
-  close(20)  
+  !nml_file =trim(nml_path)//trim('namelist.ocean')
+  !open (20,file=nml_file)
+  !read (20,NML=ocean_tracers)
+  !sclose(20)  
   
   ! recom specific namelist
   nml_file =trim(nml_path)//trim('namelist.recom') ! name of recom namelist file   !read (20,NML=precom_diag_list)
@@ -213,14 +213,15 @@ subroutine get_spatial_configuration_step(istep,mesh)
   
   integer, intent(in) :: istep
   type(t_mesh), intent(in), target :: mesh
-  
+
   ! set current geo-coordinates
   geo_coords(:) = mesh%geo_coords(:,istep)
   ! set number of vertical levels concerned for vertical column computation (varies along the track)
-  nlevels=mesh%nlevels(istep)
+  ulevel=1
+  nlevel=mesh%nlevels(istep)
   ! set the depth of the different vertical nodes
   hnode=0.d0
-  hnode(1:nlevels-1) = zbar(1:nlevels-1) - zbar(2:nlevels)
+  hnode(1:nlevel-1) = zbar(1:nlevel-1) - zbar(2:nlevel)
 
 end subroutine
 
