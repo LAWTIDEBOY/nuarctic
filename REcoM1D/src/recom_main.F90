@@ -50,14 +50,12 @@ subroutine recom(istep,mesh)
 ! ======================================================================================
 
   real(kind=8)               :: SW, Loc_slp
-  integer                    :: tr_num
-  integer                    :: nz, n, nzmin, nzmax  
+  integer                    :: nzmax  
   integer                    :: idiags
 
-  real(kind=8)               :: Sali, net, net1, net2
+  !real(kind=8)               :: Sali
   !real (kind=8), allocatable :: Temp(:),  zr(:), PAR(:)
   real(kind=8),  allocatable :: C(:,:)
-  character(len=2)           :: tr_num_name
 ! ======================================================================================
   ! allocate local tracer array
   allocate(C(nl-1,bgc_num))
@@ -134,7 +132,7 @@ subroutine recom(istep,mesh)
 ! ======================================================================================
 !******************************** RECOM FORCING ****************************************
 
-  call REcoM_computation(Z(1:nzmax), nzmax, C, SW, Loc_slp, temperature(1:nzmax), salinity(1), PAR(1:nzmax))
+  call REcoM_computation(nzmax, C, SW, Loc_slp, temperature(1:nzmax), salinity(1), PAR(1:nzmax))
      
   ! update tracers subsequently
   tr_arr(1:nzmax, 3:num_tracers)  = C(1:nzmax, 1:bgc_num)

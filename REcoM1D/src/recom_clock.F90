@@ -23,8 +23,8 @@ contains
   subroutine clock
 
     implicit none
-    integer          :: i
-    real(kind=8)    :: aux1, aux2
+    integer     :: i
+    integer    	:: aux1, aux2
     !
     timeold=timenew 
     dayold=daynew

@@ -2,11 +2,13 @@
 module REcoM_setup
 
   use general_config
-  use REcOM_config 
+  use REcoM_config 
   use ocean_module
   use REcoM_clock
   
   implicit none
+  
+  integer		:: nsteps
   
   contains
   
@@ -33,6 +35,8 @@ subroutine read_namelist
   read (20,NML=clockinit)
   read (20,NML=meshproperties)
   read (20,NML=forcingproperties)  
+  read (20,NML=diagnostics)
+  read (20,NML=calendar)  
   !read (20,NML=paths)
   close (20)
   dt=86400./real(step_per_day)
@@ -97,15 +101,11 @@ subroutine read_mesh(mesh)
 
   type(t_mesh), intent(inout), target :: mesh
   character(len=4096)	:: filename
-  integer		:: i, ncid, status
-  integer		:: ndims_in, nvars_in, ngatts_in, unlimdimid_in
+  integer		:: ncid, status
   integer		:: lon_varid, lat_varid, dpth_varid, dim_id
   integer		:: zbar_varid, Z_varid, nlevels_varid 
-  integer		:: ndims, nvars
-  real(kind=8) 		:: pi, puny
   !real (kind=8), dimension(:), allocatable :: lon, lat, dpth
   character(len=4096) :: grid_path
-  character(len=4096) :: variable_name, lon_name, lat_name, dpth_name
   character(len=4096) :: dname='time', lname='nl'
    !---------------------------------------------
   call get_environment_variable("RECOM_GRID_PATH", grid_path)
@@ -163,13 +163,12 @@ subroutine read_mesh(mesh)
 end subroutine
 
 ! ==============================================================
-subroutine get_run_steps(nsteps)
+subroutine get_run_steps
   ! Coded by Qiang Wang
   !--------------------------------------------------------------
   use recom_clock
   
   implicit none
-  integer, intent(out) :: nsteps
   integer      :: i, temp_year, temp_mon, temp_fleapyear
 
   ! clock should have been inialized before calling this routine

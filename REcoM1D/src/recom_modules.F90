@@ -63,7 +63,12 @@ module general_config
   !character(len=4096)        :: data_path='./data/'
   !character(len=4096)        :: result_path='./result/'
   !namelist /paths/  grid_path, forcing_path, data_path, result_path
-  
+
+  !_____________________________________________________________________________
+  ! *** diagnostic frequency ***
+  integer		:: diag_freq
+  character		:: diag_freq_unit
+  namelist /diagnostics/ diag_freq, diag_freq_unit  
   !_____________________________________________________________________________
   ! *** fleap_year ***
   logical                       :: include_fleapyear=.false.
@@ -154,6 +159,7 @@ module recom_config
   Real(kind=8)           :: VPhy                  = 0.d0    !!! If the number of sinking velocities are different from 3, code needs to be changed !!!
   Real(kind=8)           :: VDia                  = 0.d0 
   logical                :: allow_var_sinking     = .true.   
+  Integer		 :: Sinking_scheme	  = 3  ! scheme to solve the Sinking (1:upwind, 3: 3rd order)
   Integer                :: biostep               = 1                    ! Number of times biology should be stepped forward for each time step		 
   logical                :: REcoM_Geider_limiter  = .false.              ! Decides what routine should be used to calculate limiters in sms
   logical                :: REcoM_Grazing_Variable_Preference = .true.  ! Decides if grazing should have preference for phyN or DiaN
@@ -171,26 +177,27 @@ module recom_config
   logical                :: use_Fe2N              = .false.    ! use Fe2N instead of Fe2C, as in MITgcm version
   logical                :: use_photodamage       = .false.    ! use Alvarez et al (2018) for chlorophyll degradation
   logical                :: HetRespFlux_plus      = .true.     !MB More stable computation of zooplankton respiration fluxes adding a small number to HetN
-  character(100)         :: REcoMDataPath         = ''
   logical                :: restore_alkalinity    = .true.
   logical                :: DIC_PI                = .true.
   integer                :: Nmocsy                = 1         ! Length of the vector that is passed to mocsy (always one for recom)
   logical                :: recom_debug           =.true.
   integer                :: benthos_num           = 4
 
-  namelist /pavariables/ REcoM_restart,         recom_binary_write,     &
-                       recom_binary_init,       REcoMDataPath,		&            
-                       bgc_num,                 diags3d_num,              &
-                       VDet,          VDet_zoo2,     &
-                       VPhy,                              VDia,                    &
-                       allow_var_sinking,                 biostep,               REcoM_Geider_limiter,    &
-                       REcoM_Grazing_Variable_Preference, REcoM_Second_Zoo,      Grazing_detritus,        &
-                       zoo2_fecal_loss,                   zoo2_initial_field,    het_resp_noredfield,     &
-                       diatom_mucus,                      Graz_pref_new,          &
-                       Diags      ,                       constant_CO2,           &
-                       useAeolianN,			  UseFeDust,              & 
-                       use_Fe2N,                          use_photodamage,        &
-                       restore_alkalinity,                HetRespFlux_plus,       &         
+  namelist /pavariables/ REcoM_restart,         recom_binary_write,         	&
+                       recom_binary_init,					&            
+                       bgc_num,                 diags3d_num,              	&
+                       VDet,          VDet_zoo2,     				&
+                       VPhy,                              VDia,                 &
+                       allow_var_sinking,                 Sinking_scheme,   	&		
+                       biostep,               REcoM_Geider_limiter,    		&
+                       REcoM_Grazing_Variable_Preference, REcoM_Second_Zoo,     &
+                       Grazing_detritus,		zoo2_fecal_loss,	&
+                       zoo2_initial_field,    het_resp_noredfield,   		&
+                       diatom_mucus,                      Graz_pref_new,        &
+                       Diags      ,                       constant_CO2,         &
+                       useAeolianN,			  UseFeDust,            & 
+                       use_Fe2N,                          use_photodamage,      &
+                       restore_alkalinity,                HetRespFlux_plus,     &         
                        DIC_PI,                            Nmocsy,                recom_debug,             &
                        benthos_num
 !!------------------------------------------------------------------------------

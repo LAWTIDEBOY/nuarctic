@@ -19,36 +19,32 @@ module recom_sms
     
 contains
 
-subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,SinkVel,zF,PARc)
+subroutine REcoM_sms_computation(Nn,state,thick,recipthick,SurfSR,sms,Temp,zF,PARc)
 
 
     implicit none
-    integer, intent(in)                                     :: Nn                   !< Total number of nodes in the vertical
-    real(kind=8),dimension(:,:),intent(inout) :: state                !< ChlA conc in phytoplankton [mg/m3]
+    integer, intent(in)                             	:: Nn                   !< Total number of nodes in the vertical
+    real(kind=8),dimension(:,:),intent(inout) 		:: state                !< ChlA conc in phytoplankton [mg/m3]
 									  	    !! should be in instead of inout
 
-    real(kind=8),dimension(:)                       :: thick                !< [m] Vertical distance between two nodes = Thickness 
-    real(kind=8),dimension(:)                       :: recipthick           !< [1/m] reciprocal of thick
-    real(kind=8), intent(in)                                :: SurfSR               !< [W/m2] ShortWave radiation at surface
+    real(kind=8),dimension(:), intent(in)             	:: thick                !< [m] Vertical distance between two nodes = Thickness 
+    real(kind=8),dimension(:), intent(in)               :: recipthick           !< [1/m] reciprocal of thick
+    real(kind=8), intent(in)                            :: SurfSR               !< [W/m2] ShortWave radiation at surface
 
-    real(kind=8),dimension(:,:),intent(inout) :: sms                  !< Source-Minus-Sinks term
-    real(kind=8),dimension(:)        ,intent(in)    :: Temp                 !< [degrees C] Ocean temperature
-    real(kind=8),dimension(:,:)      ,intent(in)    :: SinkVel
+    real(kind=8),dimension(:,:),intent(inout) 		:: sms                  !< Source-Minus-Sinks term
+    real(kind=8),dimension(:)        ,intent(in)    	:: Temp                 !< [degrees C] Ocean temperature
 
-    real(kind=8),dimension(:),intent(in)              :: zF                   !< [m] Depth of fluxes
-    real(kind=8),dimension(:),intent(inout)         :: PARc
-
-    real(kind=8)                                            :: net                  
-
-    real(kind=8)                                            :: dt_d                 !< Size of time steps [day]
-    real(kind=8)                                            :: dt_b                 !< Size of time steps [day]
-    real(kind=8)                                            :: dt_sink              !< Size of local time step
-    real(kind=8)                                            :: Fc                   !< Flux of labile C into sediment, used for denitrification calculation [umolC/cm2/s]
-    real(kind=8)                                            :: recip_hetN_plus      !< MB's addition to heterotrophic respiration
-    real(kind=8)                                            :: recip_res_het        !< [day] Reciprocal of respiration by heterotrophs and mortality (loss to detritus)
-
-    integer                                                 :: k,step,ii, idiags,n, aux
-    real(kind=8)                                            :: & 
+    real(kind=8),dimension(:),intent(in)              	:: zF                   !< [m] Depth of fluxes
+    real(kind=8),dimension(:),intent(inout)         	:: PARc
+                 
+    real(kind=8)                                  	:: dt_d                 !< Size of time steps [day]
+    real(kind=8)                                       	:: dt_b                 !< Size of time steps [day]
+    real(kind=8)                                      	:: recip_hetN_plus      !< MB's addition to heterotrophic respiration
+    real(kind=8)                                      	:: recip_res_het        !< [day] Reciprocal of respiration by heterotrophs and mortality (loss to detritus)
+    real(kind=8)                                      	:: Sink_Vel
+    real(kind=8)                                        :: aux
+    integer                                            	:: k,step,ii,n
+    real(kind=8)                                        :: & 
         DIN,     & !< Dissolved Inorganic Nitrogen 				[mmol/m3] 
         DIC,     & !< Dissolved Inorganic Carbon				[mmol/m3]
         Alk,     & !< Total Alkalinity					        [mmol/m3]
@@ -156,8 +152,10 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
 !            addtiny(k,3) = DiaSi   - (state(k,idiasi)        + sms(k,idiasi  )) 
 !            addtiny(k,4) = DetZ2Si - (state(k,idetz2si)      + sms(k,idetz2si  ))
 
+ 	    Sink_Vel = Vdet_a* abs(zF(k)) + Vdet
+            calc_diss = calc_diss_rate * Sink_Vel /20.d0
 
-            calc_diss      = calc_diss_rate * SinkVel(k,ivdet) /20.d0 ! Dissolution rate of CaCO3 scaled by the sinking velocity at the current depth 0.005714   !20.d0/3500.d0
+            !calc_diss      = calc_diss_rate * SinkVel(k,ivdet) /20.d0 ! Dissolution rate of CaCO3 scaled by the sinking velocity at the current depth 0.005714   !20.d0/3500.d0
             calc_diss2     = calc_diss_rate2  ! Dissolution rate of CaCO3 for seczoo
 
             quota          =  PhyN / PhyC ! include variability of the N: C ratio, cellular chemical composition 
@@ -412,27 +410,27 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
 !< pzDet: Maximum small detritus prefence by first zooplankton
 !< pzDetZ2: Maximum large detritus preference by first zooplankton
 
-                varpzPhy    = pzPhy   * PhyN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
-                varpzDia    = pzDia   * DiaN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
-                varpzDet    = pzDet   * DetN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
-                varpzDetZ2  = pzDetZ2 * DetN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
-!                aux         = pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N
-!                varpzPhy    = pzPhy   * PhyN /aux
-!                varpzDia    = pzDia   * DiaN /aux
-!                varpzDet    = pzDet   * DetN /aux
-!                varpzDetZ2  = pzDetZ2 * DetN /aux
+                !varpzPhy    = pzPhy   * PhyN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
+                !varpzDia    = pzDia   * DiaN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
+                !varpzDet    = pzDet   * DetN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
+                !varpzDetZ2  = pzDetZ2 * DetN /(pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N)
+                aux         = pzPhy*PhyN + pzDia*DiaN + PzDet*DetN + pzDetZ2*DetZ2N
+                varpzPhy    = pzPhy   * PhyN /aux
+                varpzDia    = pzDia   * DiaN /aux
+                varpzDet    = pzDet   * DetN /aux
+                varpzDetZ2  = pzDetZ2 * DetN /aux
             else
-!                DiaNsq      = DiaN**2
-!                PhyNsq      = PhyN**2
-!                DetNsq      = DetN**2
-!                DetZ2Nsq    = DetZ2N**2
-                PhyNsq      = PhyN * PhyN
+                DiaNsq      = DiaN**2
+                PhyNsq      = PhyN**2
+                DetNsq      = DetN**2
+                DetZ2Nsq    = DetZ2N**2
+                !PhyNsq      = PhyN * PhyN
                 varpzPhy    = pzPhy * PhyNsq /(sPhyNsq + PhyNsq)
-                DiaNsq      = DiaN * DiaN
+                !DiaNsq      = DiaN * DiaN
                 varpzDia    = pzDia * DiaNsq /(sDiaNsq + DiaNsq)
-                DetNsq      = DetN * DetN
+                !DetNsq      = DetN * DetN
                 varpzDet    = pzDet * DetNsq /(sDetNsq + DetNsq)
-                DetZ2Nsq    = DetZ2N * DetZ2N
+                !DetZ2Nsq    = DetZ2N * DetZ2N
                 varpzDetZ2  = pzDetZ2 * DetZ2Nsq /(sDetZ2Nsq + DetZ2Nsq)
 
             endif
@@ -491,17 +489,17 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
     if (REcoM_Grazing_Variable_Preference) then
        if (Grazing_detritus) then
           if (Graz_pref_new) then
-             varpzDia2      = pzDia2   * DiaN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
-             varpzPhy2      = pzPhy2   * PhyN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
-             varpzHet       = pzHet    * HetN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)  
-             varpzDet2      = pzDet2   * DetN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
-             varpzDetZ22    = pzDetZ22 * DetZ2N /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
-!             aux            = pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N
-!             varpzDia2      = pzDia2   * DiaN   /aux
-!             varpzPhy2      = pzPhy2   * PhyN   /aux
-!             varpzHet       = pzHet    * HetN   /aux  
-!             varpzDet2      = pzDet2   * DetN   /aux
-!             varpzDetZ22    = pzDetZ22 * DetZ2N /aux
+!             varpzDia2      = pzDia2   * DiaN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
+!             varpzPhy2      = pzPhy2   * PhyN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
+!             varpzHet       = pzHet    * HetN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)  
+!             varpzDet2      = pzDet2   * DetN   /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
+!             varpzDetZ22    = pzDetZ22 * DetZ2N /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N)
+             aux            = pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN + pzDet2 * DetN + pzDetZ22 * DetZ2N
+             varpzDia2      = pzDia2   * DiaN   /aux
+             varpzPhy2      = pzPhy2   * PhyN   /aux
+             varpzHet       = pzHet    * HetN   /aux  
+             varpzDet2      = pzDet2   * DetN   /aux
+             varpzDetZ22    = pzDetZ22 * DetZ2N /aux
           else
              DiaNsq2        = DiaN * DiaN
              varpzDia2      = pzDia2 * DiaNsq2 /(sDiaNsq2 + DiaNsq2)
@@ -524,13 +522,13 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
           fDetZ2N2       = varpzDetZ22 * DetZ2N
        else
           if (Graz_pref_new) then
-             varpzDia2      = pzDia2 * DiaN /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN)
-             varpzPhy2      = pzPhy2 * PhyN /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN)
-             varpzHet       = pzHet * HetN /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN)
-!             aux            = pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN
-!             varpzDia2      = pzDia2 * DiaN /aux
-!             varpzPhy2      = pzPhy2 * PhyN /aux
-!             varpzHet       = pzHet  * HetN /aux
+!             varpzDia2      = pzDia2 * DiaN /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN)
+!             varpzPhy2      = pzPhy2 * PhyN /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN)
+!             varpzHet       = pzHet * HetN /(pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN)
+             aux            = pzPhy2 * PhyN + PzDia2 * DiaN + pzHet * HetN
+             varpzDia2      = pzDia2 * DiaN /aux
+             varpzPhy2      = pzPhy2 * PhyN /aux
+             varpzHet       = pzHet  * HetN /aux
 
           else
              DiaNsq2        = DiaN * DiaN
@@ -646,21 +644,25 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
        qlimitFac     = min(qLimitFac,qlimitFacTmp)
        feLimitFac  = Fe/(k_Fe_d + Fe)
        qlimitFac   = min(qlimitFac,feLimitFac)
-       if (REcoM_Second_Zoo) then 
-          aggregationrate = agg_PD * DetN + agg_PD * DetZ2N &
-                             + agg_PP * PhyN + agg_PP * (1 - qlimitFac) * DiaN
-       else
-          aggregationrate = agg_PD * DetN + agg_PP * PhyN &
-                             + agg_PP * (1 - qlimitFac) * DiaN
-       endif
+!       if (REcoM_Second_Zoo) then 
+!          aggregationrate = agg_PD * DetN + agg_PD * DetZ2N + agg_PP * PhyN + agg_PP * (1 - qlimitFac) * DiaN
+!       else
+!          aggregationrate = agg_PD * DetN                   + agg_PP * PhyN + agg_PP * (1 - qlimitFac) * DiaN
+!       endif
+       aggregationrate = agg_PD * DetN + agg_PP * PhyN + agg_PP * (1 - qlimitFac) * DiaN
+       if (REcoM_Second_Zoo) aggregationrate = aggregationrate + agg_PD * DetZ2N
+
+
     else
-       if (REcoM_Second_Zoo) then
-          aggregationrate = agg_PD * DetN + agg_PD * DetZ2N &
-                             + agg_PP * PhyN + agg_PP * DiaN
-       else
-          aggregationrate = agg_PD * DetN + agg_PP * PhyN &
-                             + agg_PP * DiaN
-       endif
+
+!       if (REcoM_Second_Zoo) then
+!          aggregationrate = agg_PD * DetN + agg_PD * DetZ2N + agg_PP * PhyN + agg_PP * DiaN
+!       else
+!          aggregationrate = agg_PD * DetN                   + agg_PP * PhyN + agg_PP * DiaN
+!       endif
+       aggregationrate = agg_PD * DetN + agg_PP * PhyN + agg_PP * DiaN
+       if (REcoM_Second_Zoo) aggregationrate = aggregationrate + agg_PD * DetZ2N
+
     endif
 !-------------------------------------------------------------------------------
 ! Phytoplankton and detritus aggregation
@@ -668,24 +670,19 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
 !                    + agg_PP * DiaN
 !-------------------------------------------------------------------------------
 ! Terms required for the formation and dissolution of CaCO3
-!#ifdef REcoM_calcification
 !< calc_prod_ratio: Calcite production ratio, dimensionless
     calcification = calc_prod_ratio * Cphot * PhyC   ! Z in equations
     calc_loss_agg = aggregationRate * PhyCalc
 
-    if(REcoM_Second_Zoo)  then
-!     calc_loss_gra  = (grazingFlux_phy + grazingFlux_phy2)  &
-!                     * recipQuota/(PhyC + tiny)    * PhyCalc
-       calc_loss_gra  =  grazingFlux_phy   &
-                       * recipQuota/(PhyC + tiny)    * PhyCalc
-       calc_loss_gra2 = grazingFlux_phy2           &
-                       * recipQuota/(PhyC + tiny)    * PhyCalc
-    else
-       calc_loss_gra = grazingFlux_phy           &
-                       * recipQuota/(PhyC + tiny)    * PhyCalc
-    endif
+    calc_loss_gra = grazingFlux_phy          &
+                  * recipQuota/(PhyC + tiny) &  
+                  * PhyCalc
+
+    if (REcoM_Second_Zoo) calc_loss_gra2 = grazingFlux_phy2         &
+                                         * recipQuota/(PhyC + tiny) &
+                                         * PhyCalc
  
-!#endif
+
 		
 !-------------------------------------------------------------------------------
 ! Sources minus sinks are calculated
@@ -774,26 +771,23 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
             + 1.0625 * N_assim             * PhyC    &
             + 1.0625 * N_assim_Dia         * DiaC    &
             - 1.0625 * rho_N * arrFunc     * DON     &
-!#ifdef REcoM_calcification     
+
             + 2.d0 * calc_diss             * DetCalc &
             + 2.d0 * calc_loss_gra * calc_diss_guts  &
             + 2.d0 * calc_loss_gra2 * calc_diss_guts &
             + 2.d0 * calc_diss2            * DetZ2Calc &
-            - 2.d0 * calcification                   &
-!#endif                       
+            - 2.d0 * calcification                   &                    
                                              ) * dt_b + sms(k,ialk)
     else
         sms(k,ialk)      = (                       &
             + 1.0625 * N_assim             * PhyC    &
             + 1.0625 * N_assim_Dia         * DiaC    &
             - 1.0625 * rho_N * arrFunc     * DON     &
-!#ifdef REcoM_calcification
+
             + 2.d0 * calc_diss             * DetCalc &
             + 2.d0 * calc_loss_gra * calc_diss_guts  &
             - 2.d0 * calcification                   &
-!      + LocRiverAlk                             &
-!#endif 
-                                             ) * dt_b + sms(k,ialk) 
+                                ) * dt_b + sms(k,ialk) 
     endif
 !____________________________________________________________
 !< Small phytoplankton
@@ -1545,17 +1539,6 @@ subroutine REcoM_sms_computation(n,Nn,state,thick,recipthick,SurfSR,sms,Temp,Sin
     decayBenthos(4) = calc_diss * LocBenthos(4)
     LocBenthos(4)      = LocBenthos(4)   - decayBenthos(4) * dt_b ! / depth of benthos
 
-!*** DFe ***
-!  if(use_Fe2N) then 
-!    Ironflux          = decayRateBenN * LocBenthos(1) * Fe2N_benthos
-!  else
-!    Ironflux          = decayRateBenC * LocBenthos(2) * Fe2C_benthos
-!  end if
-!  sms(Nn,ife)       = sms(Nn,ife) + Ironflux * recipthick(Nn) * dt_b
-
-!*** O2 ***
-!   sms(Nn,ioxy)    = sms(Nn,ioxy) - decayBenthos(2) * redO2C *dt_b  &
-!                      * recipthick(Nn)
 
   end do ! Main time loop ends
 

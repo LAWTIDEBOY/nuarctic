@@ -27,7 +27,6 @@ subroutine recom_initialization(mesh)
     implicit none
 !#include "netcdf.inc"
 
-    integer     :: n
     type(t_mesh), intent(in) , target :: mesh
 !==============================================================================================================================================
    ! nb_of_nodes=mesh%nb_of_nodes
@@ -168,6 +167,15 @@ endif
 write(*,*) 'Tracers have been initialized as spinup from WOA/glodap netcdf files'
 
 end subroutine recom_initialization
+
+subroutine deallocate_flux
+
+    deallocate(GlodecayBenthos, PAR3D, Benthos, LocBenthos, decayBenthos)   
+    deallocate(wFluxPhy, wFluxDia, GlowFluxDet, wFluxDet)
+    deallocate(GlowFluxPhy, GlowFluxDia)
+    deallocate(addtiny, Gloaddtiny, auxy)
+
+end subroutine
 
 end module recom_init
 

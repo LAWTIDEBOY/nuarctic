@@ -34,7 +34,7 @@ if(${CMAKE_Fortran_COMPILER_ID} STREQUAL  Intel )
 elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL  GNU )
 	# allow debugging
 	if(${DEBUGGING})
-		target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g -fbacktrace -ffree-line-length-none)
+		target_compile_options(${PROJECT_NAME} PRIVATE -O0 -g -fbacktrace -ffree-line-length-none -fcheck=all -Wall)
 	else()
 	# optimized compiling
 		target_compile_options(${PROJECT_NAME} PRIVATE -O3 -finit-local-zero  -finline-functions -march=native -fimplicit-none  -fdefault-real-8 -ffree-line-length-none)

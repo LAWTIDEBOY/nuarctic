@@ -98,7 +98,6 @@ subroutine Cobeta
   Real(kind=8)                     :: yDay                  ! yearfrac in radians [0 2*pi]
   Real(kind=8)                     :: declination   = 0.d0  ! Declination of the sun at present lat and time
   Real(kind=8)                     :: CosAngleNoon  = 0.d0  ! Cos(Angle of Incidence) at Noon ?
-  integer                          :: n
 
 ! Constants
   Real(kind=8)		           :: nWater        = 1.33 
