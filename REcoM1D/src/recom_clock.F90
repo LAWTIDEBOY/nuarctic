@@ -76,16 +76,14 @@ contains
     timestart=timenew
     daystart=daynew
     yearstart=yearnew
-
     ! init clock for this run
     call get_environment_variable("RECOM_RESULT_PATH", result_path)
     file_name=trim(result_path)//trim(runid)//'.clock'
-    open(99,file=file_name, status='unknown')
+    open(99,file=trim(file_name), status='unknown')
     read(99,*) timeold, dayold, yearold
     read(99,*) timenew, daynew, yearnew
     close(99)
     if(daynew==0) daynew=1
-    
     ! check if this is a restart or not
     if(yearnew==yearstart .and. daynew==daystart .and. timenew==timestart) then
        r_restart=.false.

@@ -41,7 +41,6 @@ call clock_init
 
 call get_run_steps
 
-
 ! Read mesh data (time and vertical grid)
 call read_mesh(mesh)
 
@@ -59,7 +58,6 @@ call atm_setup
 
 ! diagnostics
 call setup_diagnostics(.True.)
-
 
 ! initialize REcoM arrays
 call recom_initialization(mesh)
@@ -81,7 +79,7 @@ print*, 'initialization done'
 ! 
 print*, 'start computation loop'
 do istep=1,nsteps
-        print*, istep, nsteps
+        !print*, istep, nsteps
 	! update time
 	call clock
 

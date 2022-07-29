@@ -2,10 +2,10 @@
 module ocean_module
   ! Ocean module that gather ocean variables and related routines that are required  REcOM1D (derived from FESOM2)
   implicit none
-  save
+
   
-  integer :: num_tracers=30
-  integer, dimension(30) :: tracer_ID 
+  integer, parameter :: num_tracers=30
+  integer, dimension(num_tracers) :: tracer_ID 
   real(kind=8), allocatable :: tr_arr(:,:)
   
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -45,6 +45,7 @@ module ocean_module
   ! from Heterotroph (1st group of zooplankton)
   ! 9)  Concentration of Nitrogen in detritus				(DetN)		(ID:1007)
   ! 10) Concentration of Carbon in detritus				(DetC)		(ID:1008)
+  ! 19) Concentration of Silicate in detritus                           (DetSi)         (ID:1017)
   ! from 2nd group of zooplankton
   ! 27) Concentration of Nitrogen in detritus				(idetz2n)	(ID:1025)
   ! 28) Concentration of Carbon in detritus				(idetz2c)	(ID:1026)
@@ -61,7 +62,7 @@ module ocean_module
   ! 24) concentration in dioxygen					(O2)		(ID:1022)
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ! depth related ALE arrays
-  integer :: nlevels
+  integer :: nlevel, ulevel
   real(kind=8), allocatable,dimension(:)   :: hnode, zbar, Z
 
   ! geo coordinates along the simulated track
@@ -70,16 +71,20 @@ module ocean_module
   ! forcing variables
   real(kind=8), allocatable, dimension(:) :: temperature, salinity, Kz, PAR
   real(kind=8)				  :: shortwave
-  
+      
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ! ocean namelist
-  namelist /ocean_tracers/ num_tracers, tracer_ID 
+  !! ocean namelist
+  !namelist /ocean_tracers/ num_tracers, tracer_ID 
+  data tracer_ID / 0, 1, 1001, 1002, 1003, 1004, 1005, 1006, &
+                 1007, 1008, 1009, 1010, 1011, 1012, 1013, &
+                 1014, 1015, 1016, 1017, 1018, 1019, 1020, &
+                 1021, 1022, 1023, 1024, 1025, 1026, 1027, 1028 /
   contains
   !
   !--------------------------------------------------------------------------------
   !
 
-subroutine ocean_setup(mesh)
+subroutine ocean_setup(mesh, boolean)
   ! 
   ! allocate and initialize ocean related arrays
   ! 
@@ -90,10 +95,11 @@ subroutine ocean_setup(mesh)
   implicit none
   
   type(t_mesh), intent(in), target :: mesh
-  
+  logical, intent(in)		   :: boolean
   integer :: i
   !
   !
+  if (boolean) then
   nl=mesh%nl
   !nb_of_nodes=mesh%nb_of_nodes
   
@@ -144,6 +150,14 @@ subroutine ocean_setup(mesh)
   PAR		= 0.d0
   Kz		= 0.d0
   
+  else
+  	deallocate(tr_arr, geo_coords)
+	deallocate(hnode, zbar, Z)
+	deallocate(temperature)
+	deallocate(salinity)
+	deallocate(PAR)
+	deallocate(Kz)
+ endif
 end subroutine  
 
 end module
@@ -160,7 +174,7 @@ module ice_module
 
 subroutine ice_setup
   ! 
-  ! allocate and initialize ocean related arrays
+  ! initialize ice related arrays
   ! 
   aice=1.d0
 end subroutine
@@ -192,7 +206,6 @@ end module
 module forcing_module
   ! Ocean module that gather ocean variables and related routines that are required  REcOM1D (derived from FESOM2)
   implicit none
-  save
    
    ! temperature and salinity
    real(kind=8), allocatable, dimension(:,:)  :: temperature_forcing, salinity_forcing
@@ -227,12 +240,10 @@ subroutine read_forcing(mesh)
    integer		:: start1(1), count1(1), start2(2), count2(2)
    character(len=4096)	:: filename
    integer		:: i, ncid, status, nptf, nlf
-   integer		:: ndims_in, nvars_in, ngatts_in, unlimdimid_in
    integer		:: aice_varid, T_varid, S_varid, dim_id
    integer		:: Kz_varid, PAR_varid, sw_varid 
    integer		:: slp_varid, uw_varid, vw_varid
-   integer		:: ndims, nvars
-   character(len=4096) :: variable_name, forcing_path
+   character(len=4096) :: forcing_path
    character(len=4096) :: dname='time', lname='level'
    character(len=4096) :: iname = 'aice', Tname='temperature', Sname = 'salinity'
    character(len=4096) :: Pname = 'PAR', Swname='shortwave', Kname='Kz'
@@ -249,10 +260,10 @@ subroutine read_forcing(mesh)
    start1=1
    count1=npt
    start2=(/1, 1/)
-   count2=(/npt, nl/)
-   allocate(tmp(npt,nl))
+   count2=(/npt, nl-1/)
+   allocate(tmp(npt,nl-1))
    ! initialize/allocate arrays
-   call forcing_setup
+   call forcing_setup(.True.)
    
    ! read forcing from netcdf dedicated forcing file (pre-processed before simulation)
    !
@@ -283,7 +294,7 @@ subroutine read_forcing(mesh)
    	!call handle_err(status)
    	write(*,*) 'no ice cover specified as forcing'
    endif
-   print*, size(aice_forcing)
+
    !----------------------------------------------------------------------------
    ! read wind
    ! u-wind    
@@ -294,7 +305,7 @@ subroutine read_forcing(mesh)
    	!call handle_err(status)
    	write(*,*) 'no wind specified as forcing'
    endif
-   print*, size(uatm_forcing)
+   
    ! v-wind
    status=nf_inq_varid(ncid, trim(vwname), vw_varid)
    if (status .eq. NF_NOERR) then
@@ -318,7 +329,6 @@ subroutine read_forcing(mesh)
    if (status .eq. NF_NOERR) then
    	status=nf_get_vara_double(ncid,T_varid, start2, count2, tmp)
    	temperature_forcing=transpose(tmp)
-   	
    else
    	!call handle_err(status)
    	write(*,*) 'no temperature profile specified as forcing'
@@ -333,7 +343,6 @@ subroutine read_forcing(mesh)
    	!call handle_err(status)
    	write(*,*) 'no salinity profile specified as forcing'
    endif   
-   
    
    ! read turbulence in the water column
    status=nf_inq_varid(ncid, Kname, Kz_varid)
@@ -363,8 +372,6 @@ subroutine read_forcing(mesh)
    		write(*,*) 'no surface shortwave radiation and/or PAR are specified as forcing'
    	endif
    endif    
-     
-     
      
    status=nf_close(ncid)
    deallocate(tmp)
@@ -402,7 +409,7 @@ subroutine get_forcing(istep)
     
 end subroutine
 
-subroutine forcing_setup
+subroutine forcing_setup(boolean)
   ! 
   ! allocate and initialize ocean related arrays
   ! 
@@ -410,25 +417,32 @@ subroutine forcing_setup
   use REcoM_config
   use REcoM_GloVar
   
+  implicit none
   
-  ! allocation of the forcing variables
+  logical, intent(in)	:: boolean
   
-  allocate(aice_forcing(npt))
-  allocate(temperature_forcing(nl, npt), salinity_forcing(nl, npt))
-  allocate(Kz_forcing(nl, npt), PAR_forcing(nl,npt))
-  allocate(shortwave_forcing(npt))
-  allocate(uatm_forcing(npt), vatm_forcing(npt), pressure_forcing(npt))
- 
-  ! array initialization
-  aice_forcing = 0.d0
-  temperature_forcing = 0.d0
-  salinity_forcing = 0.d0
-  Kz_forcing = 0.d0
-  PAR_forcing = 0.d0
-  shortwave_forcing = 0.d0 
-  uatm_forcing = 0.d0
-  vatm_forcing = 0.d0  
-  pressure_forcing = 0.d0
+  if (boolean) then
+  	! allocation of the forcing variables
+  	allocate(aice_forcing(npt))
+  	allocate(temperature_forcing(nl-1, npt), salinity_forcing(nl-1, npt))
+  	allocate(Kz_forcing(nl-1, npt), PAR_forcing(nl-1,npt))
+  	allocate(shortwave_forcing(npt))
+  	allocate(uatm_forcing(npt), vatm_forcing(npt), pressure_forcing(npt))
+  	! array initialization
+  	aice_forcing = 0.d0
+  	temperature_forcing = 0.d0
+  	salinity_forcing = 0.d0
+  	Kz_forcing = 0.d0
+  	PAR_forcing = 0.d0
+  	shortwave_forcing = 0.d0 
+  	uatm_forcing = 0.d0
+  	vatm_forcing = 0.d0  
+  	pressure_forcing = 0.d0
+  else
+  	deallocate(aice_forcing, temperature_forcing, salinity_forcing)
+  	deallocate(Kz_forcing, PAR_forcing, shortwave_forcing)
+  	deallocate(uatm_forcing, vatm_forcing, pressure_forcing)
+  endif
 end subroutine
 
 end module
@@ -455,11 +469,9 @@ subroutine read_deposition(mesh)
    real(kind=8), allocatable, dimension(:) :: tmp
    integer		:: start1(1), count1(1)
    character(len=4096)	:: filename
-   integer		:: i, ncid, status, nptf, nlf
-   integer		:: ndims_in, nvars_in, ngatts_in, unlimdimid_in
+   integer		:: i, ncid, status, nptf
    integer		:: CO2_varid, Fe_varid, N_varid, dim_id
-   integer		:: ndims, nvars
-   character(len=4096) :: variable_name, data_path
+   character(len=4096) :: data_path
    character(len=4096) :: dname='time'
    character(len=4096) :: CO2name = 'CO2_deposition', Fename='Fe_deposition', Nname = 'N_deposition'
 
@@ -475,7 +487,7 @@ subroutine read_deposition(mesh)
    count1=npt
    allocate(tmp(npt))
    ! initialize/allocate arrays
-   call deposition_setup
+   call deposition_setup(.True.)
    
    ! read atm deposition from netcdf dedicated deposition file (pre-processed before simulation)
    status=nf_open(trim(filename), nf_nowrite, ncid)
@@ -490,7 +502,7 @@ subroutine read_deposition(mesh)
    	return
    endif
    !----------------------------------------------------------------------------
-   ! read CO2 depsosition
+   ! read CO2 deposition
    status=nf_inq_varid(ncid, trim(CO2name), CO2_varid)
    if (status .eq. NF_NOERR) then
    	status=nf_get_vara_double(ncid,CO2_varid, start1,count1,CO2_forcing)
@@ -524,6 +536,7 @@ end subroutine
 subroutine get_atm_deposition(istep)
     use REcoM_config
     use REcoM_GloVar
+    
     implicit none
     
     integer, intent(in) :: istep
@@ -553,20 +566,29 @@ subroutine get_atm_deposition(istep)
 
 end subroutine
 
-subroutine deposition_setup
+subroutine deposition_setup(boolean)
+
+  use REcoM_config
+  
+  implicit none
+  logical, intent(in) :: boolean
   ! 
   ! allocate and initialize arrays related to atm deposition
   ! 
-  use REcoM_config
+
   
-  ! allocation of the forcing variables
-  allocate(CO2_forcing(npt), Fe_forcing(npt), N_forcing(npt))
+  if (boolean) then
+  	! allocation of the forcing variables
+  	allocate(CO2_forcing(npt), Fe_forcing(npt), N_forcing(npt))
 
-  ! array initialization
-  CO2_forcing = 0.d0
-  Fe_forcing = 0.d0
-  N_forcing = 0.d0
-
+  	! array initialization
+  	CO2_forcing = 0.d0
+  	Fe_forcing = 0.d0
+ 	N_forcing = 0.d0
+  else
+	deallocate(CO2_forcing, Fe_forcing, N_forcing)
+  endif  
+  	
 end subroutine
 
 end module

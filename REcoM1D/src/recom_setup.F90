@@ -40,7 +40,7 @@ subroutine read_namelist
   !read (20,NML=paths)
   close (20)
   dt=86400./real(step_per_day)
-
+  
   ! ocean namelist (tracers related)
   !nml_file =trim(nml_path)//trim('namelist.ocean')
   !open (20,file=nml_file)
@@ -101,6 +101,7 @@ subroutine read_mesh(mesh)
 
   type(t_mesh), intent(inout), target :: mesh
   character(len=4096)	:: filename
+  Real(kind=8),dimension(:),allocatable  :: tmp
   integer		:: ncid, status
   integer		:: lon_varid, lat_varid, dpth_varid, dim_id
   integer		:: zbar_varid, Z_varid, nlevels_varid 
@@ -126,7 +127,7 @@ subroutine read_mesh(mesh)
   status=nf_inq_dim(ncid,dim_id,trim(dname),mesh%npt)
 
   ! allocate coordinates arrays
-  allocate(mesh%geo_coords(2,mesh%npt), mesh%depth(mesh%npt))
+  allocate(mesh%geo_coords(2,mesh%npt), mesh%depth(mesh%npt), tmp(mesh%npt))
 
   ! inquire variable ids
   status=nf_inq_varid(ncid, 'longitude', lon_varid)
@@ -134,8 +135,10 @@ subroutine read_mesh(mesh)
   status=nf_inq_varid(ncid, 'depth', dpth_varid)
   
   ! read variables
-  status=nf_get_vara_double(ncid,lon_varid,1,mesh%npt,mesh%geo_coords(1,:))
-  status=nf_get_vara_double(ncid,lat_varid,1,mesh%npt,mesh%geo_coords(2,:))
+  status=nf_get_vara_double(ncid,lon_varid,1,mesh%npt,tmp)
+  mesh%geo_coords(1,:) = tmp
+  status=nf_get_vara_double(ncid,lat_varid,1,mesh%npt,tmp)
+  mesh%geo_coords(2,:) = tmp
   status=nf_get_vara_double(ncid,dpth_varid,1,mesh%npt,mesh%depth)
 
   !
@@ -159,7 +162,7 @@ subroutine read_mesh(mesh)
   status=nf_get_vara_int(ncid,nlevels_varid,1,mesh%npt, mesh%nlevels) 
   
   status=nf_close(ncid)
-  
+  deallocate (tmp)
 end subroutine
 
 ! ==============================================================
