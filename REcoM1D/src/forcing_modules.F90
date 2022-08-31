@@ -143,7 +143,7 @@ subroutine ocean_setup(mesh, boolean)
   ! forcing ocean data: temperature, salinity, PAR, Kz
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ! allocation
-  allocate(temperature(nl-1), salinity(nl-1), PAR(nl-1), Kz(nl-1))
+  allocate(temperature(nl-1), salinity(nl-1), PAR(nl-1), Kz(nl))
   ! initialization
   temperature 	= 0.d0
   salinity 	= 0.d0
@@ -236,8 +236,8 @@ subroutine read_forcing(mesh)
 #include "netcdf.inc" 
 
    type(t_mesh), intent(in), target :: mesh
-   real(kind=8), allocatable, dimension(:,:) :: tmp
-   integer		:: start1(1), count1(1), start2(2), count2(2)
+   real(kind=8), allocatable, dimension(:,:) :: tmp, tmp2
+   integer		:: start1(1), count1(1), start2(2), count2(2), start3(2), count3(2)
    character(len=4096)	:: filename
    integer		:: i, ncid, status, nptf, nlf
    integer		:: aice_varid, T_varid, S_varid, dim_id
@@ -261,7 +261,7 @@ subroutine read_forcing(mesh)
    count1=npt
    start2=(/1, 1/)
    count2=(/npt, nl-1/)
-   allocate(tmp(npt,nl-1))
+   allocate(tmp(npt,nl-1), tmp2(npt,nl))
    ! initialize/allocate arrays
    call forcing_setup(.True.)
    
@@ -347,8 +347,8 @@ subroutine read_forcing(mesh)
    ! read turbulence in the water column
    status=nf_inq_varid(ncid, Kname, Kz_varid)
    if (status .eq. NF_NOERR) then
-   	status=nf_get_vara_double(ncid,Kz_varid,start2,count2,tmp)
-	Kz_forcing = transpose(tmp)
+   	status=nf_get_vara_double(ncid,Kz_varid,start3,count3,tmp2)
+	Kz_forcing = transpose(tmp2)
    else
    	!call handle_err(status)
    	write(*,*) 'no turbulence profile specified as forcing'
@@ -375,6 +375,7 @@ subroutine read_forcing(mesh)
      
    status=nf_close(ncid)
    deallocate(tmp)
+
 end subroutine
 
 subroutine get_forcing(istep)
@@ -425,7 +426,7 @@ subroutine forcing_setup(boolean)
   	! allocation of the forcing variables
   	allocate(aice_forcing(npt))
   	allocate(temperature_forcing(nl-1, npt), salinity_forcing(nl-1, npt))
-  	allocate(Kz_forcing(nl-1, npt), PAR_forcing(nl-1,npt))
+  	allocate(Kz_forcing(nl, npt), PAR_forcing(nl-1,npt))
   	allocate(shortwave_forcing(npt))
   	allocate(uatm_forcing(npt), vatm_forcing(npt), pressure_forcing(npt))
   	! array initialization
@@ -544,6 +545,7 @@ subroutine get_atm_deposition(istep)
     
     ! get deposition at selected time step
     ! CO2 deposition
+    ! AtmCO2 is not needed, only to scale isotope 13 and 14
     if (constant_CO2) then
     	AtmCO2 = CO2_for_spinup
     else

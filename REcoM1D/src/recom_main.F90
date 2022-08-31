@@ -64,11 +64,13 @@ subroutine recom(istep,mesh)
 !************************* SURFACE BOUNDARY  *********************************			
   ! atmospheric deposition (CO2, Fe, N)
   call get_atm_deposition(istep) 
+
   ! restore alkalinity
   relax_alk = surf_relax_Alk*(Alk_surf - tr_arr(1,2+ialk)) ! 1 temp, 2 salt
 
 ! ======================================================================================
 !************************* get forcing and update steps *********************************
+  !!!!!!!!!!!!!!!!!!!!!!!!!!! test continue here
   call get_spatial_configuration_step(istep,mesh)
   call get_forcing(istep)	
 
@@ -93,7 +95,7 @@ subroutine recom(istep,mesh)
   ULoc = sqrt(u_wind**2+v_wind**2)
 
   !!---- Atmospheric CO2 in LocVar                                                                        
-  !!!!!LocAtmCO2         = AtmCO2(month)   !!!!!!! together with Atm_Input in recom_extra
+  LocAtmCO2  = AtmCO2   
 
 
   !!---- Shortwave penetration and PAR initialization
@@ -105,7 +107,7 @@ subroutine recom(istep,mesh)
      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      SW = parFrac * shortwave
      SW = SW * (1.d0 - aice)
-     PAR(1:nzmax) = 0.d0 
+     PAR(1:nzmax) = 0.d0 ! PAR initialization (computation in sms)
   endif
   
   

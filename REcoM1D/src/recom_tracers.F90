@@ -45,7 +45,7 @@ subroutine REcoM_mixing
     vflux=0.d0
     ! compute the mixing flux in the water column
     do k = max(2,nzmin), nzmax
-    	vflux(k) = kz(k) * (tr_arr(k,tr_num) - tr_arr(k-1,tr_num))/dz_trr(k)
+    	vflux(k) = Kz(k) * (tr_arr(k,tr_num) - tr_arr(k-1,tr_num))/dz_trr(k)
     enddo 
     !!!!!!
     !!!!!!!!!!!!!!!!
@@ -91,7 +91,7 @@ subroutine REcoM_mixing
    ! compute flux at lower boundary   
    do tr_num = 3, num_tracers
         ! flux
-        deepflux(tr_num) = deepscale * kz(nzmax) *    &
+        deepflux(tr_num) = deepscale * Kz(nzmax) *    &
                      (bc_bottom_tracers(tr_num) -    & 
                      tr_arr(nzmax,tr_num)) / dz_trr(nzmax) 
          ! tracer update at bottom boundary

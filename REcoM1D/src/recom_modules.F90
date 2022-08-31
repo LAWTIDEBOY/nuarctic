@@ -556,12 +556,12 @@ Module REcoM_GloVar
   save
 	
   Real(kind=8),allocatable,dimension(:)   :: Benthos          ! 4 types of benthos-tracers with size [4]
-  Real(kind=8),allocatable		  :: GloFeDust        ! [umol/m2/s] Monthly 2D field of iron soluted in surface water from dust
-  Real(kind=8),allocatable      	  :: GloNDust         ! [mmol/m2/s] 10-year mean 2D fields of nitrogen soluted in surface water from dust
-  Real(kind=8),dimension(12)              :: AtmCO2           ! [uatm] Atmospheric CO2 partial pressure. One value for the whole planet for each month
+  Real(kind=8)				  :: GloFeDust        ! [umol/m2/s] Monthly 2D field of iron soluted in surface water from dust
+  Real(kind=8)			     	  :: GloNDust         ! [mmol/m2/s] 10-year mean 2D fields of nitrogen soluted in surface water from dust
+  Real(kind=8)            		  :: AtmCO2           ! [uatm] Atmospheric CO2 partial pressure. One value for the whole planet for each month
   
-  Real(kind=8),allocatable                :: AtmFeInput       ! [umol/m2/s] Includes ice, but is, other than that identlical to GloFeDust
-  Real(kind=8),allocatable                :: AtmNInput        ! [umol/m2/s] Includes ice, but is, other than that identlical to GloNDust
+  Real(kind=8)				  :: AtmFeInput       ! [umol/m2/s] Includes ice, but is, other than that identlical to GloFeDust
+  Real(kind=8)		                  :: AtmNInput        ! [umol/m2/s] Includes ice, but is, other than that identlical to GloNDust
   Real(kind=8) 				  :: GloPCO2surf      ! [uatm] Surface ocean CO2 partial pressure
   Real(kind=8)				  :: GloCO2flux       ! [mmol/m2/day] Positive downwards
   Real(kind=8)				  :: GloCO2flux_seaicemask       ! [mmol/m2/day] Positive downwards

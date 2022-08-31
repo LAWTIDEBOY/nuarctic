@@ -84,6 +84,7 @@ do istep=1,nsteps
 	call clock
 
 	! run main 
+	!!!! double check is here
 	call recom(istep,mesh)
 
 	! update tracers
