@@ -1,6 +1,12 @@
 ! ==============================================================
 module ocean_module
   ! Ocean module that gather ocean variables and related routines that are required  REcOM1D (derived from FESOM2)
+
+  use mod_mesh
+  use general_config
+  use REcoM_config
+  use REcoM_GloVar
+
   implicit none
 
   
@@ -70,8 +76,12 @@ module ocean_module
   
   ! forcing variables
   real(kind=8), allocatable, dimension(:) :: temperature, salinity, Kz, PAR
-  real(kind=8)				  :: shortwave
-      
+  real(kind=8)				  :: PAR_surface, shortwave
+  
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !! initialization variables for tracers
+  real(kind=8), allocatable, dimension(:) :: DIN_init, DIC_init, Alk_init, DSi_init, DFe_init, DO2_init 
+  
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !! ocean namelist
   !namelist /ocean_tracers/ num_tracers, tracer_ID 
@@ -88,10 +98,7 @@ subroutine ocean_setup(mesh, boolean)
   ! 
   ! allocate and initialize ocean related arrays
   ! 
-  use mod_mesh
-  use REcoM_config
-  use REcoM_GloVar
-  
+ 
   implicit none
   
   type(t_mesh), intent(in), target :: mesh
@@ -108,9 +115,17 @@ subroutine ocean_setup(mesh, boolean)
   !!!!!!!!!!!!!!
   ! allocate tracers arrays
   allocate(tr_arr(nl-1, num_tracers))
-  
-  ! initialize tracer arrays
+  ! allocate initialization of specific tracers
+  allocate (DIN_init(nl-1), DIC_init(nl-1), Alk_init(nl-1))
+  allocate (DSi_init(nl-1), DFe_init(nl-1), DO2_init(nl-1))
   tr_arr=0.d0
+  DIN_init=0.d0
+  DIC_init=0.d0
+  Alk_init=0.d0
+  DSi_init=0.d0
+  DFe_init=0.d0
+  DO2_init=0.d0
+
   write(*,*) 'initializing tracers'
   
   !!!!!!!!!!!!!!
@@ -152,6 +167,8 @@ subroutine ocean_setup(mesh, boolean)
   
   else
   	deallocate(tr_arr, geo_coords)
+  	deallocate(DIN_init, DIC_init, Alk_init)
+  	deallocate(DSi_init, DFe_init, DO2_init)
 	deallocate(hnode, zbar, Z)
 	deallocate(temperature)
 	deallocate(salinity)
@@ -159,10 +176,109 @@ subroutine ocean_setup(mesh, boolean)
 	deallocate(Kz)
  endif
 end subroutine  
+! 
+subroutine read_tracer_initialization(mesh)
+ 
+#include "netcdf.inc" 
+
+
+   type(t_mesh), intent(in), target :: mesh
+   integer		:: start1(1), count1(1)
+   character(len=4096)	:: filename
+   integer		:: i, ncid, status, nlf, dim_id
+   integer		:: DIN_varid, DIC_varid, Alk_varid
+   integer		:: DSi_varid, DFe_varid, DO2_varid
+   character(len=4096) :: data_path
+   character(len=4096) :: lname='index'
+   character(len=4096) :: DO2_name='DO2', DIN_name='DIN', DIC_name='DIC'
+   character(len=4096) :: DSi_name='DSi', DFe_name='DFe', Alk_name='Alk'
+ 
+   call get_environment_variable("RECOM_DATA_PATH", data_path)
+   filename = trim(data_path) // trim(tracerinitname)
+   print*, 'initialization tracer file: ', trim(filename)
+   ! initialization 
+   ! dimensions
+   nl=mesh%nl
+   ! netcdf counters
+   start1=1
+   count1=nl-1
+
+   ! read initialization from netcdf dedicated tracer initialization file (pre-processed before simulation)
+   ! 
+   ! open file 
+   status=nf_open(trim(filename), nf_nowrite, ncid)
+   ! check forcing array dimension
+   ! inquire level dimension
+   status=nf_inq_dimid(ncid,trim(lname),dim_id)
+   status=nf_inq_dim(ncid,dim_id,trim(lname),nlf)
+   if (nlf .ne. nl-1) then
+   	write(*,*) 'forcing and mesh nb of vertical levels are different, please check', nlf, nl-1
+   	return
+   endif  
+   !----------------------------------------------------------------------------
+   ! read DIN (tracer:3, ID:1001)
+   status=nf_inq_varid(ncid, trim(DIN_name), DIN_varid)
+   print*, DIN_name, DIN_varid, status
+   if (status .eq. NF_NOERR) then
+   	status=nf_get_vara_double(ncid, DIN_varid, start1, count1, DIN_init)
+   else
+   	!call handle_err(status)
+   	write(*,*) 'no DIN specified for initialization'
+   endif
+
+   ! read DIC (tracer:4, ID:1002)
+   status=nf_inq_varid(ncid, trim(DIC_name), DIC_varid)
+   if (status .eq. NF_NOERR) then
+   	status=nf_get_vara_double(ncid, DIC_varid, start1, count1, DIC_init)
+   else
+   	!call handle_err(status)
+   	write(*,*) 'no DIC specified for initialization'
+   endif 
+
+   ! read Alk (tracer:5, ID:1003)
+   status=nf_inq_varid(ncid, trim(Alk_name), Alk_varid)
+   if (status .eq. NF_NOERR) then
+   	status=nf_get_vara_double(ncid, Alk_varid, start1, count1, Alk_init)
+   else
+   	!call handle_err(status)
+   	write(*,*) 'no Alk specified for initialization'
+   endif   
+   
+   ! read DSi (tracer:20, ID:1018)
+   status=nf_inq_varid(ncid, trim(DSi_name), DSi_varid)
+   if (status .eq. NF_NOERR) then
+   	status=nf_get_vara_double(ncid, DSi_varid, start1, count1, DSi_init)
+   else
+   	!call handle_err(status)
+   	write(*,*) 'no DSi specified for initialization'
+   endif 
+   
+   ! read DFe (tracer:21, ID:1019)
+   status=nf_inq_varid(ncid, trim(DFe_name), DFe_varid)
+   if (status .eq. NF_NOERR) then
+   	status=nf_get_vara_double(ncid, DFe_varid, start1, count1, DFe_init)
+   else
+   	!call handle_err(status)
+   	write(*,*) 'no DFe specified for initialization'
+   endif 
+
+   ! read DO2 (tracer:24, ID:1022)
+   status=nf_inq_varid(ncid, trim(DO2_name), DO2_varid)
+   if (status .eq. NF_NOERR) then
+   	status=nf_get_vara_double(ncid, DO2_varid, start1, count1, DO2_init)
+   else
+   	!call handle_err(status)
+   	write(*,*) 'no O2 specified for initialization'
+   endif    
+   
+   status=nf_close(ncid)
+
+end subroutine
+
 
 end module
 
-
+! ==============================================================
 module ice_module
   ! ice module that gather ice variables
   implicit none
@@ -181,6 +297,7 @@ end subroutine
 
 end module
 
+! ==============================================================
 module atm_module
   ! atm-related module
   implicit none
@@ -203,8 +320,17 @@ end subroutine
 
 end module
 
+! ==============================================================
 module forcing_module
   ! Ocean module that gather ocean variables and related routines that are required  REcOM1D (derived from FESOM2)
+  
+  use mod_mesh
+  use general_config
+  use REcoM_config
+  use ice_module
+  use ocean_module
+  use atm_module
+  
   implicit none
    
    ! temperature and salinity
@@ -214,14 +340,14 @@ module forcing_module
    ! turbulent forcing and Photosynthetically Active Radiation
    real(kind=8), allocatable, dimension(:,:)  :: Kz_forcing, PAR_forcing
    
-   ! shortwave radiation at surface or ice/ocean interface
-   real(kind=8), allocatable, dimension(:) :: shortwave_forcing
+   ! shortwave radiation at ice surface (shortwave) or ice/ocean interface (PAR_surface)
+   real(kind=8), allocatable, dimension(:) :: shortwave_forcing, PAR_surface_forcing
  
    ! atmospheric forcing
    real(kind=8), allocatable, dimension(:) :: pressure_forcing, uatm_forcing, vatm_forcing 
    
    ! flag whether PAR is provided as forcing or not
-   logical				   :: flag_PAR
+   logical				   :: flag_PAR, flag_PAR_surface
    
    contains
    
@@ -229,9 +355,6 @@ subroutine read_forcing(mesh)
    ! 
    ! allocate and initialize ocean related arrays
    ! 
-   use mod_mesh
-   use general_config
-   use REcoM_config
  
 #include "netcdf.inc" 
 
@@ -241,12 +364,12 @@ subroutine read_forcing(mesh)
    character(len=4096)	:: filename
    integer		:: i, ncid, status, nptf, nlf
    integer		:: aice_varid, T_varid, S_varid, dim_id
-   integer		:: Kz_varid, PAR_varid, sw_varid 
+   integer		:: Kz_varid, PAR_varid, PARSF_varid, sw_varid 
    integer		:: slp_varid, uw_varid, vw_varid
    character(len=4096) :: forcing_path
    character(len=4096) :: dname='time', lname='level'
    character(len=4096) :: iname = 'aice', Tname='temperature', Sname = 'salinity'
-   character(len=4096) :: Pname = 'PAR', Swname='shortwave', Kname='Kz'
+   character(len=4096) :: Pname = 'PAR', Swname='shortwave', PSname='PAR_surface', Kname='Kz'
    character(len=4096) :: uwname= 'uatm', vwname='vatm', slpname='sea_level_pressure'
    !---------------------------------------------
    call get_environment_variable("RECOM_FORCING_PATH", forcing_path)
@@ -361,16 +484,30 @@ subroutine read_forcing(mesh)
    	status=nf_get_vara_double(ncid,PAR_varid,start2,count2,tmp)
    	PAR_forcing = transpose(tmp)
    else
-   	write(*,*) 'no PAR profile specified as forcing, surface shortwave is to be provided'
+   	write(*,*) 'no PAR profiles are specified as forcing, surface PAR or above-ice shortwave is to be provided'
         flag_PAR=.False.
-        ! read shortwave radiation at the surface
+        
+        ! read shortwave radiation at the atm/snow(ice) surface or under ice PAR (ice-ocean interface)
+        status=nf_inq_varid(ncid, PSname, PARSF_varid)
+        ! PAR at the ocean surface (under-ice)
+	if (status .eq. NF_NOERR) then
+		flag_PAR_surface=.True.
+   		status=nf_get_vara_double(ncid, PARSF_varid, start1, count1, PAR_surface_forcing)
+   	else
+   		flag_PAR_surface=.False.
+   		!call handle_err(status)
+   		write(*,*) 'no PAR (ocean surface) time series is specified as forcing'
+   	endif
+        ! shortwave
         status=nf_inq_varid(ncid, Swname, sw_varid)
 	if (status .eq. NF_NOERR) then
-   		status=nf_get_vara_double(ncid,sw_varid,start1,count1,shortwave_forcing)
+   		status=nf_get_vara_double(ncid, sw_varid, start1, count1, shortwave_forcing)
    	else
    		!call handle_err(status)
-   		write(*,*) 'no surface shortwave radiation and/or PAR are specified as forcing'
+   		write(*,*) 'no shortwave radiation (above ice) time series is specified as forcing'
    	endif
+   	
+   	
    endif    
      
    status=nf_close(ncid)
@@ -379,9 +516,6 @@ subroutine read_forcing(mesh)
 end subroutine
 
 subroutine get_forcing(istep)
-    use ice_module
-    use ocean_module
-    use atm_module
     
     implicit none
     
@@ -399,6 +533,8 @@ subroutine get_forcing(istep)
     
     if (flag_PAR) then
     	PAR(:) = PAR_forcing(:, istep)
+    elseif(.not. flag_PAR .and. flag_PAR_surface) then
+    	PAR_surface = PAR_surface_forcing(istep)
     else
     	shortwave = shortwave_forcing(istep)
     endif
@@ -427,7 +563,7 @@ subroutine forcing_setup(boolean)
   	allocate(aice_forcing(npt))
   	allocate(temperature_forcing(nl-1, npt), salinity_forcing(nl-1, npt))
   	allocate(Kz_forcing(nl, npt), PAR_forcing(nl-1,npt))
-  	allocate(shortwave_forcing(npt))
+  	allocate(shortwave_forcing(npt), PAR_surface_forcing(npt))
   	allocate(uatm_forcing(npt), vatm_forcing(npt), pressure_forcing(npt))
   	! array initialization
   	aice_forcing = 0.d0
@@ -435,20 +571,27 @@ subroutine forcing_setup(boolean)
   	salinity_forcing = 0.d0
   	Kz_forcing = 0.d0
   	PAR_forcing = 0.d0
+  	PAR_surface_forcing = 0.d0
   	shortwave_forcing = 0.d0 
   	uatm_forcing = 0.d0
   	vatm_forcing = 0.d0  
   	pressure_forcing = 0.d0
   else
   	deallocate(aice_forcing, temperature_forcing, salinity_forcing)
-  	deallocate(Kz_forcing, PAR_forcing, shortwave_forcing)
+  	deallocate(Kz_forcing, PAR_forcing, PAR_surface_forcing, shortwave_forcing)
   	deallocate(uatm_forcing, vatm_forcing, pressure_forcing)
   endif
 end subroutine
 
 end module
-
+! ==============================================================
 module atm_deposition_module
+  use mod_mesh
+  use general_config
+  use REcoM_config
+  use REcoM_GloVar
+  
+  
   implicit none
   save
    
@@ -460,9 +603,6 @@ subroutine read_deposition(mesh)
    ! 
    ! allocate and initialize ocean related arrays
    ! 
-   use mod_mesh
-   use general_config
-   use REcoM_config
  
 #include "netcdf.inc" 
 
@@ -535,8 +675,6 @@ end subroutine
 
 
 subroutine get_atm_deposition(istep)
-    use REcoM_config
-    use REcoM_GloVar
     
     implicit none
     

@@ -245,7 +245,7 @@ subroutine REcoM_sms_computation(Nn,state,thick,recipthick,SurfSR,sms,Temp,zF,PA
 
 !_______________________________________________________________________
 !< Light
-! Exponential diminition of downward irradiance
+! Exponential diminution of downward irradiance
   if (flag_PAR) then
   	PARave = PARc(k)
   else
@@ -256,7 +256,6 @@ subroutine REcoM_sms_computation(Nn,state,thick,recipthick,SurfSR,sms,Temp,zF,PA
     else    
         chl_lower = PhyChl + DiaChl
         Chlave    = (chl_upper+chl_lower)*0.5d0
-
         kappar         =  k_w + a_chl * (Chlave)
         kappastar      =  kappar / cosAI
         kdzLower       =  kdzUpper + kappastar * thick(k-1)
