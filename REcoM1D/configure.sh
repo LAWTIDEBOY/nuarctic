@@ -5,17 +5,29 @@ set -e
 # source environment fike
 source env.sh 
 
-# create build  and bin directories if they do not exist
-#build
+# create build  and bin directories from scratch
 if [ ! -d "build" ]
 then 
+	mkdir build
+else
+	# clear build directory
+	rm -r build
 	mkdir build
 fi
 #bin
 if [ ! -d "bin" ]
 then 
 	mkdir bin
-	cp set_path_REcoM.sh bin/.
+	cd bin
+	ln -s ../set_path_REcoM.sh .
+	cd ..
+else 
+	# clear directory
+	rm -r bin
+	mkdir bin
+	cd bin
+	ln -s ../set_path_REcoM.sh .
+	cd ..
 fi
 
 # clean build directory, clear cache
