@@ -218,7 +218,6 @@ subroutine read_tracer_initialization(mesh)
    !----------------------------------------------------------------------------
    ! read DIN (tracer:3, ID:1001)
    status=nf_inq_varid(ncid, trim(DIN_name), DIN_varid)
-   print*, DIN_name, DIN_varid, status
    if (status .eq. NF_NOERR) then
    	status=nf_get_vara_double(ncid, DIN_varid, start1, count1, DIN_init)
    else
@@ -344,7 +343,7 @@ module forcing_module
    real(kind=8), allocatable, dimension(:) :: shortwave_forcing, PAR_surface_forcing
  
    ! atmospheric forcing
-   real(kind=8), allocatable, dimension(:) :: pressure_forcing, uatm_forcing, vatm_forcing 
+   real(kind=8), allocatable, dimension(:) :: pressure_forcing, uwind_forcing, vwind_forcing 
    
    ! flag whether PAR is provided as forcing or not
    logical				   :: flag_PAR, flag_PAR_surface
@@ -367,10 +366,10 @@ subroutine read_forcing(mesh)
    integer		:: Kz_varid, PAR_varid, PARSF_varid, sw_varid 
    integer		:: slp_varid, uw_varid, vw_varid
    character(len=4096) :: forcing_path
-   character(len=4096) :: dname='time', lname='level'
+   character(len=4096) :: dname='time', lname='level_node'
    character(len=4096) :: iname = 'aice', Tname='temperature', Sname = 'salinity'
    character(len=4096) :: Pname = 'PAR', Swname='shortwave', PSname='PAR_surface', Kname='Kz'
-   character(len=4096) :: uwname= 'uatm', vwname='vatm', slpname='sea_level_pressure'
+   character(len=4096) :: uwname= 'uwind', vwname='vwind', slpname='sea_level_pressure'
    !---------------------------------------------
    call get_environment_variable("RECOM_FORCING_PATH", forcing_path)
    filename = trim(forcing_path) // trim(forcingname)
@@ -404,8 +403,8 @@ subroutine read_forcing(mesh)
    ! inquire level dimension
    status=nf_inq_dimid(ncid,trim(lname),dim_id)
    status=nf_inq_dim(ncid,dim_id,trim(lname),nlf)
-   if (nlf .ne. nl-1) then
-   	write(*,*) 'forcing and mesh nb of vertical levels are different, please check', nlf, nl-1
+   if (nlf .ne. nl) then
+   	write(*,*) 'forcing and mesh nb of vertical levels are different, please check', nlf, nl
    	return
    endif  
    !----------------------------------------------------------------------------
@@ -417,22 +416,20 @@ subroutine read_forcing(mesh)
    	!call handle_err(status)
    	write(*,*) 'no ice cover specified as forcing'
    endif
-
    !----------------------------------------------------------------------------
    ! read wind
    ! u-wind    
    status=nf_inq_varid(ncid, trim(uwname), uw_varid)
    if (status .eq. NF_NOERR) then
-   	status=nf_get_vara_double(ncid,uw_varid, start1, count1, uatm_forcing)
+   	status=nf_get_vara_double(ncid,uw_varid, start1, count1, uwind_forcing)
    else
    	!call handle_err(status)
    	write(*,*) 'no wind specified as forcing'
    endif
-   
    ! v-wind
    status=nf_inq_varid(ncid, trim(vwname), vw_varid)
    if (status .eq. NF_NOERR) then
-   	status=nf_get_vara_double(ncid,vw_varid, start1, count1, vatm_forcing)
+   	status=nf_get_vara_double(ncid,vw_varid, start1, count1, vwind_forcing)
    else
    	!call handle_err(status)
    	write(*,*) 'no wind specified as forcing'
@@ -445,7 +442,7 @@ subroutine read_forcing(mesh)
    else
    	!call handle_err(status)
    	write(*,*) 'mean sea level pressure specified as forcing'
-   endif    
+   endif   
    !----------------------------------------------------------------------------   
    ! read water column temperature
    status=nf_inq_varid(ncid, trim(Tname), T_varid)
@@ -466,7 +463,6 @@ subroutine read_forcing(mesh)
    	!call handle_err(status)
    	write(*,*) 'no salinity profile specified as forcing'
    endif   
-   
    ! read turbulence in the water column
    status=nf_inq_varid(ncid, Kname, Kz_varid)
    if (status .eq. NF_NOERR) then
@@ -507,7 +503,6 @@ subroutine read_forcing(mesh)
    		write(*,*) 'no shortwave radiation (above ice) time series is specified as forcing'
    	endif
    	
-   	
    endif    
      
    status=nf_close(ncid)
@@ -540,8 +535,8 @@ subroutine get_forcing(istep)
     endif
     
     ! atmospheric forcing
-    u_wind = uatm_forcing(istep)
-    v_wind = vatm_forcing(istep)
+    u_wind = uwind_forcing(istep)
+    v_wind = vwind_forcing(istep)
     press_air = pressure_forcing(istep)
     
 end subroutine
@@ -564,7 +559,7 @@ subroutine forcing_setup(boolean)
   	allocate(temperature_forcing(nl-1, npt), salinity_forcing(nl-1, npt))
   	allocate(Kz_forcing(nl, npt), PAR_forcing(nl-1,npt))
   	allocate(shortwave_forcing(npt), PAR_surface_forcing(npt))
-  	allocate(uatm_forcing(npt), vatm_forcing(npt), pressure_forcing(npt))
+  	allocate(uwind_forcing(npt), vwind_forcing(npt), pressure_forcing(npt))
   	! array initialization
   	aice_forcing = 0.d0
   	temperature_forcing = 0.d0
@@ -573,13 +568,13 @@ subroutine forcing_setup(boolean)
   	PAR_forcing = 0.d0
   	PAR_surface_forcing = 0.d0
   	shortwave_forcing = 0.d0 
-  	uatm_forcing = 0.d0
-  	vatm_forcing = 0.d0  
+  	uwind_forcing = 0.d0
+  	vwind_forcing = 0.d0  
   	pressure_forcing = 0.d0
   else
   	deallocate(aice_forcing, temperature_forcing, salinity_forcing)
   	deallocate(Kz_forcing, PAR_forcing, PAR_surface_forcing, shortwave_forcing)
-  	deallocate(uatm_forcing, vatm_forcing, pressure_forcing)
+  	deallocate(uwind_forcing, vwind_forcing, pressure_forcing)
   endif
 end subroutine
 

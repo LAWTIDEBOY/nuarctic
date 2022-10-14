@@ -47,19 +47,16 @@ subroutine REcoM_mixing
     do k = max(2,nzmin), nzmax
     	vflux(k) = Kz(k) * (tr_arr(k,tr_num) - tr_arr(k-1,tr_num))/dz_trr(k)
     enddo 
-    !!!!!!
-    !!!!!!!!!!!!!!!!
-    !!!! and the flux with the surface ??????
-    !!!!!!!!!!!!!!!!
-    !!!!!!
-    
+
+    ! rk: no flux at the surface
+      
     ! update the tracers accordingly
     do k = max(2,nzmin), nzmax
     	tr_arr(k-1,tr_num) = tr_arr(k-1,tr_num) + vflux(k) / dz_trr(k-1)
         tr_arr(k,tr_num)   = tr_arr(k,tr_num)   - vflux(k) / dz_trr(k)
     enddo
   enddo
-
+  
   ! compute the residual flux across the lower boundary (might be negligible for significant depth)
    bc_bottom_tracers = 0.d0
    ! set boundary conditions at the bottom
