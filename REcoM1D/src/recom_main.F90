@@ -99,14 +99,18 @@ subroutine recom(istep,mesh)
 
 
   !!---- Shortwave penetration and PAR initialization
-  if (flag_PAR) then 
+  if (flag_PAR) then
+     ! if PAR profile is available 
      SW = 0.d0
   else
-     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     !!!!!!!!!! regarder ici pour inclure la neige
-     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-     SW = parFrac * shortwave
-     SW = SW * (1.d0 - aice)
+     if (flag_PAR_surface) then
+     	! PAR is available at the ocean-ice interface
+     	SW = PAR_surface
+     else
+     	! shortwave is available at the atm-snow/ice interface and require attenuation
+     	SW = parFrac * shortwave
+     	SW = SW * (1.d0 - aice) !! this is a simplification, how to account for snow and ice thickness
+     endif
      PAR(1:nzmax) = 0.d0 ! PAR initialization (computation in sms)
   endif
   

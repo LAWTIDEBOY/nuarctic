@@ -14,8 +14,8 @@ module REcoM_diagnostics
  character(len=*), parameter :: Conc_unit = 'mmol/m3'
  
  ! storage array definition
- real(kind=8), dimension(:) , allocatable :: dates_diag
- real(kind=8), dimension(:,:) , allocatable :: depth_diag, bound_diag
+ integer, dimension(:), allocatable 	  :: day_diag, year_diag, nlevel_diag
+ real(kind=8), dimension(:) , allocatable :: zcell_diag, znode_diag
  
  ! C02 related outputs
  real(kind=8), dimension(:) , allocatable :: dpCO2s_diag, pCO2s_diag, CO2f_diag
@@ -80,21 +80,21 @@ subroutine diagnostics_properties
   use recom_setup
   
   implicit none
-  integer     :: fac, it, is
+  integer     :: fac, it, is, fac_day
   
   allocate(mask_diagnostic(nsteps), index_diagnostic(nsteps))
   mask_diagnostic = .False.
   index_diagnostic = 0
-  
+  fac_day=int(step_per_day/24.)
   if (diag_freq_unit=='h') then
-	fac=1
+	fac=1*fac_day
   elseif (diag_freq_unit=='d') then
-  	fac=24
+  	fac=24*fac_day
   else
   	print*, 'not coded yet only daily or sub-daily diagnostics available'
   	fac=24
   endif 
-   
+  write(*,*) 'simulation time step (h):', 24./step_per_day, 'diagnostic frequency (h)', fac/fac_day
   ! if comptutational timestep is in seconds 
   if(run_length_unit=='s') fac = fac * 3600
   it = 0
@@ -106,7 +106,6 @@ subroutine diagnostics_properties
   	endif
   enddo
   ndiag = it
-  
 end subroutine
 					  					  
 subroutine setup_diagnostics(boolean)
@@ -119,7 +118,8 @@ subroutine setup_diagnostics(boolean)
  if (boolean) then
 	call diagnostics_properties
  	! allocate 
- 	allocate(dates_diag(ndiag), depth_diag(ndiag, nl-1), bound_diag(ndiag,nl))
+ 	allocate(day_diag(ndiag), year_diag(ndiag), nlevel_diag(ndiag))
+ 	allocate(zcell_diag(nl-1), znode_diag(nl))
  	allocate(dpCO2s_diag(ndiag), pCO2s_diag(ndiag), CO2f_diag(ndiag))
  	allocate(Hp_diag(ndiag), aFe_diag(ndiag), aN_diag(ndiag))
  	allocate(denb_diag(ndiag), benN_diag(ndiag), benC_diag(ndiag),		&
@@ -147,6 +147,13 @@ subroutine setup_diagnostics(boolean)
  	
  	
  	! initialize to zero
+ 	day_diag        = 0
+ 	year_diag       = 0 
+ 	nlevel_diag     = 0
+ 	
+ 	znode_diag      = 0.d0
+ 	zcell_diag      = 0.d0
+ 	
  	dpCO2s_diag	= 0.d0
  	pCO2s_diag	= 0.d0
  	CO2f_diag	= 0.d0
@@ -202,7 +209,7 @@ subroutine setup_diagnostics(boolean)
 		idetz2calc_diag	= 0.d0
 	endif
   else
-  	deallocate(dates_diag, depth_diag, bound_diag)
+  	deallocate(day_diag, year_diag, nlevel_diag, zcell_diag, znode_diag)
   	deallocate(dpCO2s_diag, pCO2s_diag, CO2f_diag)
   	deallocate(Hp_diag, aFe_diag, aN_diag)
   	deallocate(denb_diag, benN_diag, benC_diag, benSi_diag, benCalc_diag)
@@ -227,72 +234,85 @@ end subroutine
 subroutine store_diagnostics(idiag)
    use REcoM_GloVar
    use recom_clock
-   !!!!!!!!
-   !! continue her to propose the daily/monthly mean
+   
    implicit none
    integer, intent(in) :: idiag
-   integer 	       :: nlvl
-   
-   	nlvl = nlevel-1
+   integer 	       :: nlvl, flaglyr
    	
-   	dates_diag(idiag)		= yearnew*1e8 + daynew*1e5 + timenew
-   	depth_diag(idiag,1:nlvl)	= hnode(1:nlvl)
-   	bound_diag(idiag,1:nlvl+1)	= zbar(1:nlvl+1)
+   nlvl = nlevel-1
+   nlevel_diag(idiag)		= nlvl
+   year_diag(idiag)		= yearnew
+   day_diag(idiag)		= daynew + int(timenew/86400.)
    	
-   	dpCO2s_diag(idiag)	= GlodPCO2surf
- 	pCO2s_diag(idiag)	= GloPCO2surf
- 	CO2f_diag(idiag)	= GloCO2flux
- 	Hp_diag(idiag)		= GloHplus
- 	aFe_diag(idiag)		= AtmFeInput
- 	aN_diag(idiag)		= AtmNInput
- 	denb_diag(idiag)	= DenitBen
- 	benN_diag(idiag)	= Benthos(1)
- 	benC_diag(idiag)	= Benthos(2)
- 	benSi_diag(idiag)	= Benthos(3)
- 	benCalc_diag(idiag)	= Benthos(4)
-	NPPn_diag(idiag)	= diags2D(1)
-	NPPd_diag(idiag)	= diags2D(2)
-	GPPn_diag(idiag)	= diags2D(3)
-	GPPd_diag(idiag)	= diags2D(4)
-	NNAn_diag(idiag)	= diags2D(5)
-	NNAd_diag(idiag)	= diags2D(6)
-	GNAn_diag(idiag)	= diags2D(7)
-	GNAd_diag(idiag)	= diags2D(8)
+   ! deal with leap year
+   call check_fleapyr(year_diag(idiag), flaglyr)
+   if (day_diag(idiag)>365 .and. flaglyr<1) then
+   	day_diag(idiag) = 1
+   	year_diag(idiag) = year_diag(idiag) + 1
+   endif
+   	
+   ! deal with depth and level
+   if (idiag.eq.1) then
+   	zcell_diag		= Z
+   	znode_diag		= zbar
+   endif
+   !
+   !zcell_diag, znode_diag
+   	
+   dpCO2s_diag(idiag)	= GlodPCO2surf
+   pCO2s_diag(idiag)	= GloPCO2surf
+   CO2f_diag(idiag)	= GloCO2flux
+   Hp_diag(idiag)		= GloHplus
+   aFe_diag(idiag)		= AtmFeInput
+   aN_diag(idiag)		= AtmNInput
+   denb_diag(idiag)	= DenitBen
+   benN_diag(idiag)	= Benthos(1)
+   benC_diag(idiag)	= Benthos(2)
+   benSi_diag(idiag)	= Benthos(3)
+   benCalc_diag(idiag)	= Benthos(4)
+   NPPn_diag(idiag)	= diags2D(1)
+   NPPd_diag(idiag)	= diags2D(2)
+   GPPn_diag(idiag)	= diags2D(3)
+   GPPd_diag(idiag)	= diags2D(4)
+   NNAn_diag(idiag)	= diags2D(5)
+   NNAd_diag(idiag)	= diags2D(6)
+   GNAn_diag(idiag)	= diags2D(7)
+   GNAd_diag(idiag)	= diags2D(8)
 	
-	temp_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,1)
-	sali_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,2)
-	PAR_diag(idiag,1:nlvl)		= PAR(1:nlvl)
-	O2_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,24)
-	DIN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,3)
-	DIC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,4)
-	Alk_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,5)
-	PhyN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,6)
-	PhyC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,7)
-	PhyChl_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,8)
-	PhyCalc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,22)
-	DetN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,9)
-	DetC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,10)
-	DetSi_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,19)
-	DetCalc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,23)
-	HetN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,11)
-	HetC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,12)
-	DON_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,13)
-	DOC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,14)
-	DSi_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,20)
-	DFe_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,21)
-	DiaC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,16)
-	DiaN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,15)
-	DiaChl_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,17)
-	DiaSi_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,18)
+   temp_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,1)
+   sali_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,2)
+   PAR_diag(idiag,1:nlvl)		= PAR(1:nlvl)
+   O2_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,24)
+   DIN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,3)
+   DIC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,4)
+   Alk_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,5)
+   PhyN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,6)
+   PhyC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,7)
+   PhyChl_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,8)
+   PhyCalc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,22)
+   DetN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,9)
+   DetC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,10)
+   DetSi_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,19)
+   DetCalc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,23)
+   HetN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,11)
+   HetC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,12)
+   DON_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,13)
+   DOC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,14)
+   DSi_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,20)
+   DFe_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,21)
+   DiaC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,16)
+   DiaN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,15)
+   DiaChl_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,17)
+   DiaSi_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,18)
 
-	if (REcoM_Second_Zoo) then
-		Zoo2N_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,25)
-		Zoo2C_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,26)
-		idetz2n_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,27)
-		idetz2c_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,28)
-		idetz2si_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,29)
-		idetz2calc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,30)
-	endif
+   if (REcoM_Second_Zoo) then
+	Zoo2N_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,25)
+	Zoo2C_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,26)
+	idetz2n_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,27)
+	idetz2c_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,28)
+	idetz2si_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,29)
+	idetz2calc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,30)
+    endif
 
 end subroutine
 !----------------------------------------------------------------------------------
@@ -300,13 +320,13 @@ subroutine write_diagnostics
 	
   implicit none
   
-  character(len=4096),parameter	:: diag_name='diagnostics.nc', units="units", lname="long_name"
+  character(len=4096),parameter	:: diag_name='REcoM1d_outputs.nc', units="units", lname="long_name"
   character(len=4096)		:: result_path, filename
   integer, dimension(4)		:: dd
-  integer, parameter		:: namelength = 50, unitlength=6
   integer			:: status, fileid
-  integer			:: dim_level, dim_time, dim_bound
-  integer			:: dates_varid, depth_varid, bound_varid  
+  integer			:: dim_time, dim_cell, dim_node
+  ! Id of output variables
+  integer			:: year_varid, day_varid, zcell_varid, znode_varid, nlvl_varid  
   integer			:: dpCO2_varid, pCO2_varid, CO2f_varid
   integer			:: Hp_varid, aFe_varid, aN_varid
   integer			:: denb_varid, benN_varid, benC_varid, benSi_varid, benCalc_varid
@@ -320,408 +340,466 @@ subroutine write_diagnostics
   integer			:: DiaN_varid, DiaC_varid, DiaChl_varid, DiaSi_varid
   integer			:: Zoo2N_varid, Zoo2C_varid
   integer			:: detz2n_varid,detz2c_varid, detz2si_varid, detz2calc_varid
-  logical 			:: test
+  ! name of output variables	
+  character(len=20), parameter	:: time_name='time', cell_name='level_cell', node_name='level_node'
+  character(len=20), parameter	:: day_name='day', year_name='year', nlvl_name='level'
+  character(len=20), parameter	:: znode_name='z_node', zcell_name='z_cell'
+  character(len=20), parameter	:: dpCO2s_name = 'dpCO2s', pCO2s_name = 'pCO2s', CO2f_name='CO2f'
+  character(len=20), parameter	:: Hp_name='Hp', aFe_name='aFe', aN_name='aN'
+  character(len=20), parameter	:: denb_name='denb', benN_name='benN', benC_name = 'benC'
+  character(len=20), parameter	:: benSi_name='benSi', benCalc_name='benCalc'
+  character(len=20), parameter	:: NPPn_name='NPPn', NPPd_name='NPPd', GPPn_name='GPPn', GPPd_name='GPPd'
+  character(len=20), parameter	:: NNAn_name='NNAn', NNAd_name='NNAd', GNAd_name='GNAd', GNAn_name='GNAn'
+  character(len=20), parameter	:: temp_name='temp', salt_name='salt', PAR_name='PAR'
+  character(len=20), parameter	:: DIN_name='DIN', DIC_name='DIC', ALk_name='Alk', O2_name='O2'
+  character(len=20), parameter	:: PhyN_name='PhyN', PhyC_name='PhyC', PhyChl_name='PhyChl', PhyCalc_name='PhyCalc'
+  character(len=20), parameter	:: DetN_name='DetN', DetC_name='DetC', DetSi_name='DetSi', DetCalc_name='DetCalc'
+  character(len=20), parameter	:: HetN_name='HetN', HetC_name='HetC', DSi_name='DSi', DFe_name='DFe'
+  character(len=20), parameter	:: DON_name='DON', DOC_name='DOC'
+  character(len=20), parameter	:: DiaN_name='DiaN', DiaC_name='DiaC', DiaChl_name='DiaChl', DiaSi_name='DiaSi'
+  character(len=20), parameter	:: Zoo2N_name='Zoo2N', Zoo2C_name='Zoo2C'
+  character(len=20), parameter	:: detz2n_name='idetz2n', detz2c_name='idetz2c'
+  character(len=20), parameter	:: detz2si_name='idetz2si', detz2calc_name='idetz2calc'
+  ! variable long names
+  character(len=12), parameter	:: day_lname="calendar day", year_lname="year"
+  character(len=12), parameter	:: nlvl_lname="series of nb of active depth level in the computation "
+  character(len=50), parameter	:: znode_lname="z at vertical nodes", zcell_lname="z at center of vertical cells"
+  character(len=50), parameter	:: dpCO2s_lname = "Difference of oceanic pCO2 minus atmospheric pCO2"
+  character(len=50), parameter	:: pCO2s_lname = "Partial pressure of oceanic CO2"
+  character(len=50), parameter	:: CO2f_lname="CO2-flux into the surface water"
+  character(len=50), parameter	:: Hp_lname="Mean of H-plus ions in the surface water"
+  character(len=50), parameter	:: aFe_lname="Atmospheric iron input", aN_lname="Atmospheric DIN input"
+  character(len=50), parameter	:: denb_lname="Benthic denitrification rate"
+  character(len=50), parameter	:: benN_lname="Benthos Nitrogen", benC_lname = "Benthos Carbon"
+  character(len=50), parameter	:: benSi_lname="Benthos silicon", benCalc_lname="Benthos calcite"
+  character(len=50), parameter	:: NPPn_lname="Mean NPP nanophytoplankton", NPPd_lname="Mean NPP diatoms"
+  character(len=50), parameter	:: GPPn_lname="Mean GPP nanophytoplankton", GPPd_lname="Mean GPP diatoms"
+  character(len=50), parameter	:: NNAn_lname="Net N-assimilation nanophytoplankton", NNAd_lname="Net N-assimilation diatoms"
+  character(len=50), parameter	:: GNAd_lname="Gross N-assimilation diatoms", GNAn_lname="Gross N-assimilation nanophytoplankton"
+  character(len=50), parameter	:: temp_lname="Temperature profile", salt_lname="Salinity profile"
+  character(len=50), parameter	:: PAR_lname="Photosynthecally Active Radiation"
+  character(len=50), parameter	:: DIN_lname="Dissolved Inorganic Nitrogen", DIC_lname="Dissolved Inorganic Carbon"
+  character(len=50), parameter	:: Alk_lname="Total Alkalinity", O2_lname="concentration of dioxygen in water"
+  character(len=50), parameter	:: PhyN_lname="Intracellular concentration of Nitrogen in small phytoplankton"
+  character(len=50), parameter	:: PhyC_lname="Intracellular concentration of Carbon in small phytoplankton" 
+  character(len=50), parameter	:: PhyChl_lname="Current intracellular Chlorophyl A concentration"
+  character(len=50), parameter	:: PhyCalc_lname="Current intracellular Calcite concentration"
+  character(len=50), parameter	:: DetN_lname="Concentration of Nitrogen in Detritus", DetC_lname="Concentration of Carbon in Detritus"
+  character(len=50), parameter	:: DetSi_lname="Concentration of Silicon in Detritus", DetCalc_lname="Concentration of Calcite in Detritus"
+  character(len=50), parameter	:: HetN_lname="Concentration of Nitrogen in heterotrophs", HetC_lname="Concentration of Carbon in heterotrophs"
+  character(len=50), parameter	:: DSi_lname="concentration of Dissolved Silicate", DFe_lname="concentration of Dissolved Iron"
+  character(len=50), parameter	:: DON_lname="Dissolved organic Nitrogen in water", DOC_lname="Dissolved organic Carbon in water"
+  character(len=50), parameter	:: DiaN_lname="concentration of Nitrogen in diatoms", DiaC_lname="concentration of Carbon in diatoms"
+  character(len=50), parameter	:: DiaChl_lname="concentration of Chlorophyll A in diatoms", DiaSi_lname="concentration of Silicon in diatoms"
+  character(len=50), parameter	:: Zoo2N_lname="Intracellular concentration of Nitrogen in second zooplankton"
+  character(len=50), parameter	:: Zoo2C_lname="Intracellular concentration of Carbon in second zooplankton"
+  character(len=50), parameter	:: detz2n_lname="Concentration of Nitrogen in detritus from second zooplankton"
+  character(len=50), parameter	:: detz2c_lname="Concentration of Carbon in detritus from second zooplankton"
+  character(len=50), parameter	:: detz2si_lname="Concentration of Silicon in detritus from second zooplankton"
+  character(len=50), parameter	:: detz2calc_lname="Concentration of Calcite in detritus from second zooplankton"
+
+
 #include "netcdf.inc" 
   
   call get_environment_variable("RECOM_RESULT_PATH", result_path)
   filename = trim(result_path) // trim(diag_name)
   dd=0
-  test=.False.
+  
   print*,'number of diagnostic steps',ndiag
   ! open netCDF file
   status=nf_create(filename, NF_CLOBBER, fileid)
 
   ! define output array dimensions
-  status = nf_def_dim(fileid,'time',ndiag,dim_time)
-  status = nf_def_dim(fileid,'level',nl-1,dim_level)
-  status = nf_def_dim(fileid,'level_bounds',nl,dim_bound)
+  status = nf_def_dim(fileid,trim(time_name),ndiag, dim_time)
+  status = nf_def_dim(fileid, trim(cell_name),nl-1,dim_cell)
+  status = nf_def_dim(fileid, trim(node_name),nl,dim_node)
+
+
   ! define variable
   !dates
   dd(1)= dim_time
-  status = nf_def_var(fileid,'dates', nf_real,1, dd, dates_varid)
+  status = nf_def_var(fileid,trim(day_name), nf_int,1, dd, day_varid)
+  status = nf_def_var(fileid,trim(year_name), nf_int,1, dd, year_varid) 
+  status = nf_def_var(fileid,trim(nlvl_name), nf_int,1, dd, nlvl_varid) 
+  ! level and depth information: depth proxies z at center of cell and at cell nodes
+  dd(1) = dim_node
+  status = nf_def_var(fileid,trim(znode_name), nf_real,1, dd, znode_varid)	
+  dd(1) = dim_cell
+  status = nf_def_var(fileid,trim(zcell_name), nf_real,1, dd, zcell_varid)
+  !print*, 'test', ndiag, nl, nl-1, dim_time, dim_cell, dim_node
   
   ! time dependent variables
-  status=nf_def_var(fileid, 'dpCO2s', nf_real, 1, dd, dpCO2_varid)
-  status=nf_def_var(fileid, 'pCO2s', nf_real, 1, dd, pCO2_varid)
-  status=nf_def_var(fileid, 'CO2f', nf_real, 1, dd, CO2f_varid)
-  status=nf_def_var(fileid, 'Hp', nf_real, 1, dd, Hp_varid)
-  status=nf_def_var(fileid, 'aFe', nf_real, 1, dd, aFe_varid)
-  status=nf_def_var(fileid, 'aN', nf_real, 1, dd, aN_varid)
+  dd(1)=dim_time
+  ! time series
+  status=nf_def_var(fileid, trim(dpCO2s_name), nf_real, 1, dd, dpCO2_varid)
+  status=nf_def_var(fileid, trim(pCO2s_name), nf_real, 1, dd, pCO2_varid)
+  status=nf_def_var(fileid, trim(CO2f_name), nf_real, 1, dd, CO2f_varid)
+  status=nf_def_var(fileid, trim(Hp_name), nf_real, 1, dd, Hp_varid)
+  status=nf_def_var(fileid, trim(aFe_name), nf_real, 1, dd, aFe_varid)
+  status=nf_def_var(fileid, trim(aN_name), nf_real, 1, dd, aN_varid)
   
-  status=nf_def_var(fileid, 'denb', nf_real, 1, dd, denb_varid)
-  status=nf_def_var(fileid, 'benN', nf_real, 1, dd, benN_varid)
-  status=nf_def_var(fileid, 'benC', nf_real, 1, dd, benC_varid)
-  status=nf_def_var(fileid, 'benSi', nf_real, 1, dd, benSi_varid)
-  status=nf_def_var(fileid, 'benCalc', nf_real, 1, dd, benCalc_varid)
+  status=nf_def_var(fileid, trim(denb_name), nf_real, 1, dd, denb_varid)
+  status=nf_def_var(fileid, trim(benN_name), nf_real, 1, dd, benN_varid)
+  status=nf_def_var(fileid, trim(benC_name), nf_real, 1, dd, benC_varid)
+  status=nf_def_var(fileid, trim(benSi_name), nf_real, 1, dd, benSi_varid)
+  status=nf_def_var(fileid, trim(benCalc_name), nf_real, 1, dd, benCalc_varid)
   
-  status=nf_def_var(fileid, 'NPPn', nf_real, 1, dd, NPPn_varid)
-  status=nf_def_var(fileid, 'NPPd', nf_real, 1, dd, NPPd_varid)
-  status=nf_def_var(fileid, 'GPPn', nf_real, 1, dd, GPPn_varid)
-  status=nf_def_var(fileid, 'GPPd', nf_real, 1, dd, GPPd_varid)
+  ! diagnostics
+  status=nf_def_var(fileid, trim(NPPn_name), nf_real, 1, dd, NPPn_varid)
+  status=nf_def_var(fileid, trim(NPPd_name), nf_real, 1, dd, NPPd_varid)
+  status=nf_def_var(fileid, trim(GPPn_name), nf_real, 1, dd, GPPn_varid)
+  status=nf_def_var(fileid, trim(GPPd_name), nf_real, 1, dd, GPPd_varid)
   
-  status=nf_def_var(fileid, 'NNAn', nf_real, 1, dd, NNAn_varid)
-  status=nf_def_var(fileid, 'NNAd', nf_real, 1, dd, NNAd_varid)
-  status=nf_def_var(fileid, 'GNAn', nf_real, 1, dd, GNAn_varid)
-  status=nf_def_var(fileid, 'GNAd', nf_real, 1, dd, GNAd_varid)
+  status=nf_def_var(fileid, trim(NNAn_name), nf_real, 1, dd, NNAn_varid)
+  status=nf_def_var(fileid, trim(NNAd_name), nf_real, 1, dd, NNAd_varid)
+  status=nf_def_var(fileid, trim(GNAn_name), nf_real, 1, dd, GNAn_varid)
+  status=nf_def_var(fileid, trim(GNAd_name), nf_real, 1, dd, GNAd_varid)
   
-  ! level and depth information: depth at center of cell and depth of cell nodes
+  ! depth at middle of cell
   dd(1) = dim_time
-  dd(2) = dim_level
-  status = nf_def_var(fileid,'depth', nf_real,2, dd, depth_varid)	
-  dd(1) = dim_time
-  dd(2) = dim_bound	
-  status = nf_def_var(fileid,'depth_bounds', nf_real,2, dd, bound_varid)
+  dd(2) = dim_cell
   
-  ! time and depth dependent variables (mainly tracers)
-  dd(1) = dim_time
-  dd(2) = dim_level
-  status=nf_def_var(fileid, 'temp', nf_real, 2, dd, T_varid)
-  status=nf_def_var(fileid, 'salt', nf_real, 2, dd, S_varid)  
-  status=nf_def_var(fileid, 'PAR', nf_real, 2, dd, PAR_varid)
+  ! state variables(time and depth dependent, mainly tracers)
+  status=nf_def_var(fileid, trim(PAR_name), nf_real, 2, dd, PAR_varid)
+  
+  status=nf_def_var(fileid, trim(temp_name), nf_real, 2, dd, T_varid)
+  status=nf_def_var(fileid, trim(salt_name), nf_real, 2, dd, S_varid)  
  
-  status=nf_def_var(fileid, 'DIN', nf_real, 2, dd, DIN_varid) 
-  status=nf_def_var(fileid, 'DIC', nf_real, 2, dd, DIC_varid)
-  status=nf_def_var(fileid, 'Alk', nf_real, 2, dd, Alk_varid) 
-  status=nf_def_var(fileid, 'O2', nf_real, 2, dd, O2_varid)
-  status=nf_def_var(fileid, 'PhyN', nf_real, 2, dd, PhyN_varid)  
-  status=nf_def_var(fileid, 'PhyC', nf_real, 2, dd, PhyC_varid)
-  status=nf_def_var(fileid, 'PhyChl', nf_real, 2, dd, PhyChl_varid)
-  status=nf_def_var(fileid, 'PhyCalc', nf_real, 2, dd, Phycalc_varid) 
+  status=nf_def_var(fileid, trim(DIN_name), nf_real, 2, dd, DIN_varid) 
+  status=nf_def_var(fileid, trim(DIC_name), nf_real, 2, dd, DIC_varid)
+  status=nf_def_var(fileid, trim(Alk_name), nf_real, 2, dd, Alk_varid) 
   
-  status=nf_def_var(fileid, 'DetN', nf_real, 2, dd, DetN_varid)
-  status=nf_def_var(fileid, 'DetC', nf_real, 2, dd, DetC_varid) 
-  status=nf_def_var(fileid, 'DetSi', nf_real, 2, dd, DetSi_varid)
-  status=nf_def_var(fileid, 'DetCalc', nf_real, 2, dd, DetCalc_varid)
-    
-  status=nf_def_var(fileid, 'HetN', nf_real, 2, dd, HetN_varid)
-  status=nf_def_var(fileid, 'HetC', nf_real, 2, dd, HetC_varid) 
+  status=nf_def_var(fileid, trim(PhyN_name), nf_real, 2, dd, PhyN_varid)  
+  status=nf_def_var(fileid, trim(PhyC_name), nf_real, 2, dd, PhyC_varid)
+  status=nf_def_var(fileid, trim(PhyChl_name), nf_real, 2, dd, PhyChl_varid)
   
-  status=nf_def_var(fileid, 'DSi', nf_real, 2, dd, DSi_varid)
-  status=nf_def_var(fileid, 'DFe', nf_real, 2, dd, DFe_varid) 
+  status=nf_def_var(fileid, trim(DetN_name), nf_real, 2, dd, DetN_varid)
+  status=nf_def_var(fileid, trim(DetC_name), nf_real, 2, dd, DetC_varid)
   
-  status=nf_def_var(fileid, 'DON', nf_real, 2, dd, DON_varid)
-  status=nf_def_var(fileid, 'DOC', nf_real, 2, dd, DOC_varid)
-    
-  status=nf_def_var(fileid, 'DiaN', nf_real, 2, dd, DiaN_varid)
-  status=nf_def_var(fileid, 'DiaC', nf_real, 2, dd, DiaC_varid) 
-  status=nf_def_var(fileid, 'DiaChl', nf_real, 2, dd, DiaChl_varid)
-  status=nf_def_var(fileid, 'DiaSi', nf_real, 2, dd, DiaSi_varid) 
+  status=nf_def_var(fileid, trim(HetN_name), nf_real, 2, dd, HetN_varid)
+  status=nf_def_var(fileid, trim(HetC_name), nf_real, 2, dd, HetC_varid)  
   
+  status=nf_def_var(fileid, trim(DON_name), nf_real, 2, dd, DON_varid)
+  status=nf_def_var(fileid, trim(DOC_name), nf_real, 2, dd, DOC_varid)
+  
+  status=nf_def_var(fileid, trim(DiaN_name), nf_real, 2, dd, DiaN_varid)
+  status=nf_def_var(fileid, trim(DiaC_name), nf_real, 2, dd, DiaC_varid) 
+  status=nf_def_var(fileid, trim(DiaChl_name), nf_real, 2, dd, DiaChl_varid)
+  status=nf_def_var(fileid, trim(DiaSi_name), nf_real, 2, dd, DiaSi_varid) 
+  
+  status=nf_def_var(fileid, trim(DetSi_name), nf_real, 2, dd, DetSi_varid)
+  
+  status=nf_def_var(fileid, trim(DSi_name), nf_real, 2, dd, DSi_varid)
+  status=nf_def_var(fileid, trim(DFe_name), nf_real, 2, dd, DFe_varid)
+  
+  status=nf_def_var(fileid, trim(PhyCalc_name), nf_real, 2, dd, Phycalc_varid) 
+  status=nf_def_var(fileid, trim(DetCalc_name), nf_real, 2, dd, DetCalc_varid)
+  
+  status=nf_def_var(fileid, trim(O2_name), nf_real, 2, dd, O2_varid)
  
   if (REcoM_Second_Zoo) then
-    	status=nf_def_var(fileid, 'Zoo2N', nf_real, 2, dd, Zoo2N_varid)
-  	status=nf_def_var(fileid, 'Zoo2C', nf_real, 2, dd, Zoo2C_varid) 
-  	status=nf_def_var(fileid, 'idetz2n', nf_real, 2, dd, detz2n_varid)
-  	status=nf_def_var(fileid, 'idetz2c', nf_real, 2, dd, detz2c_varid) 
-  	status=nf_def_var(fileid, 'idetz2si', nf_real, 2, dd, detz2si_varid)
-  	status=nf_def_var(fileid, 'idetz2calc', nf_real, 2, dd, detz2calc_varid)   
+    	status=nf_def_var(fileid, trim(Zoo2N_name), nf_real, 2, dd, Zoo2N_varid)
+  	status=nf_def_var(fileid, trim(Zoo2C_name), nf_real, 2, dd, Zoo2C_varid) 
+  	status=nf_def_var(fileid, trim(detz2n_name), nf_real, 2, dd, detz2n_varid)
+  	status=nf_def_var(fileid, trim(detz2c_name), nf_real, 2, dd, detz2c_varid) 
+  	status=nf_def_var(fileid, trim(detz2si_name), nf_real, 2, dd, detz2si_varid)
+  	status=nf_def_var(fileid, trim(detz2calc_name), nf_real, 2, dd, detz2calc_varid)   
   endif   
 
   ! define attributes (units, variable names) long_name, unit
-  ! dates, depth and depth bounds
+  ! dates, depth proxies day and year
   ! dates
 
-  print*, 'test', fileid, dates_varid, depth_varid, trim(units), d_unit
-  status = nf_put_att_text(fileid, dates_varid, trim(units), unitlength, d_unit)
-  status = nf_put_att_text(fileid, dates_varid, trim(lname), namelength,		&
-  	"days of simulation")
-  test=.False.
-  if (test) then 
-  ! depth
-  status = nf_put_att(fileid, depth_varid, trim(units), unitlength, m_unit)
-  status = nf_put_att(fileid, depth_varid, trim(lname), namelength, 		&
-  	"depth (center of vertical cell)") 
+  status = nf_put_att_text(fileid, day_varid, trim(lname), len(trim(day_lname)), trim(day_lname))
+  status = nf_put_att_text(fileid, year_varid, trim(lname), len(trim(year_lname)), trim(year_lname))
+  status = nf_put_att_text(fileid, nlvl_varid, trim(lname), len(trim(nlvl_lname)), trim(nlvl_lname))  
+  	 
+  ! depth proxy at middle of cells
+  status = nf_put_att_text(fileid, zcell_varid, trim(units), len(trim(m_unit)), m_unit)
+  status = nf_put_att_text(fileid, zcell_varid, trim(lname), len(trim(zcell_lname)), trim(zcell_lname)) 
   
-  ! depth cell boundaries 
-   status = nf_put_att(fileid, bound_varid, trim(units), unitlength, m_unit)
-  status = nf_put_att(fileid, bound_varid, trim(lname), namelength, 		&
-  	"depth (boundaries of vertical cell)")
+  ! depth at vertical nodes
+  status = nf_put_att_text(fileid, znode_varid, trim(units), len(trim(m_unit)), m_unit)
+  status = nf_put_att_text(fileid, znode_varid, trim(lname), len(trim(znode_lname)), trim(znode_lname))
   	  
   ! dpCO2
-  status = nf_put_att(fileid, dpCO2_varid, trim(units), unitlength, P_unit)
-  status = nf_put_att(fileid, dpCO2_varid, trim(lname), namelength, 		&
-  	"Difference of oceanic pCO2 minus atmospheric pCO2") 
+  status = nf_put_att_text(fileid, dpCO2_varid, trim(units), len(trim(P_unit)), P_unit)
+  status = nf_put_att_text(fileid, dpCO2_varid, trim(lname), len(trim(dpCO2s_lname)), trim(dpCO2s_lname)) 
+
   ! pCO2
-  status = nf_put_att(fileid, pCO2_varid, trim(units), unitlength, P_unit)
-  status = nf_put_att(fileid, pCO2_varid, trim(lname), namelength, 		&
-  	"Partial pressure of oceanic CO2") 
+  status = nf_put_att_text(fileid, pCO2_varid, trim(units), len(trim(P_unit)), P_unit)
+  status = nf_put_att_text(fileid, pCO2_varid, trim(lname), len(trim(pCO2s_lname)), trim(pCO2s_lname)) 
+
   ! CO2f
-  status = nf_put_att(fileid, CO2f_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, CO2f_varid, trim(lname), namelength, 		&
-  	"CO2-flux into the surface water") 
+  status = nf_put_att_text(fileid, CO2f_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, CO2f_varid, trim(lname), len(trim(CO2f_lname)), trim(CO2f_lname)) 
   ! Hp
-  status = nf_put_att(fileid, Hp_varid, trim(units), unitlength, qm_unit)
-  status = nf_put_att(fileid, Hp_varid, trim(lname), namelength, 			&
-  	"Mean of H-plus ions in the surface water") 
+  status = nf_put_att_text(fileid, Hp_varid, trim(units), len(trim(qm_unit)), qm_unit)
+  status = nf_put_att_text(fileid, Hp_varid, trim(lname), len(trim(Hp_lname)), trim(Hp_lname))
   ! aFe
-  status = nf_put_att(fileid, aFe_varid, trim(units), unitlength, aFe_unit)
-  status = nf_put_att(fileid, aFe_varid, trim(lname), namelength, "Atmospheric iron input")   
+  status = nf_put_att_text(fileid, aFe_varid, trim(units), len(trim(aFe_unit)), aFe_unit)
+  status = nf_put_att_text(fileid, aFe_varid, trim(lname), len(trim(aFe_lname)), trim(aFe_lname))   
   
   ! aN
-  status = nf_put_att(fileid, aN_varid, trim(units), unitlength, aN_unit)
-  status = nf_put_att(fileid, aN_varid, trim(lname), namelength, "Atmospheric DIN input") 
+  status = nf_put_att_text(fileid, aN_varid, trim(units), len(trim(aN_unit)), aN_unit)
+  status = nf_put_att_text(fileid, aN_varid, trim(lname), len(trim(aN_lname)), trim(aN_lname)) 
   
   ! denb
-  status = nf_put_att(fileid, denb_varid, trim(units), unitlength, qa_unit)
-  status = nf_put_att(fileid, denb_varid, trim(lname), namelength, "Benthic denitrification rate") 
+  status = nf_put_att_text(fileid, denb_varid, trim(units), len(trim(qa_unit)), qa_unit)
+  status = nf_put_att_text(fileid, denb_varid, trim(lname), len(trim(denb_lname)), trim(denb_lname)) 
   
   ! benN
-  status = nf_put_att(fileid, benN_varid, trim(units), unitlength, qa_unit)
-  status = nf_put_att(fileid, benN_varid, trim(lname), namelength, "Benthos Nitrogen") 
+  status = nf_put_att_text(fileid, benN_varid, trim(units), len(trim(qa_unit)), qa_unit)
+  status = nf_put_att_text(fileid, benN_varid, trim(lname), len(trim(benN_lname)), trim(benN_lname)) 
     
   ! benC
-  status = nf_put_att(fileid, benC_varid, trim(units), unitlength, qa_unit)
-  status = nf_put_att(fileid, benC_varid, trim(lname), namelength, "Benthos Carbon") 
+  status = nf_put_att_text(fileid, benC_varid, trim(units), len(trim(qa_unit)), qa_unit)
+  status = nf_put_att_text(fileid, benC_varid, trim(lname), len(trim(benC_lname)), trim(benC_lname)) 
     
   ! benSi
-  status = nf_put_att(fileid, benSi_varid, trim(units), unitlength, qa_unit)
-  status = nf_put_att(fileid, benSi_varid, trim(lname), namelength, "Benthos silicon") 
+  status = nf_put_att_text(fileid, benSi_varid, trim(units), len(trim(qa_unit)), qa_unit)
+  status = nf_put_att_text(fileid, benSi_varid, trim(lname), len(trim(benSi_lname)), trim(benSi_lname)) 
     
   ! benCalc
-  status = nf_put_att(fileid, benCalc_varid, trim(units), unitlength, qa_unit)
-  status = nf_put_att(fileid, benCalc_varid, trim(lname), namelength, "Benthos calcite") 
+  status = nf_put_att_text(fileid, benCalc_varid, trim(units), len(trim(qa_unit)), qa_unit)
+  status = nf_put_att_text(fileid, benCalc_varid, trim(lname), len(trim(benCalc_lname)), trim(benCalc_lname)) 
   
   ! NPPn
-  status = nf_put_att(fileid, NPPn_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, NPPn_varid, trim(lname), namelength, "Mean NPP nanophytoplankton")
+  status = nf_put_att_text(fileid, NPPn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NPPn_varid, trim(lname), len(trim(NPPn_lname)), trim(NPPn_lname))
   
   ! NPPd
-  status = nf_put_att(fileid, NPPd_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, NPPd_varid, trim(lname), namelength, "Mean NPP diatoms")
+  status = nf_put_att_text(fileid, NPPd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NPPd_varid, trim(lname), len(trim(NPPd_lname)), trim(NPPd_lname))
     
   ! GPPn
-  status = nf_put_att(fileid, GPPn_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, GPPn_varid, trim(lname), namelength, "Mean GPP nanophytoplankton")
+  status = nf_put_att_text(fileid, GPPn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GPPn_varid, trim(lname), len(trim(GPPn_lname)), trim(GPPn_lname))
     
   ! GPPd
-  status = nf_put_att(fileid, GPPd_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, GPPd_varid, trim(lname), namelength, "Mean GPP diatoms")
+  status = nf_put_att_text(fileid, GPPd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GPPd_varid, trim(lname), len(trim(GPPd_lname)), trim(GPPd_lname))
     
   ! NNAn
-  status = nf_put_att(fileid, NNAn_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, NNAn_varid, trim(lname), namelength, "Net N-assimilation nanophytoplankton")
+  status = nf_put_att_text(fileid, NNAn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NNAn_varid, trim(lname), len(trim(NNAn_lname)), trim(NNAn_lname))
     
   ! NNAd
-  status = nf_put_att(fileid, NNAd_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, NNAd_varid, trim(lname), namelength, "Net N-assimilation diatoms")  
+  status = nf_put_att_text(fileid, NNAd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NNAd_varid, trim(lname), len(trim(NNAd_lname)), trim(NNAd_lname))  
 
   ! GNAn
-  status = nf_put_att(fileid, GNAn_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, GNAn_varid, trim(lname), namelength, "Gross N-assimilation nanophytoplankton")
+  status = nf_put_att_text(fileid, GNAn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GNAn_varid, trim(lname), len(trim(GNAn_lname)), trim(GNAn_lname))
     
   ! GNAd
-  status = nf_put_att(fileid, GNAd_varid, trim(units), unitlength, f_unit)
-  status = nf_put_att(fileid, GNAd_varid, trim(lname), namelength, "Gross N-assimilation diatoms")  
+  status = nf_put_att_text(fileid, GNAd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GNAd_varid, trim(lname), len(trim(GNAd_lname)), trim(GNAd_lname))  
   
   ! temp
-  status = nf_put_att(fileid, T_varid, trim(units), unitlength, T_unit)
-  status = nf_put_att(fileid, T_varid, trim(lname), namelength, "Temperature profile")   
+  status = nf_put_att_text(fileid, T_varid, trim(units), len(trim(T_unit)), T_unit)
+  status = nf_put_att_text(fileid, T_varid, trim(lname), len(trim(temp_lname)), trim(temp_lname))   
   
   ! salt
-  status = nf_put_att(fileid, S_varid, trim(units), unitlength, S_unit)
-  status = nf_put_att(fileid, S_varid, trim(lname), namelength, "Salinity profile") 
+  status = nf_put_att_text(fileid, S_varid, trim(units), len(trim(S_unit)), S_unit)
+  status = nf_put_att_text(fileid, S_varid, trim(lname), len(trim(salt_lname)), trim(salt_lname)) 
     
   ! PAR
-  status = nf_put_att(fileid, PAR_varid, trim(units), unitlength, W_unit)
-  status = nf_put_att(fileid, PAR_varid, trim(lname), namelength, "PAR")   
+  status = nf_put_att_text(fileid, PAR_varid, trim(units), len(trim(W_unit)), W_unit)
+  status = nf_put_att_text(fileid, PAR_varid, trim(lname), len(trim(PAR_lname)), trim(PAR_lname))   
   
   ! DIN
-  status = nf_put_att(fileid, DIN_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DIN_varid, trim(lname), namelength, "Dissolved Inorganic Nitrogen")  
+  status = nf_put_att_text(fileid, DIN_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DIN_varid, trim(lname), len(trim(DIN_lname)),trim(DIN_lname))  
    
   ! DIC
-  status = nf_put_att(fileid, DIC_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DIC_varid, trim(lname), namelength, "Dissolved Inorganic Carbon")  
+  status = nf_put_att_text(fileid, DIC_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DIC_varid, trim(lname), len(trim(DIC_lname)), trim(DIC_lname))  
   
   ! Alk
-  status = nf_put_att(fileid, Alk_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, Alk_varid, trim(lname), namelength, "Total Alkalinity")   
+  status = nf_put_att_text(fileid, Alk_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, Alk_varid, trim(lname), len(trim(Alk_lname)), trim(Alk_lname))   
 
   ! PhyN
-  status = nf_put_att(fileid, PhyN_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, PhyN_varid, trim(lname), namelength, 			&
-  "Intracellular concentration of Nitrogen in small phytoplankton")   
+  status = nf_put_att_text(fileid, PhyN_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, PhyN_varid, trim(lname), len(trim(PhyN_lname)), trim(PhyN_lname))   
   
   ! PhyC
-  status = nf_put_att(fileid, PhyC_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, PhyC_varid, trim(lname), namelength, 			&
-  "Intracellular concentration of Carbon in small phytoplankton")   
+  status = nf_put_att_text(fileid, PhyC_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, PhyC_varid, trim(lname), len(trim(PhyC_lname)), trim(PhyC_lname))   
   
   ! PhyChl
-  status = nf_put_att(fileid, PhyChl_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, PhyChl_varid, trim(lname), namelength, "Current intracellular Chlorophyl A concentration")   
+  status = nf_put_att_text(fileid, PhyChl_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, PhyChl_varid, trim(lname), len(trim(PhyChl_lname)), trim(PhyChl_lname))   
 
   ! PhyCalc
-  status = nf_put_att(fileid, PhyCalc_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, PhyCalc_varid, trim(lname), namelength, "Current intracellular Calcite concentration")  
+  status = nf_put_att_text(fileid, PhyCalc_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, PhyCalc_varid, trim(lname), len(trim(PhyCalc_lname)), trim(PhyCalc_lname))  
     
   ! DetN
-  status = nf_put_att(fileid, DetN_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DetN_varid, trim(lname), namelength, "Concentration of Nitrogen in Detritus")  
+  status = nf_put_att_text(fileid, DetN_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DetN_varid, trim(lname), len(trim(DetN_lname)), trim(DetN_lname))  
   
   ! DetC
-  status = nf_put_att(fileid, DetC_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DetC_varid, trim(lname), namelength, "Concentration of Carbon in Detritus")  
+  status = nf_put_att_text(fileid, DetC_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DetC_varid, trim(lname), len(trim(DetC_lname)), trim(DetC_lname))  
 
   ! DetSi
-  status = nf_put_att(fileid, DetSi_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DetSi_varid, trim(lname), namelength, "Concentration of Silicon in Detritus")  
+  status = nf_put_att_text(fileid, DetSi_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DetSi_varid, trim(lname), len(trim(DetSi_lname)), trim(DetSi_lname))  
   
   ! DetCalc
-  status = nf_put_att(fileid, DetCalc_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DetCalc_varid, trim(lname), namelength, "Concentration of Calcite in Detritus")  
+  status = nf_put_att_text(fileid, DetCalc_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DetCalc_varid, trim(lname), len(trim(DetCalc_lname)), trim(DetCalc_lname))  
  
   ! HetN
-  status = nf_put_att(fileid, HetN_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, HetN_varid, trim(lname), namelength, "Concentration of Nitrogen in heterotrophs")   
+  status = nf_put_att_text(fileid, HetN_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, HetN_varid, trim(lname), len(trim(HetN_lname)), trim(HetN_lname))
   
   ! HetC
-  status = nf_put_att(fileid, HetC_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, HetC_varid, trim(lname), namelength, "Concentration of Carbon in heterotrophs")  
+  status = nf_put_att_text(fileid, HetC_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, HetC_varid, trim(lname), len(trim(HetC_lname)), trim(HetC_lname))  
    
   ! DON
-  status = nf_put_att(fileid, DON_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DON_varid, trim(lname), namelength, "Dissolved organic Nitrogen in water") 
+  status = nf_put_att_text(fileid, DON_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DON_varid, trim(lname), len(trim(DON_lname)), trim(DON_lname)) 
     
   ! DOC
-  status = nf_put_att(fileid, DOC_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DOC_varid, trim(lname), namelength, "Dissolved organic Carbon in water") 
+  status = nf_put_att_text(fileid, DOC_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DOC_varid, trim(lname), len(trim(DOC_lname)), trim(DOC_lname)) 
   
   ! O2
-  status = nf_put_att(fileid, O2_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, O2_varid, trim(lname), namelength, "concentration of dioxygen in water") 
+  status = nf_put_att_text(fileid, O2_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, O2_varid, trim(lname), len(trim(O2_lname)), trim(O2_lname)) 
 
   ! DiaN
-  status = nf_put_att(fileid, DiaN_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DiaN_varid, trim(lname), namelength, "concentration of Nitrogen in diatoms")   
+  status = nf_put_att_text(fileid, DiaN_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DiaN_varid, trim(lname), len(trim(DiaN_lname)), trim(DiaN_lname))   
   
   ! DiaC
-  status = nf_put_att(fileid, DiaC_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DiaC_varid, trim(lname), namelength, "concentration of Carbon in diatoms")   
+  status = nf_put_att_text(fileid, DiaC_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DiaC_varid, trim(lname), len(trim(DiaC_lname)), trim(DiaC_lname))   
   
   ! DiaChl
-  status = nf_put_att(fileid, DiaChl_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DiaChl_varid, trim(lname), namelength, "concentration of Chlorophyll A in diatoms")   
+  status = nf_put_att_text(fileid, DiaChl_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DiaChl_varid, trim(lname), len(trim(DiaChl_lname)), trim(DiaChl_lname))   
   
   ! DiaSi
-  status = nf_put_att(fileid, DiaSi_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DiaSi_varid, trim(lname), namelength, "concentration of Silicon in diatoms")   
+  status = nf_put_att_text(fileid, DiaSi_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DiaSi_varid, trim(lname), len(trim(DiaSi_lname)), trim(DiaSi_lname))   
   
   ! DSi
-  status = nf_put_att(fileid, DSi_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DSi_varid, trim(lname), namelength, "concentration of Dissolved Silicate")   
+  status = nf_put_att_text(fileid, DSi_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DSi_varid, trim(lname), len(trim(DSi_lname)), trim(DSi_lname))   
     
   ! DFe
-  status = nf_put_att(fileid, DFe_varid, trim(units), unitlength, Conc_unit)
-  status = nf_put_att(fileid, DFe_varid, trim(lname), namelength, "concentration of Dissolved Iron")   
+  status = nf_put_att_text(fileid, DFe_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  status = nf_put_att_text(fileid, DFe_varid, trim(lname), len(trim(DFe_lname)), trim(DFe_lname))   
 
 
   
   if (REcoM_Second_Zoo) then
   
     	! Zoo2N
-  	status = nf_put_att(fileid, Zoo2N_varid, trim(units), unitlength, Conc_unit)
-  	status = nf_put_att(fileid, Zoo2N_varid, trim(lname), namelength, 				&
-  	"Intracellular concentration of Nitrogen in second zooplankton")   
+  	status = nf_put_att_text(fileid, Zoo2N_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  	status = nf_put_att_text(fileid, Zoo2N_varid, trim(lname), len(trim(Zoo2N_lname)), trim(Zoo2N_lname))   
     
   	! Zoo2C
-  	status = nf_put_att(fileid, Zoo2C_varid, trim(units), unitlength, Conc_unit)
-  	status = nf_put_att(fileid, Zoo2C_varid, trim(lname), namelength, 				&
-  	"Intracellular concentration of Carbon in second zooplankton")   
+  	status = nf_put_att_text(fileid, Zoo2C_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  	status = nf_put_att_text(fileid, Zoo2C_varid, trim(lname), len(trim(Zoo2C_lname)), trim(Zoo2C_lname))   
   	
   	! idetz2n
-  	status = nf_put_att(fileid, detz2n_varid, trim(units), unitlength, Conc_unit)
-  	status = nf_put_att(fileid, detz2n_varid, trim(lname), namelength, 				&
-  	"Concentration of Nitrogen in detritus from second zooplankton")   
+  	status = nf_put_att_text(fileid, detz2n_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  	status = nf_put_att_text(fileid, detz2n_varid, trim(lname), len(trim(detz2n_lname)), trim(detz2n_lname))   
     
   	! idetz2c
-  	status = nf_put_att(fileid, detz2c_varid, trim(units), unitlength, Conc_unit)
-  	status = nf_put_att(fileid, detz2c_varid, trim(lname), namelength,  				&
-  	"Concentration of Carbon in detritus from second zooplankton")   
+  	status = nf_put_att_text(fileid, detz2c_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  	status = nf_put_att_text(fileid, detz2c_varid, trim(lname), len(trim(detz2c_lname)), trim(detz2c_lname))   
     
   	! idetz2si
-  	status = nf_put_att(fileid, detz2si_varid, trim(units), unitlength, Conc_unit)
-  	status = nf_put_att(fileid, detz2si_varid, trim(lname), namelength,  				&
-  	"Concentration of Silicon in detritus from second zooplankton")     
+  	status = nf_put_att_text(fileid, detz2si_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  	status = nf_put_att_text(fileid, detz2si_varid, trim(lname), len(trim(detz2si_lname)), trim(detz2si_lname))     
 
   	! idetz2calc
-  	status = nf_put_att(fileid, detz2calc_varid, trim(units), unitlength, Conc_unit)
-  	status = nf_put_att(fileid, detz2calc_varid, trim(lname), namelength,  				&
-  	"Concentration of Calcite in detritus from second zooplankton")   
+  	status = nf_put_att_text(fileid, detz2calc_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
+  	status = nf_put_att_text(fileid, detz2calc_varid, trim(lname), len(trim(detz2calc_lname)), trim(detz2calc_lname))   
   endif
-  endif
+ 
   ! end definition mode
    status = nf_enddef(fileid)
    
   ! fill and store variable in the netcdf file
-  status = nf_put_var(fileid, dates_varid, dates_diag)
-  status = nf_put_var(fileid, depth_varid, Z)
-  status = nf_put_var(fileid, bound_varid, zbar)
+  status = nf_put_var_int(fileid, day_varid, day_diag)
+  status = nf_put_var_int(fileid, year_varid, year_diag)
+  status = nf_put_var_int(fileid, nlvl_varid, nlevel_diag)
+  status = nf_put_var_double(fileid, zcell_varid, zcell_diag)
+  status = nf_put_var_double(fileid, znode_varid, znode_diag)
   
-  status = nf_put_var(fileid, dpCO2_varid, dpCO2s_diag)
-  status = nf_put_var(fileid, pCO2_varid, pCO2s_diag)
-  status = nf_put_var(fileid, CO2f_varid, CO2f_diag)
-  status = nf_put_var(fileid, Hp_varid, Hp_diag)
-  status = nf_put_var(fileid, aFe_varid, aFe_diag)
-  status = nf_put_var(fileid, aN_varid, aN_diag)    
+  status = nf_put_var_double(fileid, dpCO2_varid, dpCO2s_diag)
+  status = nf_put_var_double(fileid, pCO2_varid, pCO2s_diag)
+  status = nf_put_var_double(fileid, CO2f_varid, CO2f_diag)
+  status = nf_put_var_double(fileid, Hp_varid, Hp_diag)
+  status = nf_put_var_double(fileid, aFe_varid, aFe_diag)
+  status = nf_put_var_double(fileid, aN_varid, aN_diag)    
 
-  status = nf_put_var(fileid, denb_varid, denb_diag)
-  status = nf_put_var(fileid, benN_varid, benN_diag)  
-  status = nf_put_var(fileid, benC_varid, benC_diag)
-  status = nf_put_var(fileid, benSi_varid, benSi_diag)    
-  status = nf_put_var(fileid, benCalc_varid, benCalc_diag)
+  status = nf_put_var_double(fileid, denb_varid, denb_diag)
+  status = nf_put_var_double(fileid, benN_varid, benN_diag)  
+  status = nf_put_var_double(fileid, benC_varid, benC_diag)
+  status = nf_put_var_double(fileid, benSi_varid, benSi_diag)    
+  status = nf_put_var_double(fileid, benCalc_varid, benCalc_diag)
   
-  status = nf_put_var(fileid, NPPn_varid, NPPn_diag)
-  status = nf_put_var(fileid, NPPd_varid, NPPd_diag)  
-  status = nf_put_var(fileid, GPPn_varid, GPPn_diag)
-  status = nf_put_var(fileid, GPPd_varid, GPPd_diag) 
+  status = nf_put_var_double(fileid, NPPn_varid, NPPn_diag)
+  status = nf_put_var_double(fileid, NPPd_varid, NPPd_diag)  
+  status = nf_put_var_double(fileid, GPPn_varid, GPPn_diag)
+  status = nf_put_var_double(fileid, GPPd_varid, GPPd_diag) 
   
-  status = nf_put_var(fileid, NNAn_varid, NNAn_diag)
-  status = nf_put_var(fileid, NNAd_varid, NNAd_diag)  
-  status = nf_put_var(fileid, GNAn_varid, GNAn_diag)
-  status = nf_put_var(fileid, GNAd_varid, GNAd_diag) 
+  status = nf_put_var_double(fileid, NNAn_varid, NNAn_diag)
+  status = nf_put_var_double(fileid, NNAd_varid, NNAd_diag)  
+  status = nf_put_var_double(fileid, GNAn_varid, GNAn_diag)
+  status = nf_put_var_double(fileid, GNAd_varid, GNAd_diag) 
   
-  status = nf_put_var(fileid, T_varid, temp_diag)  
-  status = nf_put_var(fileid, S_varid, sali_diag)
-  status = nf_put_var(fileid, PAR_varid, PAR_diag) 
+  status = nf_put_var_double(fileid, T_varid, temp_diag)  
+  status = nf_put_var_double(fileid, S_varid, sali_diag)
+  status = nf_put_var_double(fileid, PAR_varid, PAR_diag) 
 
-  status = nf_put_var(fileid, DIN_varid, DIN_diag)
-  status = nf_put_var(fileid, DIC_varid, DIC_diag)  
-  status = nf_put_var(fileid, Alk_varid, Alk_diag)
-  status = nf_put_var(fileid, O2_varid, O2_diag) 
+  status = nf_put_var_double(fileid, DIN_varid, DIN_diag)
+  status = nf_put_var_double(fileid, DIC_varid, DIC_diag)  
+  status = nf_put_var_double(fileid, Alk_varid, Alk_diag)
+  status = nf_put_var_double(fileid, O2_varid, O2_diag) 
+  print*, 'O2', O2_diag(10,:)
   
-  status = nf_put_var(fileid, PhyN_varid, PhyN_diag)
-  status = nf_put_var(fileid, PhyC_varid, PhyC_diag)  
-  status = nf_put_var(fileid, PhyChl_varid, PhyChl_diag)
-  status = nf_put_var(fileid, Phycalc_varid, PhyCalc_diag) 
+  status = nf_put_var_double(fileid, PhyN_varid, PhyN_diag)
+  status = nf_put_var_double(fileid, PhyC_varid, PhyC_diag)  
+  status = nf_put_var_double(fileid, PhyChl_varid, PhyChl_diag)
+  status = nf_put_var_double(fileid, Phycalc_varid, PhyCalc_diag) 
 
-  status = nf_put_var(fileid, DetN_varid, DetN_diag)
-  status = nf_put_var(fileid, DetC_varid, DetC_diag)  
-  status = nf_put_var(fileid, DetSi_varid, DetSi_diag)
-  status = nf_put_var(fileid, DetCalc_varid, DetCalc_diag) 
+  status = nf_put_var_double(fileid, DetN_varid, DetN_diag)
+  status = nf_put_var_double(fileid, DetC_varid, DetC_diag)  
+  status = nf_put_var_double(fileid, DetSi_varid, DetSi_diag)
+  status = nf_put_var_double(fileid, DetCalc_varid, DetCalc_diag) 
 
-  status = nf_put_var(fileid, HetN_varid, HetN_diag)
-  status = nf_put_var(fileid, HetC_varid, HetC_diag) 
+  status = nf_put_var_double(fileid, HetN_varid, HetN_diag)
+  status = nf_put_var_double(fileid, HetC_varid, HetC_diag) 
    
-  status = nf_put_var(fileid, DSi_varid, DSi_diag)
-  status = nf_put_var(fileid, DFe_varid, DFe_diag) 
+  status = nf_put_var_double(fileid, DSi_varid, DSi_diag)
+  status = nf_put_var_double(fileid, DFe_varid, DFe_diag) 
   
-  status = nf_put_var(fileid, DON_varid, DON_diag)
-  status = nf_put_var(fileid, DOC_varid, DOC_diag) 
+  status = nf_put_var_double(fileid, DON_varid, DON_diag)
+  status = nf_put_var_double(fileid, DOC_varid, DOC_diag) 
   
-  status = nf_put_var(fileid, DiaN_varid, DiaN_diag)
-  status = nf_put_var(fileid, DiaC_varid, DiaC_diag)  
-  status = nf_put_var(fileid, DiaChl_varid, DiaChl_diag)
-  status = nf_put_var(fileid, DiaSi_varid, DiaSi_diag)
+  status = nf_put_var_double(fileid, DiaN_varid, DiaN_diag)
+  status = nf_put_var_double(fileid, DiaC_varid, DiaC_diag)  
+  status = nf_put_var_double(fileid, DiaChl_varid, DiaChl_diag)
+  status = nf_put_var_double(fileid, DiaSi_varid, DiaSi_diag)
    
   
   if (REcoM_Second_Zoo) then
-    	status = nf_put_var(fileid, Zoo2N_varid, Zoo2N_diag)
-  	status = nf_put_var(fileid, Zoo2C_varid, Zoo2C_diag)  
-  	status = nf_put_var(fileid, detz2n_varid, idetz2n_diag)
-  	status = nf_put_var(fileid, detz2c_varid, idetz2c_diag) 
-  	status = nf_put_var(fileid, detz2si_varid, idetz2si_diag)
-  	status = nf_put_var(fileid, detz2calc_varid, idetz2calc_diag) 
+    	status = nf_put_var_double(fileid, Zoo2N_varid, Zoo2N_diag)
+  	status = nf_put_var_double(fileid, Zoo2C_varid, Zoo2C_diag)  
+  	status = nf_put_var_double(fileid, detz2n_varid, idetz2n_diag)
+  	status = nf_put_var_double(fileid, detz2c_varid, idetz2c_diag) 
+  	status = nf_put_var_double(fileid, detz2si_varid, idetz2si_diag)
+  	status = nf_put_var_double(fileid, detz2calc_varid, idetz2calc_diag) 
   endif   
 
   ! close file

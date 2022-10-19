@@ -79,7 +79,7 @@ recom_time = REcoM_time()
 
 
 #
-# write time configuration information to temporary info file
+# write time configuration information to temporary info file to be parsed in namelist.config
 #
 var=recom_time
 
@@ -96,3 +96,13 @@ f.write('timenew=' + str(var.timenew) + '\n')
 f.write('daynew=' + str(var.daynew) + '\n')
 f.write('yearnew=' + str(var.yearnew) + '\n')
 f.close()
+
+#
+# write time configuration in test.clock
+#
+fname = 'test.clock'
+f = open(fname, 'w')
+f.write(str(int(var.timenew)) + '\t' + str(int(var.daynew)) + '\t' + str(int(var.yearnew)) + '\n')
+f.write(str(int(var.timenew)) + '\t' + str(int(var.daynew)) + '\t' + str(int(var.yearnew)) + '\n')
+f.close()
+

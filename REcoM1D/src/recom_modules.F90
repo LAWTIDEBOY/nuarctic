@@ -55,7 +55,8 @@ module general_config
   ! *** forcing ***  
   character(len=4096)   :: forcingname='MOSAiC_forcing'                ! file name which contains REcoM forcing
   character(len=4096)   :: atmdepositionname='MOSAiC_atm_deposition'  ! file name which contains atm deposition to prescribe
-  namelist /forcingproperties/ forcingname, atmdepositionname
+  character(len=4096)	:: tracerinitname='MOSAiC_tracer_initialization'
+  namelist /forcingproperties/ forcingname, atmdepositionname, tracerinitname
   !_____________________________________________________________________________
   ! *** Paths for all in and out ***
   !character(len=4096)        :: grid_path='./grid/'
@@ -241,7 +242,7 @@ module recom_config
 !! *** Photosynthesis ***
   Real(kind=8)                 :: alfa           = 0.14d0	  ! [(mmol C*m2)/(mg Chl*W*day)] 
   Real(kind=8)                 :: alfa_d         = 0.19d0         ! An initial slope of the P-I curve
-  Real(kind=8)                 :: parFrac        = 0.43d0
+  Real(kind=8)                 :: parFrac        = 0.43d0	  ! fraction in between shortwave radiation and PAR (e.g. Howell et al., 1983)
   namelist /paphotosynthesis/ alfa, alfa_d, parFrac   
 !!------------------------------------------------------------------------------
 !! *** Assimilation ***

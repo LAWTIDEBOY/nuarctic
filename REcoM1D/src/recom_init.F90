@@ -116,8 +116,15 @@ end if
     write(*,*) 'Benthic layers are set'
 
 ! initialize tracer arrays (previously define in ocean_module)
-! for now, no change in DIN(3), DIC(4), Alk(5), DSi(20), O2(24) -> initialized to 0
-
+! DIN(3), DIC(4), Alk(5), DSi(20), DFe, O2(24) are initialize from climatology or MOSAiC initial conditions
+! if no specific values are defined then it stays equal to 0
+    call read_tracer_initialization(mesh)
+    if (sum(abs(DIN_init))>0) tr_arr(:,3)=DIN_init
+    if (sum(abs(DIC_init))>0) tr_arr(:,4)=DIC_init
+    if (sum(abs(Alk_init))>0) tr_arr(:,5)=Alk_init
+    if (sum(abs(DSi_init))>0) tr_arr(:,20)=DSi_init
+    if (sum(abs(DFe_init))>0) tr_arr(:,21)=DFe_init
+    if (sum(abs(DO2_init))>0) tr_arr(:,24)=DO2_init      
 ! tracer 6  = PhyN   -> Intracellular conc of Nitrogen in small phytoplankton
     tr_arr(:,6)  = tiny_chl/chl2N_max   !tiny                  
     
@@ -144,7 +151,7 @@ end if
     tr_arr(:,18) = tiny_chl/chl2N_max_d/NCmax_d/SiCmax !tiny          
 
 ! concentration in Dissolved Iron (DFe) 
-    tr_arr(:,21) = tr_arr(:,21) * 1.e9 ! Fe [mol/L] => [umol/m3] Check the units again!
+    !tr_arr(:,21) = tr_arr(:,21) * 1.e9 ! Fe [mol/L] => [umol/m3] Check the units again!
 
 ! calcification: concentration from phytoplankton and Detritus (PhyCalc(22) and DetCalc(23))
     tr_arr(:,22) = tiny !cPhyN * 0.25d0    
