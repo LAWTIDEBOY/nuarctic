@@ -47,6 +47,9 @@ elseif(${CMAKE_Fortran_COMPILER_ID} STREQUAL Cray )
        target_compile_options(${PROJECT_NAME} PRIVATE -c -emf -hbyteswapio -hflex_mp=conservative -hfp1 -hadd_paren -Ounroll0 -hipa0 -r am -s real64)
 endif()
 
+# suppress systematic warning
+add_definitions(-w)
+
 #librairies
 # include path to required librairies (netcdf,...) 
 target_include_directories(${PROJECT_NAME} PRIVATE ${NETCDF_Fortran_INCLUDE_DIRECTORIES})
