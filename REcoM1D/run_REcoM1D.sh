@@ -17,6 +17,10 @@ JOBID=`echo $SLURM_JOB_ID |cut -d"." -f1`
 # script to run REcoM1D along a selected track/trajectory
 # 
 #----------------------------------------------------------------------------------------------
+# manage time file infos consistently to mesh and to time.recom
+cd config/scripts/
+./REcoM_time.sh
+cd ../..
 # create symbolic link to the data
 # mesh
 cd grid
