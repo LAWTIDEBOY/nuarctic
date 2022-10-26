@@ -520,11 +520,17 @@ subroutine get_forcing(istep)
     ! get forcing at selected time step
     ! ice related forcing
     aice = aice_forcing(istep)
-
+    
     ! ocean related forcing
     temperature(:) = temperature_forcing(:, istep)
     salinity(:) = salinity_forcing(:, istep)
     Kz(:) = Kz_forcing(:, istep)
+    
+    ! just for output of salinity and temperature
+    tr_arr(:,1) = temperature_forcing(:, istep) ! temperature
+    tr_arr(:,2) = salinity_forcing(:, istep) ! salinity
+    
+    
     
     if (flag_PAR) then
     	PAR(:) = PAR_forcing(:, istep)
