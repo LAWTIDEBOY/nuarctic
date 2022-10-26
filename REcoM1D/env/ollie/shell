@@ -2,6 +2,7 @@
 
 module load intel.compiler intel.mpi netcdf/4.4.0_intel
 module load centoslibs # required on compute nodes
+module load python3
 
 # the netcdf c++ path given by the netcdf module is broken, we have to workaround this
 export NETCDF_CXX_INCLUDE_DIRECTORIES=/global/AWIsoft/tkleiner/netcdf/4.4.0_intel_impi/include
