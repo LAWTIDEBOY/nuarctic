@@ -12,6 +12,9 @@ ulimit -s unlimited
 # determine JOBID
 JOBID=`echo $SLURM_JOB_ID |cut -d"." -f1`
 
+# source environment file
+source env.sh 
+
 #----------------------------------------------------------------------------------------------
 #
 # script to run REcoM1D along a selected track/trajectory
