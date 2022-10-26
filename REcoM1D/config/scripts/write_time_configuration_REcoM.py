@@ -5,9 +5,6 @@
 #
 from glob import glob as gg
 import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib import cm as cm
-from matplotlib import rc as rc
 #
 from netCDF4 import Dataset  
 #
@@ -16,18 +13,22 @@ from datetime import datetime,date
 import pandas as pd
 
 #
+# path and filename of the main time configuration file 'time.recom'
+#
+path = '../'
+filename_time = path + 'time.recom'
+
+#
 # load time properties from time.recom
 #
 class REcoM_time:
-    def __init__(self):
+    def __init__(self, filename):
         # load time properties
-        self.estimate_time_axis()
+        self.estimate_time_axis(filename)
         # estimate REcoM time initialization variables
         self.estimate_initialization_variables()
         
-    def estimate_time_axis(self):
-        path_obs = '/home/fbirrien/NuArctic/nuarctic/REcoM1D/config/'
-        filename = path_obs + 'time.recom'
+    def estimate_time_axis(self, filename):
         # read data
         with open(filename) as f:
             lines = f.readlines()
@@ -75,7 +76,7 @@ class REcoM_time:
         self.yearnew = year_start
         
 #
-recom_time = REcoM_time()
+recom_time = REcoM_time(filename_time)
 
 
 #
