@@ -35,6 +35,9 @@ cd ../data
 rm *.nc
 ln -s ../../data/atm_deposition/atm_deposition.nc
 
+# tracer initialisation
+ln -s ../../data/initialisation/initial_conditions.nc
+
 # perform computation 
 cd ../bin
 # compile path
