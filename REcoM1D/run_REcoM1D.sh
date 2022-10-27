@@ -12,6 +12,9 @@ ulimit -s unlimited
 # determine JOBID
 JOBID=`echo $SLURM_JOB_ID |cut -d"." -f1`
 
+# source environment file
+source env.sh 
+
 #----------------------------------------------------------------------------------------------
 #
 # script to run REcoM1D along a selected track/trajectory
@@ -34,6 +37,9 @@ ln -s ../../data/REcoM_forcing_data/REcoM1D_forcing.nc
 cd ../data
 rm *.nc
 ln -s ../../data/atm_deposition/atm_deposition.nc
+
+# tracer initialisation
+ln -s ../../data/initialization/tracer_initialization.nc
 
 # perform computation 
 cd ../bin
