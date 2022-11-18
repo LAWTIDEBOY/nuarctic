@@ -383,6 +383,8 @@ subroutine read_forcing(mesh)
    count1=npt
    start2=(/1, 1/)
    count2=(/npt, nl-1/)
+   start3=(/1, 1/)
+   count3=(/npt, nl/)  
    allocate(tmp(npt,nl-1), tmp2(npt,nl))
    ! initialize/allocate arrays
    call forcing_setup(.True.)
@@ -479,8 +481,8 @@ subroutine read_forcing(mesh)
    	flag_PAR=.True.
    	status=nf_get_vara_double(ncid,PAR_varid,start2,count2,tmp)
    	PAR_forcing = transpose(tmp)
+   	write(*,*) 'PAR profiles are specified as forcing, surface PAR or above-ice shortwave is to be provided'
    else
-   	write(*,*) 'no PAR profiles are specified as forcing, surface PAR or above-ice shortwave is to be provided'
         flag_PAR=.False.
         
         ! read shortwave radiation at the atm/snow(ice) surface or under ice PAR (ice-ocean interface)
@@ -489,25 +491,24 @@ subroutine read_forcing(mesh)
 	if (status .eq. NF_NOERR) then
 		flag_PAR_surface=.True.
    		status=nf_get_vara_double(ncid, PARSF_varid, start1, count1, PAR_surface_forcing)
+   		write(*,*) 'PAR (ocean surface) time series is specified as forcing'
    	else
    		flag_PAR_surface=.False.
    		!call handle_err(status)
-   		write(*,*) 'no PAR (ocean surface) time series is specified as forcing'
+   		
    	endif
         ! shortwave
         status=nf_inq_varid(ncid, Swname, sw_varid)
 	if (status .eq. NF_NOERR) then
    		status=nf_get_vara_double(ncid, sw_varid, start1, count1, shortwave_forcing)
-   	else
-   		!call handle_err(status)
-   		write(*,*) 'no shortwave radiation (above ice) time series is specified as forcing'
+   		write(*,*) 'shortwave radiation (above ice) time series is specified as forcing'
    	endif
    	
    endif    
      
    status=nf_close(ncid)
    deallocate(tmp)
-
+   
 end subroutine
 
 subroutine get_forcing(istep)
@@ -716,7 +717,6 @@ subroutine deposition_setup(boolean)
   ! 
   ! allocate and initialize arrays related to atm deposition
   ! 
-
   
   if (boolean) then
   	! allocation of the forcing variables
