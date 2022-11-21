@@ -2,7 +2,7 @@
 
 set -e
 
-# source environment fike
+# source environment file
 source env.sh 
 
 # create build  and bin directories from scratch
