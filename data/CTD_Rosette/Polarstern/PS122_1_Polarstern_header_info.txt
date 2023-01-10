@@ -1,0 +1,29 @@
+Alfred Wegener Institute, Germany
+Contact: Sandra.Tippenhauer@awi.de
+Instrument: SBE911plus
+Ship: Polarstern
+Cruise: PS122
+Leg 1
+Accuracy for salinity and conductivity = 0.004
+Accuracy for temperature = 0.002
+Quality control flagging scheme: https://www.seadatanet.org
+Event Label	Date/Time	Lat	Lon	Sensor channel used temp/cond	Sensor channel used oxy	Altimeter [m]	Water depth [m]	Water depth Info
+PS121/1_2-68	2019-10-04T08:25:45	85.1282	132.5512	 1	 1	NaN	4175.00	Waterdepth from GEBCO
+PS122/1_6-58	2019-11-08T01:24:37	85.9120	116.2910	 1	 1	NaN	4259.00	Waterdepth from GEBCO
+PS122/1_6-79	2019-11-09T01:23:58	85.8625	115.7703	 1	 2	NaN	4261.00	Waterdepth from GEBCO
+PS122/1_6-81	2019-11-09T06:44:19	85.8485	115.7860	 1	 2	NaN	4260.00	Waterdepth from GEBCO
+PS122/1_7-47	2019-11-14T01:42:29	86.1527	118.1070	 1	 1	NaN	4253.00	Waterdepth from GEBCO
+PS122/1_7-49	2019-11-14T03:32:19	86.1582	118.1502	 1	 2	19.13	4364.36	Waterdepth = CTD-Z + ALTI
+PS122/1_7-80	2019-11-15T04:41:35	86.1900	118.3568	 1	 2	NaN	4252.00	Waterdepth from GEBCO
+PS122/1_8-43	2019-11-21T03:04:16	85.7452	120.9907	 1	 1	NaN	4244.00	Waterdepth from GEBCO
+PS122/1_8-46	2019-11-21T05:18:35	85.7445	120.9543	 2	 2	26.29	4370.57	Waterdepth = CTD-Z + ALTI
+PS122/1_8-71	2019-11-22T03:00:07	85.7357	120.8132	 1	 2	NaN	4245.00	Waterdepth from GEBCO
+PS122/1_8-98	2019-11-23T08:59:18	85.7373	120.4130	 1	 1	NaN	4245.00	Waterdepth from GEBCO
+PS122/1_9-50	2019-11-28T08:28:26	86.1622	116.8502	 1	 2	NaN	4257.00	Waterdepth from GEBCO
+PS122/1_9-61	2019-11-29T04:00:45	86.1223	115.0373	 1	 2	NaN	4261.00	Waterdepth from GEBCO
+PS122/1_9-67	2019-11-29T09:33:39	86.1115	114.4548	 1	 2	NaN	4263.00	Waterdepth from GEBCO
+PS122/1_9-87	2019-11-30T10:19:26	86.0463	112.8925	 1	 2	NaN	4265.00	Waterdepth from GEBCO
+PS122/1_10-41	2019-12-05T05:08:52	86.1390	120.5032	 1	 2	NaN	4245.00	Waterdepth from GEBCO
+PS122/1_10-44	2019-12-05T07:23:53	86.1410	120.7385	 1	 2	20.75	4362.11	Waterdepth = CTD-Z + ALTI
+PS122/1_10-60	2019-12-06T04:44:02	86.1407	122.1840	 1	 2	NaN	4239.00	Waterdepth from GEBCO
+PS122/1_10-64	2019-12-06T10:13:25	86.1388	122.2923	 1	 2	NaN	4239.00	Waterdepth from GEBCO
