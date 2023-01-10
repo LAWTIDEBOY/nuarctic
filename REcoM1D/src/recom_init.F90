@@ -34,7 +34,7 @@ subroutine recom_initialization(mesh)
       
     !___allocate________________________________________________________________
     allocate(GlodecayBenthos(benthos_num))
-    allocate(PAR3D(nl-1)) 
+    allocate(PAR2D(nl-1)) 
     allocate(Benthos(benthos_num))
     allocate(LocBenthos(benthos_num))
     allocate(decayBenthos(benthos_num)) ! [1/day] Decay rate of detritus in the benthic layer
@@ -79,7 +79,7 @@ end if
     ! 
     cosAI = 0.d0
 
-    ! initialise 2d field of CO2 related diagnostics
+    ! initialise 1d (time series) field of CO2 related diagnostics
     GloPCO2surf = 0.d0
     GloCO2flux = 0.d0
     GloCO2flux_seaicemask = 0.0d0 
@@ -87,7 +87,7 @@ end if
     GlodPCO2surf = 0.d0
     GlodecayBenthos = 0.0d0
 
-    ! initialise 2d field of CO2 related variables 
+    ! initialise 1d (time series) field of CO2 related variables 
     ! atmospheric CO2 is read from a file if constant_CO2 is false 
     AtmCO2 = 0.d0 
     Hplus = 0.d0
@@ -98,13 +98,13 @@ end if
     dpco2surf= 0.d0
 
     if (Diags) then
-        allocate(diags2D(8))
-        diags2D(:)      = 0.d0
-        allocate(diags3D(nl-1,diags3d_num))
-        diags3D(:,:)    = 0.d0
+        allocate(diags1D(8))
+        diags1D(:)      = 0.d0
+        allocate(diags2D(nl-1,diags2d_num))
+        diags2D(:,:)    = 0.d0
     end if  
 
-    PAR3D(:) = 0.d0
+    PAR2D(:) = 0.d0
     DenitBen = 0.d0
     !__________________________________________________________________________
     ! Initialization of benthos
@@ -177,7 +177,7 @@ end subroutine recom_initialization
 
 subroutine deallocate_flux
 
-    deallocate(GlodecayBenthos, PAR3D, Benthos, LocBenthos, decayBenthos)   
+    deallocate(GlodecayBenthos, PAR2D, Benthos, LocBenthos, decayBenthos)   
     deallocate(wFluxPhy, wFluxDia, GlowFluxDet, wFluxDet)
     deallocate(GlowFluxPhy, GlowFluxDia)
     deallocate(addtiny, Gloaddtiny, auxy)

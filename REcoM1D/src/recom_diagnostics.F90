@@ -11,7 +11,7 @@ module REcoM_diagnostics
  character(len=*), parameter :: aFe_unit='umolFe/m2/s', aN_unit='mmolN/m2/s'
  character(len=*), parameter :: qm_unit='mol/kg', qa_unit='mmol/m2'
  character(len=*), parameter :: T_unit= 'C' , S_unit ='psu', W_unit = 'W/m2'
- character(len=*), parameter :: Conc_unit = 'mmol/m3'
+ character(len=*), parameter :: Conc_unit = 'mmol/m3', Kz_unit='m2/s'
  
  ! storage array definition
  integer, dimension(:), allocatable 	  :: day_diag, year_diag, nlevel_diag
@@ -27,6 +27,10 @@ module REcoM_diagnostics
  ! benthos-related outputs
  real(kind=8), dimension(:) , allocatable :: denb_diag, benN_diag, benC_diag, &
  						benSi_diag, benCalc_diag
+ 
+ ! Diagnostics
+ 
+ ! 1D (depth integrated)
  ! NPP and GPP diatoms and nano-PhytoPlankton
  real(kind=8), dimension(:) , allocatable :: NPPn_diag, NPPd_diag, 		&
  						GPPn_diag, GPPd_diag
@@ -34,9 +38,20 @@ module REcoM_diagnostics
  real(kind=8), dimension(:) , allocatable :: NNAn_diag, NNAd_diag,		&
   						GNAn_diag, GNAd_diag
   						
+ ! 2D as function of depth and time
+ real(kind=8), dimension(:,:) , allocatable :: NPPn_2D_diag, NPPd_2D_diag, 		&
+ 						GPPn_2D_diag, GPPd_2D_diag
+ ! N-assimilation diatoms and nano-Phytoplankton
+ real(kind=8), dimension(:,:) , allocatable :: NNAn_2D_diag, NNAd_2D_diag,		&
+  						GNAn_2D_diag, GNAd_2D_diag
+  						  			
+  ! forcing and state variables
+ ! vertical diffusivity Kz and PAR
+ real(kind=8), dimension(:,:) , allocatable ::	Kz_diag, PAR_diag
+ 				
  !tracers output
  ! water column temperature and salinity, PAR 
- real(kind=8), dimension(:,:) , allocatable :: temp_diag, sali_diag, PAR_diag
+ real(kind=8), dimension(:,:) , allocatable :: temp_diag, sali_diag
  ! DIN and DIC
  real(kind=8), dimension(:,:) , allocatable :: DIN_diag, DIC_diag
  ! alkalinity
@@ -124,13 +139,18 @@ subroutine setup_diagnostics(boolean)
  	allocate(Hp_diag(ndiag), aFe_diag(ndiag), aN_diag(ndiag))
  	allocate(denb_diag(ndiag), benN_diag(ndiag), benC_diag(ndiag),		&
  		benSi_diag(ndiag), benCalc_diag(ndiag))
+ 	! 
  	allocate(NPPn_diag(ndiag), NPPd_diag(ndiag), GPPn_diag(ndiag), 		&
  		GPPd_diag(ndiag))
  	allocate(NNAn_diag(ndiag), NNAd_diag(ndiag), GNAn_diag(ndiag), 		&
  		GNAd_diag(ndiag))
+ 	allocate(NPPn_2D_diag(ndiag,nl-1), NPPd_2D_diag(ndiag,nl-1), 		&
+ 		GPPn_2D_diag(ndiag,nl-1), GPPd_2D_diag(ndiag,nl-1))
+ 	allocate(NNAn_2D_diag(ndiag,nl-1), NNAd_2D_diag(ndiag,nl-1),		& 
+ 		GNAn_2D_diag(ndiag,nl-1),  GNAd_2D_diag(ndiag,nl-1))	
  	! 
  	allocate(temp_diag(ndiag, nl-1), sali_diag(ndiag, nl-1), 			&
- 		PAR_diag(ndiag, nl-1), O2_diag(ndiag, nl-1))
+ 		PAR_diag(ndiag, nl-1), Kz_diag(ndiag,nl), O2_diag(ndiag, nl-1))
  	allocate(DIN_diag(ndiag, nl-1), DIC_diag(ndiag, nl-1), Alk_diag(ndiag, nl-1))
  	allocate(PhyN_diag(ndiag, nl-1), PhyC_diag(ndiag, nl-1), 			&
  		PhyChl_diag(ndiag, nl-1), PhyCalc_diag(ndiag, nl-1))
@@ -165,6 +185,7 @@ subroutine setup_diagnostics(boolean)
  	benC_diag	= 0.d0
  	benSi_diag	= 0.d0
  	benCalc_diag	= 0.d0
+ 	
 	NPPn_diag	= 0.d0
 	NPPd_diag	= 0.d0
 	GPPn_diag	= 0.d0
@@ -173,10 +194,21 @@ subroutine setup_diagnostics(boolean)
 	NNAd_diag	= 0.d0
 	GNAn_diag	= 0.d0
 	GNAd_diag	= 0.d0
+	NPPn_2D_diag	= 0.d0
+	NPPd_2D_diag	= 0.d0
+	GPPn_2D_diag	= 0.d0
+	GPPd_2D_diag	= 0.d0
+	NNAn_2D_diag	= 0.d0
+	NNAd_2D_diag	= 0.d0
+	GNAn_2D_diag	= 0.d0
+	GNAd_2D_diag	= 0.d0	
+	
+	PAR_diag	= 0.d0
+	Kz_diag		= 0.d0
 	
 	temp_diag	= 0.d0
 	sali_diag	= 0.d0
-	PAR_diag	= 0.d0
+	
 	O2_diag		= 0.d0
 	DIN_diag	= 0.d0
 	DIC_diag	= 0.d0
@@ -215,7 +247,9 @@ subroutine setup_diagnostics(boolean)
   	deallocate(denb_diag, benN_diag, benC_diag, benSi_diag, benCalc_diag)
   	deallocate(NPPn_diag, NPPd_diag, GPPn_diag, GPPd_diag)
   	deallocate(NNAn_diag, NNAd_diag, GNAn_diag, GNAd_diag)
-  	deallocate(temp_diag, sali_diag, PAR_diag, O2_diag)
+ 	deallocate(NPPn_2D_diag, NPPd_2D_diag, GPPn_2D_diag, GPPd_2D_diag)
+  	deallocate(NNAn_2D_diag, NNAd_2D_diag, GNAn_2D_diag, GNAd_2D_diag)  	
+  	deallocate(temp_diag, sali_diag, PAR_diag, Kz_diag, O2_diag)
   	deallocate(DIN_diag, DIC_diag, Alk_diag)
   	deallocate(PhyN_diag, PhyC_diag, PhyChl_diag, PhyCalc_diag)
   	deallocate(DetN_diag, DetC_diag, DetSi_diag, DetCalc_diag)
@@ -243,7 +277,6 @@ subroutine store_diagnostics(idiag)
    nlevel_diag(idiag)		= nlvl
    year_diag(idiag)		= yearnew
    day_diag(idiag)		= daynew + int(timenew/86400.)
-   	
    ! deal with leap year
    call check_fleapyr(year_diag(idiag), flaglyr)
    if (day_diag(idiag)>365 .and. flaglyr<1) then
@@ -258,42 +291,59 @@ subroutine store_diagnostics(idiag)
    endif
    !
    !zcell_diag, znode_diag
-   	
+   
+   ! flux, benthos, etc
    dpCO2s_diag(idiag)	= GlodPCO2surf
    pCO2s_diag(idiag)	= GloPCO2surf
    CO2f_diag(idiag)	= GloCO2flux
-   Hp_diag(idiag)		= GloHplus
-   aFe_diag(idiag)		= AtmFeInput
-   aN_diag(idiag)		= AtmNInput
+   Hp_diag(idiag)	= GloHplus
+   aFe_diag(idiag)	= AtmFeInput
+   aN_diag(idiag)	= AtmNInput
    denb_diag(idiag)	= DenitBen
    benN_diag(idiag)	= Benthos(1)
    benC_diag(idiag)	= Benthos(2)
    benSi_diag(idiag)	= Benthos(3)
    benCalc_diag(idiag)	= Benthos(4)
-   NPPn_diag(idiag)	= diags2D(1)
-   NPPd_diag(idiag)	= diags2D(2)
-   GPPn_diag(idiag)	= diags2D(3)
-   GPPd_diag(idiag)	= diags2D(4)
-   NNAn_diag(idiag)	= diags2D(5)
-   NNAd_diag(idiag)	= diags2D(6)
-   GNAn_diag(idiag)	= diags2D(7)
-   GNAd_diag(idiag)	= diags2D(8)
-	
-   temp_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,1)
-   sali_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,2)
+   
+   ! diagnostics
+   NPPn_diag(idiag)	= diags1D(1)
+   NPPd_diag(idiag)	= diags1D(2)
+   GPPn_diag(idiag)	= diags1D(3)
+   GPPd_diag(idiag)	= diags1D(4)
+   NNAn_diag(idiag)	= diags1D(5)
+   NNAd_diag(idiag)	= diags1D(6)
+   GNAn_diag(idiag)	= diags1D(7)
+   GNAd_diag(idiag)	= diags1D(8)
+   
+   NPPn_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,1)
+   NPPd_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,2)
+   GPPn_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,3)
+   GPPd_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,4)
+   NNAn_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,5)
+   NNAd_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,6)
+   GNAn_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,7)
+   GNAd_2D_diag(idiag,1:nlvl)	= diags2D(1:nlvl,8)   
+
+   ! forcing
    PAR_diag(idiag,1:nlvl)		= PAR(1:nlvl)
+   Kz_diag(idiag,1:nlvl+1)		= Kz(1:nlvl+1)
+
+   temp_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,1)
+   sali_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,2) 
+
+   ! tracers
    O2_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,24)
    DIN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,3)
    DIC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,4)
    Alk_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,5)
    PhyN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,6)
    PhyC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,7)
-   PhyChl_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,8)
-   PhyCalc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,22)
+   PhyChl_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,8)
+   PhyCalc_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,22)
    DetN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,9)
    DetC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,10)
-   DetSi_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,19)
-   DetCalc_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,23)
+   DetSi_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,19)
+   DetCalc_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,23)
    HetN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,11)
    HetC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,12)
    DON_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,13)
@@ -302,8 +352,8 @@ subroutine store_diagnostics(idiag)
    DFe_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,21)
    DiaC_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,16)
    DiaN_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,15)
-   DiaChl_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,17)
-   DiaSi_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,18)
+   DiaChl_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,17)
+   DiaSi_diag(idiag,1:nlvl)		= tr_arr(1:nlvl,18)
 
    if (REcoM_Second_Zoo) then
 	Zoo2N_diag(idiag,1:nlvl)	= tr_arr(1:nlvl,25)
@@ -320,7 +370,8 @@ subroutine write_diagnostics
 	
   implicit none
   
-  character(len=4096),parameter	:: diag_name='REcoM1d_outputs.nc', units="units", lname="long_name"
+  character(len=4096),parameter	:: output_name='REcoM1d_outputs.nc', diag_name='REcoM1d_diagnostics.nc'
+  character(len=4096),parameter	:: units="units", lname="long_name"
   character(len=4096)		:: result_path, filename
   integer, dimension(4)		:: dd
   integer			:: status, fileid
@@ -332,7 +383,9 @@ subroutine write_diagnostics
   integer			:: denb_varid, benN_varid, benC_varid, benSi_varid, benCalc_varid
   integer			:: NPPn_varid, NPPd_varid, GPPn_varid, GPPd_varid
   integer			:: NNAn_varid, NNAd_varid, GNAn_varid, GNAd_varid
-  integer			:: T_varid, S_varid, Alk_varid, PAR_varid
+  integer			:: NPPn_2D_varid, NPPd_2D_varid, GPPn_2D_varid, GPPd_2D_varid
+  integer			:: NNAn_2D_varid, NNAd_2D_varid, GNAn_2D_varid, GNAd_2D_varid
+  integer			:: T_varid, S_varid, Alk_varid, PAR_varid, Kz_varid
   integer			:: O2_varid, DIN_varid, DIC_varid, DOC_Varid, DON_varid
   integer			:: PhyN_varid, PhyC_varid, PhyChl_varid, PhyCalc_varid
   integer			:: DetN_varid, DetC_varid, DetSi_varid, DetCalc_varid
@@ -350,7 +403,9 @@ subroutine write_diagnostics
   character(len=20), parameter	:: benSi_name='benSi', benCalc_name='benCalc'
   character(len=20), parameter	:: NPPn_name='NPPn', NPPd_name='NPPd', GPPn_name='GPPn', GPPd_name='GPPd'
   character(len=20), parameter	:: NNAn_name='NNAn', NNAd_name='NNAd', GNAd_name='GNAd', GNAn_name='GNAn'
-  character(len=20), parameter	:: temp_name='temp', salt_name='salt', PAR_name='PAR'
+  character(len=20), parameter	:: NPPn_2D_name='NPPn2D', NPPd_2D_name='NPPd2D', GPPn_2D_name='GPPn2D', GPPd_2D_name='GPPd2D'
+  character(len=20), parameter	:: NNAn_2D_name='NNAn2D', NNAd_2D_name='NNAd2D', GNAd_2D_name='GNAd2D', GNAn_2D_name='GNAn2D'
+  character(len=20), parameter	:: temp_name='temp', salt_name='salt', PAR_name='PAR', Kz_name='Kz'
   character(len=20), parameter	:: DIN_name='DIN', DIC_name='DIC', ALk_name='Alk', O2_name='O2'
   character(len=20), parameter	:: PhyN_name='PhyN', PhyC_name='PhyC', PhyChl_name='PhyChl', PhyCalc_name='PhyCalc'
   character(len=20), parameter	:: DetN_name='DetN', DetC_name='DetC', DetSi_name='DetSi', DetCalc_name='DetCalc'
@@ -372,12 +427,23 @@ subroutine write_diagnostics
   character(len=50), parameter	:: denb_lname="Benthic denitrification rate"
   character(len=50), parameter	:: benN_lname="Benthos Nitrogen", benC_lname = "Benthos Carbon"
   character(len=50), parameter	:: benSi_lname="Benthos silicon", benCalc_lname="Benthos calcite"
-  character(len=50), parameter	:: NPPn_lname="Mean NPP nanophytoplankton", NPPd_lname="Mean NPP diatoms"
-  character(len=50), parameter	:: GPPn_lname="Mean GPP nanophytoplankton", GPPd_lname="Mean GPP diatoms"
-  character(len=50), parameter	:: NNAn_lname="Net N-assimilation nanophytoplankton", NNAd_lname="Net N-assimilation diatoms"
-  character(len=50), parameter	:: GNAd_lname="Gross N-assimilation diatoms", GNAn_lname="Gross N-assimilation nanophytoplankton"
+  
+  character(len=50), parameter	:: NPPn_lname="Mean NPP nanophytoplankton (depth integrated)", NPPd_lname="Mean NPP diatoms (depth integrated)"
+  character(len=50), parameter	:: GPPn_lname="Mean GPP nanophytoplankton (depth integrated)", GPPd_lname="Mean GPP diatoms (depth integrated)"
+  character(len=50), parameter	:: NNAn_lname="Net N-assimilation nanophytoplankton(depth integrated)"
+  character(len=50), parameter	:: NNAd_lname="Net N-assimilation diatoms (depth integrated)"
+  character(len=50), parameter	:: GNAd_lname="Gross N-assimilation diatoms (depth integrated)"
+  character(len=50), parameter	:: GNAn_lname="Gross N-assimilation nanophytoplankton (depth integrated)"
+  character(len=50), parameter	:: NPPn_2D_lname="NPP nanophytoplankton (2D)", NPPd_2D_lname="NPP diatoms (2D)"
+  character(len=50), parameter	:: GPPn_2D_lname="GPP nanophytoplankton (2D)", GPPd_2D_lname="GPP diatoms (2D)"
+  character(len=50), parameter	:: NNAn_2D_lname="Net N-assimilation nanophytoplankton(2D)"
+  character(len=50), parameter	:: NNAd_2D_lname="Net N-assimilation diatoms (2D)"
+  character(len=50), parameter	:: GNAd_2D_lname="Gross N-assimilation diatoms (2D)"
+  character(len=50), parameter	:: GNAn_2D_lname="Gross N-assimilation nanophytoplankton (2D)"
+  
   character(len=50), parameter	:: temp_lname="Temperature profile", salt_lname="Salinity profile"
   character(len=50), parameter	:: PAR_lname="Photosynthecally Active Radiation"
+  character(len=50), parameter	:: Kz_lname="Vertical diffusivity"
   character(len=50), parameter	:: DIN_lname="Dissolved Inorganic Nitrogen", DIC_lname="Dissolved Inorganic Carbon"
   character(len=50), parameter	:: Alk_lname="Total Alkalinity", O2_lname="concentration of dioxygen in water"
   character(len=50), parameter	:: PhyN_lname="Intracellular concentration of Nitrogen in small phytoplankton"
@@ -401,11 +467,13 @@ subroutine write_diagnostics
 
 #include "netcdf.inc" 
   
-  call get_environment_variable("RECOM_RESULT_PATH", result_path)
-  filename = trim(result_path) // trim(diag_name)
-  dd=0
-  
   print*,'number of diagnostic steps',ndiag
+  call get_environment_variable("RECOM_RESULT_PATH", result_path)
+  ! 
+  ! 1. output state variable and fluxes
+  ! 
+  filename = trim(result_path) // trim(output_name)
+  dd=0
   ! open netCDF file
   status=nf_create(filename, NF_CLOBBER, fileid)
 
@@ -426,7 +494,6 @@ subroutine write_diagnostics
   status = nf_def_var(fileid,trim(znode_name), nf_real,1, dd, znode_varid)	
   dd(1) = dim_cell
   status = nf_def_var(fileid,trim(zcell_name), nf_real,1, dd, zcell_varid)
-  !print*, 'test', ndiag, nl, nl-1, dim_time, dim_cell, dim_node
   
   ! time dependent variables
   dd(1)=dim_time
@@ -444,18 +511,7 @@ subroutine write_diagnostics
   status=nf_def_var(fileid, trim(benSi_name), nf_real, 1, dd, benSi_varid)
   status=nf_def_var(fileid, trim(benCalc_name), nf_real, 1, dd, benCalc_varid)
   
-  ! diagnostics
-  status=nf_def_var(fileid, trim(NPPn_name), nf_real, 1, dd, NPPn_varid)
-  status=nf_def_var(fileid, trim(NPPd_name), nf_real, 1, dd, NPPd_varid)
-  status=nf_def_var(fileid, trim(GPPn_name), nf_real, 1, dd, GPPn_varid)
-  status=nf_def_var(fileid, trim(GPPd_name), nf_real, 1, dd, GPPd_varid)
-  
-  status=nf_def_var(fileid, trim(NNAn_name), nf_real, 1, dd, NNAn_varid)
-  status=nf_def_var(fileid, trim(NNAd_name), nf_real, 1, dd, NNAd_varid)
-  status=nf_def_var(fileid, trim(GNAn_name), nf_real, 1, dd, GNAn_varid)
-  status=nf_def_var(fileid, trim(GNAd_name), nf_real, 1, dd, GNAd_varid)
-  
-  ! depth at middle of cell
+  ! dimension for variables estimated at middle of cell
   dd(1) = dim_time
   dd(2) = dim_cell
   
@@ -505,6 +561,12 @@ subroutine write_diagnostics
   	status=nf_def_var(fileid, trim(detz2si_name), nf_real, 2, dd, detz2si_varid)
   	status=nf_def_var(fileid, trim(detz2calc_name), nf_real, 2, dd, detz2calc_varid)   
   endif   
+  
+  ! dimension for variables estimated at nodes
+  dd(1) = dim_time
+  dd(2) = dim_cell
+  ! Kz
+  status=nf_def_var(fileid, trim(Kz_name), nf_real, 2, dd, Kz_varid)
 
   ! define attributes (units, variable names) long_name, unit
   ! dates, depth proxies day and year
@@ -564,38 +626,6 @@ subroutine write_diagnostics
   status = nf_put_att_text(fileid, benCalc_varid, trim(units), len(trim(qa_unit)), qa_unit)
   status = nf_put_att_text(fileid, benCalc_varid, trim(lname), len(trim(benCalc_lname)), trim(benCalc_lname)) 
   
-  ! NPPn
-  status = nf_put_att_text(fileid, NPPn_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, NPPn_varid, trim(lname), len(trim(NPPn_lname)), trim(NPPn_lname))
-  
-  ! NPPd
-  status = nf_put_att_text(fileid, NPPd_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, NPPd_varid, trim(lname), len(trim(NPPd_lname)), trim(NPPd_lname))
-    
-  ! GPPn
-  status = nf_put_att_text(fileid, GPPn_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, GPPn_varid, trim(lname), len(trim(GPPn_lname)), trim(GPPn_lname))
-    
-  ! GPPd
-  status = nf_put_att_text(fileid, GPPd_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, GPPd_varid, trim(lname), len(trim(GPPd_lname)), trim(GPPd_lname))
-    
-  ! NNAn
-  status = nf_put_att_text(fileid, NNAn_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, NNAn_varid, trim(lname), len(trim(NNAn_lname)), trim(NNAn_lname))
-    
-  ! NNAd
-  status = nf_put_att_text(fileid, NNAd_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, NNAd_varid, trim(lname), len(trim(NNAd_lname)), trim(NNAd_lname))  
-
-  ! GNAn
-  status = nf_put_att_text(fileid, GNAn_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, GNAn_varid, trim(lname), len(trim(GNAn_lname)), trim(GNAn_lname))
-    
-  ! GNAd
-  status = nf_put_att_text(fileid, GNAd_varid, trim(units), len(trim(f_unit)), f_unit)
-  status = nf_put_att_text(fileid, GNAd_varid, trim(lname), len(trim(GNAd_lname)), trim(GNAd_lname))  
-  
   ! temp
   status = nf_put_att_text(fileid, T_varid, trim(units), len(trim(T_unit)), T_unit)
   status = nf_put_att_text(fileid, T_varid, trim(lname), len(trim(temp_lname)), trim(temp_lname))   
@@ -607,7 +637,11 @@ subroutine write_diagnostics
   ! PAR
   status = nf_put_att_text(fileid, PAR_varid, trim(units), len(trim(W_unit)), W_unit)
   status = nf_put_att_text(fileid, PAR_varid, trim(lname), len(trim(PAR_lname)), trim(PAR_lname))   
-  
+
+  ! Kz
+  status = nf_put_att_text(fileid, Kz_varid, trim(units), len(trim(W_unit)), W_unit)
+  status = nf_put_att_text(fileid, Kz_varid, trim(lname), len(trim(Kz_lname)), trim(Kz_lname)) 
+    
   ! DIN
   status = nf_put_att_text(fileid, DIN_varid, trim(units), len(trim(Conc_unit)), Conc_unit)
   status = nf_put_att_text(fileid, DIN_varid, trim(lname), len(trim(DIN_lname)),trim(DIN_lname))  
@@ -748,25 +782,16 @@ subroutine write_diagnostics
   status = nf_put_var_double(fileid, benSi_varid, benSi_diag)    
   status = nf_put_var_double(fileid, benCalc_varid, benCalc_diag)
   
-  status = nf_put_var_double(fileid, NPPn_varid, NPPn_diag)
-  status = nf_put_var_double(fileid, NPPd_varid, NPPd_diag)  
-  status = nf_put_var_double(fileid, GPPn_varid, GPPn_diag)
-  status = nf_put_var_double(fileid, GPPd_varid, GPPd_diag) 
-  
-  status = nf_put_var_double(fileid, NNAn_varid, NNAn_diag)
-  status = nf_put_var_double(fileid, NNAd_varid, NNAd_diag)  
-  status = nf_put_var_double(fileid, GNAn_varid, GNAn_diag)
-  status = nf_put_var_double(fileid, GNAd_varid, GNAd_diag) 
-  
   status = nf_put_var_double(fileid, T_varid, temp_diag)  
   status = nf_put_var_double(fileid, S_varid, sali_diag)
+  
   status = nf_put_var_double(fileid, PAR_varid, PAR_diag) 
+  status = nf_put_var_double(fileid, Kz_varid, Kz_diag)  
 
   status = nf_put_var_double(fileid, DIN_varid, DIN_diag)
   status = nf_put_var_double(fileid, DIC_varid, DIC_diag)  
   status = nf_put_var_double(fileid, Alk_varid, Alk_diag)
   status = nf_put_var_double(fileid, O2_varid, O2_diag) 
-  print*, 'O2', O2_diag(10,:)
   
   status = nf_put_var_double(fileid, PhyN_varid, PhyN_diag)
   status = nf_put_var_double(fileid, PhyC_varid, PhyC_diag)  
@@ -801,6 +826,138 @@ subroutine write_diagnostics
   	status = nf_put_var_double(fileid, detz2si_varid, idetz2si_diag)
   	status = nf_put_var_double(fileid, detz2calc_varid, idetz2calc_diag) 
   endif   
+
+  ! close file
+  status=nf_close(fileid)
+  
+  
+  ! 
+  ! 2. output diagnostics
+  ! 
+  filename = trim(result_path) // trim(diag_name)
+  dd=0
+  ! open netCDF file
+  status=nf_create(filename, NF_CLOBBER, fileid)
+
+  ! define output array dimensions
+  status = nf_def_dim(fileid,trim(time_name),ndiag, dim_time)
+  status = nf_def_dim(fileid, trim(cell_name),nl-1,dim_cell)
+  
+  ! create output arrays
+  ! time series
+  dd(1)=dim_time
+  status=nf_def_var(fileid, trim(NPPn_name), nf_real, 1, dd, NPPn_varid)
+  status=nf_def_var(fileid, trim(NPPd_name), nf_real, 1, dd, NPPd_varid)
+  status=nf_def_var(fileid, trim(GPPn_name), nf_real, 1, dd, GPPn_varid)
+  status=nf_def_var(fileid, trim(GPPd_name), nf_real, 1, dd, GPPd_varid)
+  
+  status=nf_def_var(fileid, trim(NNAn_name), nf_real, 1, dd, NNAn_varid)
+  status=nf_def_var(fileid, trim(NNAd_name), nf_real, 1, dd, NNAd_varid)
+  status=nf_def_var(fileid, trim(GNAn_name), nf_real, 1, dd, GNAn_varid)
+  status=nf_def_var(fileid, trim(GNAd_name), nf_real, 1, dd, GNAd_varid)
+  
+  ! 2D diagnostics
+  dd(1) = dim_time
+  dd(2) = dim_cell
+  status=nf_def_var(fileid, trim(NPPn_2D_name), nf_real, 2, dd, NPPn_2D_varid)
+  status=nf_def_var(fileid, trim(NPPd_2D_name), nf_real, 2, dd, NPPd_2D_varid)
+  status=nf_def_var(fileid, trim(GPPn_2D_name), nf_real, 2, dd, GPPn_2D_varid)
+  status=nf_def_var(fileid, trim(GPPd_2D_name), nf_real, 2, dd, GPPd_2D_varid)
+  
+  status=nf_def_var(fileid, trim(NNAn_2D_name), nf_real, 2, dd, NNAn_2D_varid)
+  status=nf_def_var(fileid, trim(NNAd_2D_name), nf_real, 2, dd, NNAd_2D_varid)
+  status=nf_def_var(fileid, trim(GNAn_2D_name), nf_real, 2, dd, GNAn_2D_varid)
+  status=nf_def_var(fileid, trim(GNAd_2D_name), nf_real, 2, dd, GNAd_2D_varid)
+
+  ! define attributes (long name and units)
+  ! NPPn
+  status = nf_put_att_text(fileid, NPPn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NPPn_varid, trim(lname), len(trim(NPPn_lname)), trim(NPPn_lname))
+  
+  ! NPPd
+  status = nf_put_att_text(fileid, NPPd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NPPd_varid, trim(lname), len(trim(NPPd_lname)), trim(NPPd_lname))
+    
+  ! GPPn
+  status = nf_put_att_text(fileid, GPPn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GPPn_varid, trim(lname), len(trim(GPPn_lname)), trim(GPPn_lname))
+    
+  ! GPPd
+  status = nf_put_att_text(fileid, GPPd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GPPd_varid, trim(lname), len(trim(GPPd_lname)), trim(GPPd_lname))
+    
+  ! NNAn
+  status = nf_put_att_text(fileid, NNAn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NNAn_varid, trim(lname), len(trim(NNAn_lname)), trim(NNAn_lname))
+    
+  ! NNAd
+  status = nf_put_att_text(fileid, NNAd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NNAd_varid, trim(lname), len(trim(NNAd_lname)), trim(NNAd_lname))  
+
+  ! GNAn
+  status = nf_put_att_text(fileid, GNAn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GNAn_varid, trim(lname), len(trim(GNAn_lname)), trim(GNAn_lname))
+    
+  ! GNAd
+  status = nf_put_att_text(fileid, GNAd_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GNAd_varid, trim(lname), len(trim(GNAd_lname)), trim(GNAd_lname))  
+  
+  
+  ! NPPn
+  status = nf_put_att_text(fileid, NPPn_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NPPn_varid, trim(lname), len(trim(NPPn_lname)), trim(NPPn_lname))
+  
+  ! NPPd (2D)
+  status = nf_put_att_text(fileid, NPPd_2D_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NPPd_2D_varid, trim(lname), len(trim(NPPd_2D_lname)), trim(NPPd_2D_lname))
+    
+  ! GPPn (2D)
+  status = nf_put_att_text(fileid, GPPn_2D_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GPPn_2D_varid, trim(lname), len(trim(GPPn_2D_lname)), trim(GPPn_2D_lname))
+    
+  ! GPPd (2D)
+  status = nf_put_att_text(fileid, GPPd_2D_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GPPd_2D_varid, trim(lname), len(trim(GPPd_2D_lname)), trim(GPPd_2D_lname))
+    
+  ! NNAn (2D)
+  status = nf_put_att_text(fileid, NNAn_2D_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NNAn_2D_varid, trim(lname), len(trim(NNAn_2D_lname)), trim(NNAn_2D_lname))
+    
+  ! NNAd (2D)
+  status = nf_put_att_text(fileid, NNAd_2D_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, NNAd_2D_varid, trim(lname), len(trim(NNAd_2D_lname)), trim(NNAd_2D_lname))  
+
+  ! GNAn (2D)
+  status = nf_put_att_text(fileid, GNAn_2D_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GNAn_2D_varid, trim(lname), len(trim(GNAn_2D_lname)), trim(GNAn_2D_lname))
+    
+  ! GNAd (2D)
+  status = nf_put_att_text(fileid, GNAd_2D_varid, trim(units), len(trim(f_unit)), f_unit)
+  status = nf_put_att_text(fileid, GNAd_2D_varid, trim(lname), len(trim(GNAd_2D_lname)), trim(GNAd_2D_lname))  
+  
+  ! end definition mode
+  status = nf_enddef(fileid)
+  
+  ! write variable to file
+  status = nf_put_var_double(fileid, NPPn_varid, NPPn_diag)
+  status = nf_put_var_double(fileid, NPPd_varid, NPPd_diag)  
+  status = nf_put_var_double(fileid, GPPn_varid, GPPn_diag)
+  status = nf_put_var_double(fileid, GPPd_varid, GPPd_diag) 
+  
+  status = nf_put_var_double(fileid, NNAn_varid, NNAn_diag)
+  status = nf_put_var_double(fileid, NNAd_varid, NNAd_diag)  
+  status = nf_put_var_double(fileid, GNAn_varid, GNAn_diag)
+  status = nf_put_var_double(fileid, GNAd_varid, GNAd_diag) 
+  
+  status = nf_put_var_double(fileid, NPPn_2D_varid, NPPn_2D_diag)
+  status = nf_put_var_double(fileid, NPPd_2D_varid, NPPd_2D_diag)  
+  status = nf_put_var_double(fileid, GPPn_2D_varid, GPPn_2D_diag)
+  status = nf_put_var_double(fileid, GPPd_2D_varid, GPPd_2D_diag) 
+  
+  status = nf_put_var_double(fileid, NNAn_2D_varid, NNAn_2D_diag)
+  status = nf_put_var_double(fileid, NNAd_2D_varid, NNAd_2D_diag)  
+  status = nf_put_var_double(fileid, GNAn_2D_varid, GNAn_2D_diag)
+  status = nf_put_var_double(fileid, GNAd_2D_varid, GNAd_2D_diag) 
 
   ! close file
   status=nf_close(fileid)

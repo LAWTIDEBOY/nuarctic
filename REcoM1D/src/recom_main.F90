@@ -95,7 +95,7 @@ subroutine recom(istep,mesh)
   ULoc = sqrt(u_wind**2+v_wind**2)
 
   !!---- Atmospheric CO2 in LocVar                                                                        
-  LocAtmCO2  = AtmCO2   
+  LocAtmCO2  = AtmCO2   ! multiply by (1-aice)?
 
 
   !!---- Shortwave penetration and PAR initialization
@@ -115,7 +115,7 @@ subroutine recom(istep,mesh)
   endif
   
   
-  !!!! not needed as well as PAR3D
+  !!!! not needed as well as PAR2D
   !!---- Temperature in water column and surface salinity
   !!Temp(1:nzmax) = tr_arr(1:nzmax, 1)
   !!Sali = tr_arr(1, 2)
@@ -130,8 +130,8 @@ subroutine recom(istep,mesh)
   FeDust = GloFeDust * (1 - aice) * dust_sol    
   NDust = GloNDust  * (1 - aice)
 
-  allocate(Diags3Dloc(nzmax,8))
-  Diags3Dloc(:,:) = 0.d0
+  allocate(Diags2Dloc(nzmax,8))
+  Diags2Dloc(:,:) = 0.d0
 
 
 
@@ -146,7 +146,7 @@ subroutine recom(istep,mesh)
 ! =====================================================================================================
 !******************************** saved local variables****************************************
   Benthos(1:benthos_num)         = LocBenthos(1:benthos_num)         ! Updating Benthos values
-  Diags2D(1:8)                   = LocDiags2D(1:8)                   ! Updating diagnostics
+  Diags1D(1:8)                   = LocDiags1D(1:8)                   ! Updating diagnostics
   GloPCO2surf                    = pco2surf
   GlodPCO2surf                   = dpco2surf
 
@@ -161,13 +161,13 @@ subroutine recom(istep,mesh)
 
   GlodecayBenthos(1:benthos_num) = decayBenthos(1:benthos_num)/SecondsPerDay ! convert from [mmol/m2/d] to [mmol/m2/s]  
 
-  PAR3D(1:nzmax)             = PAR(1:nzmax)
+  PAR2D(1:nzmax)             = PAR(1:nzmax)
    
-  do idiags = 1,diags3d_num
-    Diags3D(1:nzmax,idiags)  = Diags3Dloc(1:nzmax,idiags) ! 1=NPPnano, 2=NPPdia
+  do idiags = 1,diags2d_num
+    Diags2D(1:nzmax,idiags)  = Diags2Dloc(1:nzmax,idiags) ! 1=NPPnano, 2=NPPdia
   end do
 
-  deallocate(Diags3Dloc,C)
+  deallocate(Diags2Dloc,C)
 
 end subroutine recom
 

@@ -5,14 +5,14 @@ This is the namelist recom
 	recom_binary_write    =.false.      ! Determines if tracervalue snapshots are saved. For fine grids it may crash the model to set this to true
 
 	recom_binary_init     = .false.     ! Restart from binary
-	REcoMDataPath         = '/home/fbirrien/NuArctic/nuarctic/REcoM1D/data/'
 	bgc_num               = 28 !24 !38
-	diags3d_num           = 8           ! Number of diagnostic 3d tracers to be saved
+	diags2d_num           = 8           ! Number of diagnostic 2d (time, depth level) tracers to be saved
 	VDet                  = 20.d0       ! Sinking velocity, constant through the water column and positive downwards
 	VDet_zoo2             = 20.d0       ! Sinking velocity, constant through the water column
 	VPhy                  = 0.d0        !!! If the number of sinking velocities are different from 3, code needs to be changed !!!
 	VDia                  = 0.d0 
 	allow_var_sinking     = .true.   
+	Sinking_scheme        = 3           ! scheme to solve the Sinking (1:upwind, 3: 3rd order)
 	biostep               = 1           ! Number of times biology should be stepped forward for each time step		 
 	REcoM_Geider_limiter  = .false.     ! Decides what routine should be used to calculate limiters in sms
 	REcoM_Grazing_Variable_Preference = .true. ! Decides if grazing should have preference for phyN or DiaN 
@@ -25,8 +25,8 @@ This is the namelist recom
 	Graz_pref_new         = .true.    ! If it is true Fasham 1990, if not recom original variable preference
 	Diags                 = .true.
 	constant_CO2          = .true.
-	useAeolianN           = .false.      ! When set to true, aeolian nitrogen deposition is activated
-	UseFeDust             = .false.      ! Turns dust input of iron off when set to.false.
+	useAeolianN           = .true.      ! When set to true, aeolian nitrogen deposition is activated
+	UseFeDust             = .true.      ! Turns dust input of iron off when set to.false.
 	use_Fe2N              = .true.      ! use Fe2N instead of Fe2C, as in MITgcm version
 	use_photodamage       = .true.      ! use Alvarez et al (2018) for chlorophyll degradation
         restore_alkalinity    = .true.
