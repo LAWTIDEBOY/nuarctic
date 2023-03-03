@@ -62,6 +62,9 @@ subroutine REcoM_computation(Nn, state, SurfSW, Loc_slp, Temp, Sali, PARc)
   Real(kind=8)                          :: ppo                 ! atmospheric pressure, divided by 1 atm 
   Real(kind=8)                          :: REcoM_O2            ! [mmol/m3] Conc of O2 in the surface water, used to calculate O2 flux
 
+! misceallaneous
+  Real(kind=8)				:: tmp, diags1d_tmp			
+
 ! Subroutine REcoM_sms_computation
   Real(kind=8),dimension(:,:), allocatable :: sms, aux                ! matrix that entail changes in tracer concentrations
 
@@ -73,7 +76,7 @@ subroutine REcoM_computation(Nn, state, SurfSW, Loc_slp, Temp, Sali, PARc)
   character(7), parameter :: optT='Tpot   ', optGAS='Pinsitu'
 
 !Diagnostics
-  integer                              :: idiags
+  integer                              :: idiags, j
 !===============================================================================
   ! allocate and initialize arrays 
   allocate(zF(nl), SinkVel(nl,4), thick(nl-1), recipthick(nl-1), sms(nl-1,bgc_num), aux(nl-1,bgc_num))
@@ -217,7 +220,12 @@ subroutine REcoM_computation(Nn, state, SurfSW, Loc_slp, Temp, Sali, PARc)
 ! Diagnostics
   if (Diags) then
 	do idiags = one,8
-	  LocDiags2D(idiags) = sum(diags3Dloc(1:nn,idiags) * thick(1:nn))
+	  diags1d_tmp = 0
+	  do j=1,nn
+	  	tmp = diags2Dloc(j,idiags) * thick(j)
+	  	if (.not. isnan(tmp)) diags1d_tmp = diags1d_tmp + tmp
+	  enddo
+	  LocDiags1D(idiags) = diags1d_tmp
 	end do
   end if
 ! array deallocation

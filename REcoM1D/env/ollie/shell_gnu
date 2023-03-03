@@ -1,0 +1,7 @@
+# load module and export useful path
+module load gnu.compiler/9.4.0
+module load netcdf/4.7.4_gnu
+module load python3
+module load cmake/3.22.0
+
+export FC="gfortran" CC=gcc CXX=gcc

@@ -1,0 +1,7 @@
+# load module and export useful path
+module load intel.compiler/2022.0.2
+module load netcdf/4.6.2_intel
+module load python3
+module load cmake/3.22.0
+
+export FC="ifort"

@@ -154,7 +154,7 @@ module recom_config
 
   logical                :: recom_binary_init    = .false.  ! Restart from binary
   Integer                :: bgc_num               = 22
-  Integer                :: diags3d_num           = 2       ! Number of diagnostic 3d tracers to be saved
+  Integer                :: diags2d_num           = 2       ! Number of diagnostic 2d (time, level) tracers to be saved
   Real(kind=8)           :: VDet                  = 20.d0   ! Sinking velocity, constant through the water column and positive downwards
   Real(kind=8)           :: VDet_zoo2             = 200.d0   ! Sinking velocity, constant through the water column 
   Real(kind=8)           :: VPhy                  = 0.d0    !!! If the number of sinking velocities are different from 3, code needs to be changed !!!
@@ -186,7 +186,7 @@ module recom_config
 
   namelist /pavariables/ REcoM_restart,         recom_binary_write,         	&
                        recom_binary_init,					&            
-                       bgc_num,                 diags3d_num,              	&
+                       bgc_num,                 diags2d_num,              	&
                        VDet,          VDet_zoo2,     				&
                        VPhy,                              VDia,                 &
                        allow_var_sinking,                 Sinking_scheme,   	&		
@@ -530,7 +530,7 @@ Module REcoM_declarations
 !-------------------------------------------------------------------------------
 ! Diagnostics
   Real(kind=8)  :: recipbiostep                         ! 1/number of steps per recom cycle
-  Real(kind=8),allocatable,dimension(:,:) :: Diags3Dloc
+  Real(kind=8),allocatable,dimension(:,:) :: Diags2Dloc
 !-------------------------------------------------------------------------------
 ! Benthos
   Real(kind=8),allocatable,dimension(:) :: decayBenthos ! [1/day] Decay rate of detritus in the benthic layer
@@ -550,15 +550,15 @@ Module REcoM_declarations
 end module REcoM_declarations
 
 !==========================================================================================================
-! For arrays needed for the whole 2D or 3D domain, but only needed in REcoM
+! For arrays needed for the whole 1D(time) or 2D(depth, time) domain, but only needed in REcoM
 !-------------------------------------------------------------------------------
 Module REcoM_GloVar
   implicit none
   save
 	
   Real(kind=8),allocatable,dimension(:)   :: Benthos          ! 4 types of benthos-tracers with size [4]
-  Real(kind=8)				  :: GloFeDust        ! [umol/m2/s] Monthly 2D field of iron soluted in surface water from dust
-  Real(kind=8)			     	  :: GloNDust         ! [mmol/m2/s] 10-year mean 2D fields of nitrogen soluted in surface water from dust
+  Real(kind=8)				  :: GloFeDust        ! [umol/m2/s] Monthly 1D field of iron soluted in surface water from dust
+  Real(kind=8)			     	  :: GloNDust         ! [mmol/m2/s] 10-year mean 1D fields of nitrogen soluted in surface water from dust
   Real(kind=8)            		  :: AtmCO2           ! [uatm] Atmospheric CO2 partial pressure. One value for the whole planet for each month
   
   Real(kind=8)				  :: AtmFeInput       ! [umol/m2/s] Includes ice, but is, other than that identlical to GloFeDust
@@ -580,14 +580,14 @@ Module REcoM_GloVar
   Real(kind=8),allocatable,dimension(:,:) :: auxy 
 
 !  Real(kind=8),allocatable,dimension(:,:)   :: GlowFlux         ! 
-  Real(kind=8),allocatable,dimension(:)   :: diags2D          ! Diagnostics in 2D [8]
-  Real(kind=8),allocatable,dimension(:,:) :: diags3D          ! Diagnostics in 3D [2 nl-1]
-  Real(kind=8)				  :: DenitBen         ! Benthic denitrification Field in 2D
+  Real(kind=8),allocatable,dimension(:)   :: diags1D          ! Diagnostics in 1D [8] (time series)
+  Real(kind=8),allocatable,dimension(:,:) :: diags2D          ! Diagnostics in 2D [2 nl-1] (time series of levels)
+  Real(kind=8)				  :: DenitBen         ! Benthic denitrification Field in 1D
 
   Real(kind=8)				  :: Alk_surf         ! Surface alkalinity field used for restoring
   Real(kind=8)				  :: relax_alk
   Real(kind=8)                            :: virtual_alk
-  real(kind=8), allocatable,dimension(:)  :: PAR3D           ! Light in the water column [nl-1]
+  real(kind=8), allocatable,dimension(:)  :: PAR2D           ! Light in the water column [nl-1]
 
 !! Cobeta, Cos(Angle of incidence)
   Real(kind=8) ::  cosAI
@@ -601,10 +601,10 @@ Module REcoM_locVar
 
   Real(kind=8),allocatable,dimension(:) :: LocBenthos ! Storing the values for benthos in current watercolumn: N,C,Si and Calc
   Real(kind=8) :: Hplus                     ! [mol/kg] Concentrations of H-plus ions in the surface node
-  Real(kind=8) :: pco2surf                  ! [uatm] Partial pressure of CO2 in surface layer at current 2D node	
+  Real(kind=8) :: pco2surf                  ! [uatm] Partial pressure of CO2 in surface layer at current node (1D)
   Real(kind=8) :: dflux                     ! [mmol/m2/day] Flux of CO2 into the ocean
   Real(kind=8) :: o2ex                     ! [mmol/m2/s] Flux of O2 into the ocean
-  Real(kind=8) :: ULoc                      ! Wind strength above current 2D node, change array size if used with mocsy input vector longer than one
+  Real(kind=8) :: ULoc                      ! Wind strength above current node (1D), change array size if used with mocsy input vector longer than one
   Real(kind=8) :: dpco2surf              ! [uatm] difference of oceanic pCO2 minus atmospheric pCO2
 
 ! mocsy output -----------------------------------------------------------------------------------------------------------------------------
@@ -634,7 +634,7 @@ Module REcoM_locVar
   Real(kind=8) :: NDust                     ! [mmol/m2/s]
   Real(kind=8) :: Loc_ice_conc           ! Used to calculate flux of DIC in REcoM 0 -> 1
   Real(kind=8) :: LocAtmCO2              ! [uatm]
-  Real(kind=8) :: LocDiags2D(8)
+  Real(kind=8) :: LocDiags1D(8)
   Real(kind=8) :: LocDenit
 !  if (REcoM_Second_Zoo) then
   Real(kind=8) :: res_zoo2_a, res_zoo2_f

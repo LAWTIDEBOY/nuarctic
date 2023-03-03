@@ -45,7 +45,9 @@ subroutine REcoM_mixing
     vflux=0.d0
     ! compute the mixing flux in the water column
     do k = max(2,nzmin), nzmax
+    	if (isnan(Kz(k))) Kz(k)=1e-7
     	vflux(k) = Kz(k) * (tr_arr(k,tr_num) - tr_arr(k-1,tr_num))/dz_trr(k)
+    	if (isnan(vflux(k))) vflux(k) = 0 
     enddo 
 
     ! rk: no flux at the surface
@@ -91,6 +93,7 @@ subroutine REcoM_mixing
         deepflux(tr_num) = deepscale * Kz(nzmax) *    &
                      (bc_bottom_tracers(tr_num) -    & 
                      tr_arr(nzmax,tr_num)) / dz_trr(nzmax) 
+        if (isnan(deepflux(tr_num))) deepflux(tr_num)=0.
          ! tracer update at bottom boundary
          tr_arr(nzmax,tr_num) = tr_arr(nzmax,tr_num) + & 
          deepflux(tr_num)/dz_trr(nzmax)                    

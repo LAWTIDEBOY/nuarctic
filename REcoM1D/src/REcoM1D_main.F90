@@ -84,7 +84,7 @@ do istep=1,nsteps
 	call clock
 
 	! run main 
-	!!!! double check is here
+	!!!! double check here
 	call recom(istep,mesh)
 
 	! update tracers
@@ -95,12 +95,11 @@ do istep=1,nsteps
 	
 	! perform diagnostics
 	if (mask_diagnostic(istep)) call store_diagnostics(index_diagnostic(istep))
-	
 enddo
 
 print*, 'computation done'
 !=============================================================================!
-print*, 'start diagnostics'
+print*, 'start writing diagnostics and outputs'
 ! 
 ! write diagnostics to netcdf and deallocate arrays
 ! 
@@ -108,7 +107,7 @@ print*, 'start diagnostics'
 ! write diagnostics
 ! 
 call write_diagnostics
-print*, 'diagnostics done'
+print*, 'diagnostics and outputs written'
 ! 
 ! deallocate arrays
 ! 

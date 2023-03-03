@@ -196,7 +196,7 @@ subroutine REcoM_sms_computation(Nn,state,thick,recipthick,SurfSR,sms,Temp,zF,PA
 
     rTloc   = real(one)/(Temp(k) + C2K)
     arrFunc = exp(-Ae * ( rTloc - rTref))
-
+    
     if (REcoM_Second_Zoo) then 
         arrFuncZoo2 = exp(t1_zoo2/t2_zoo2 - t1_zoo2*rTloc)/(1 + exp(t3_zoo2/t4_zoo2 - t3_zoo2*rTloc))
     endif
@@ -242,7 +242,7 @@ subroutine REcoM_sms_computation(Nn,state,thick,recipthick,SurfSR,sms,Temp,zF,PA
     feLimitFac  	= Fe/(k_Fe_d + Fe)
     qlimitFac   	= min(qlimitFac,feLimitFac)
     pMax_dia      	= P_cm_d * qlimitFac * arrFunc
-
+   
 !_______________________________________________________________________
 !< Light
 ! Exponential diminution of downward irradiance
@@ -614,8 +614,7 @@ subroutine REcoM_sms_computation(Nn,state,thick,recipthick,SurfSR,sms,Temp,zF,PA
 ! Second zooplankton respiration is assumed to drive zooplankton back to Redfield C:N
 ! if their C:N becomes higher than Redfield
        call krill_resp
-   !print*,'daynew: ', daynew
-   !print*,'Latr ', Latr 
+ 
        if((grazingFluxcarbonzoo2/Zoo2C) <= 0.1)then
           res_zoo2_f = 0.1*(grazingFluxcarbonzoo2/Zoo2C*100)
        else
@@ -1463,42 +1462,42 @@ subroutine REcoM_sms_computation(Nn,state,thick,recipthick,SurfSR,sms,Temp,zF,PA
 	recipbiostep    = 1.d0/real(biostep)
 
 !*** Net primary production [mmol C /(m3 * day)]
-	Diags3Dloc(k,1) = Diags3Dloc(k,1) + (   &
+	Diags2Dloc(k,1) = Diags2Dloc(k,1) + (   &
      	+ Cphot                   * PhyC  &
      	- PhyRespRate             * PhyC  &
      	) * recipbiostep
 
-	Diags3Dloc(k,2) = Diags3Dloc(k,2) + (   &
+	Diags2Dloc(k,2) = Diags2Dloc(k,2) + (   &
      	+ Cphot_dia               * DiaC  &
      	- PhyRespRate_dia         * DiaC  &
      	) * recipbiostep
 
 !*** Gross primary production [mmol C /(m3 * day)]
-	Diags3Dloc(k,3) = Diags3Dloc(k,3) + (   &
+	Diags2Dloc(k,3) = Diags2Dloc(k,3) + (   &
      	+ Cphot                   * PhyC  &
      	) * recipbiostep
 
-	Diags3Dloc(k,4) = Diags3Dloc(k,4) + (   &
+	Diags2Dloc(k,4) = Diags2Dloc(k,4) + (   &
      	+ Cphot_dia               * DiaC  &
      	) * recipbiostep
 
 !*** Net N-assimilation [mmol N/(m3 * day)]
-	Diags3Dloc(k,5) = Diags3Dloc(k,5) + (   &
+	Diags2Dloc(k,5) = Diags2Dloc(k,5) + (   &
      	+ N_assim                 * PhyC  &
      	- lossN * limitFacN       * PhyN  &
      	) * recipbiostep
 
-	Diags3Dloc(k,6) = Diags3Dloc(k,6) + (   &
+	Diags2Dloc(k,6) = Diags2Dloc(k,6) + (   &
      	+ N_assim_dia             * DiaC  &
      	- lossN * limitFacN_dia   * DiaN  &
      	) * recipbiostep
 
 !*** Changed to chlorophyll degradation (commented out gross N-assimilation below)
-        Diags3Dloc(k,7) = Diags3Dloc(k,7) + (   &
+        Diags2Dloc(k,7) = Diags2Dloc(k,7) + (   &
         + KOchl  &
         ) * recipbiostep
 
-        Diags3Dloc(k,8) = Diags3Dloc(k,8) + (   &
+        Diags2Dloc(k,8) = Diags2Dloc(k,8) + (   &
         + KOchl_dia  &
         ) * recipbiostep
 
