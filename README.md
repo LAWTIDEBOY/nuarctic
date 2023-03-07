@@ -1,4 +1,4 @@
-# <span style="color:blue">nuArctic</span>
+# <span style="color:blue"> :large_blue_circle: nuArctic :large_blue_circle: </span>
 
 <p align="center">
     <img src="logos/logo4_whitebackground.png" alt="Drawing" style="width: 300px;">
@@ -6,7 +6,7 @@
 
 The nuArctic project is a BMBF project that aims at exploiting data aquired during the MOSAiC expedition to improve / implement biogeochemical models with regards to the remineralization / export of organic material (nutrients and carbon).
 
-nuArctic develop a 1D version of the biogeochemical model REcoM, combined with the assimilation framework PDAF and field data from MOSAiC.
+nuArctic develops a 1D version of the biogeochemical model REcoM, combined with the assimilation framework PDAF and field data from MOSAiC.
 
 contact:
 @LaurentOziel: laurent.oziel@awi.de
@@ -64,7 +64,7 @@ The main steps consists in providing:
 - atmospheric deposition (Carbon C, Nitrogen N and Iron Fe,  in folder atm_deposition)
 - forcing, which is here derived from in-situ observations (folders ITP_CTD_Ben, ITP_PAR, MSS, and METEO, ...).
 
-#### remarks:
+#### <span style="color:red"> :small_red_triangle_down: remarks:</span>
 - Paths do not need to be changed in the following scripts, they are defined according to the current cloned/downloaded repository architecture.
 - the following extraction algorithms are based on the nearest neighbor approximation to estimate the track/mesh correspondence.
 
@@ -95,7 +95,7 @@ The script needs to be run to twice, switching the dedicate flag ‘flag_daily�
 whereas
 - a discretized mesh si required to format all datasets, according to the simulation time frame, in order to create the final model forcing file.
 
-#### <span style="color:red">Remark:</span> The mesh-related script needs to be run first because all the other pre-processing steps are based on along-track extracted mesh.
+#### <span style="color:red">:small_red_triangle_down: Remark:</span> The mesh-related script needs to be run first because all the other pre-processing steps are based on along-track extracted mesh.
 
 ### <span style="color:blue">1.3. Initial tracer conditions</span><a class="anchor" id="1.3"></a>
 Folder: scripts/Create_Init/)
@@ -223,7 +223,7 @@ The other source code files are identical with 3D REcoM:
 - recom_modules.F90 gathers basis modules for constant and namelists definition as well as local and  global (cf. FESOM code) variable declarations.
 - recom_init.F90 (partially rewritten) is dedicated to the declaration, allocation and initialization of original REcoM global/local variables and initialization of tracers.
 
-#### <span style="color:red">remark</span>: most tracers are initialized with very small values except DIN(tracer 3), DIC(tracer 4), Alk(tracer 5), Dsi(tracer 20), Dfe(tracer 21), O2(tracer 24) which are initialized from climatology or in-situ initial conditions.
+#### <span style="color:red"> :small_red_triangle_down: remark</span>: most tracers are initialized with very small values except DIN(tracer 3), DIC(tracer 4), Alk(tracer 5), Dsi(tracer 20), Dfe(tracer 21), O2(tracer 24) which are initialized from climatology or in-situ initial conditions.</span>
 
 - recom_setup.F90 performs the reading of the namelists and mesh and estimate time and vertical mesh properties at each time step.
 - recom_extra.F90 gathers REcoM useful computation tool routines.
@@ -237,7 +237,7 @@ The other source code files are identical with 3D REcoM:
 The work environment is defined using the script env.sh. The script recognizes the machine with which the user is working (local AWI laptop, Ollie, hlrn, etc….). The script then loads the required environment-related modules using the file shell located in the folder env/ollie/ (for example if Ollie is used, other environment are available).
 shell gathers command lines to load modules related to processing (python) and compiling (cmake, compiler, netcdf libraries) and defines compiler to be used.
 
-#### <span style="color:red">Remarks:</span>
+#### <span style="color:red"> :small_red_triangle_down: Remarks:</span>
 - only 2 environments are for now provided (Ollie, AWI laptop), the user might create environment files according to its needs and the available modules (command module avail to know more about modules that are available on each machine). An example, which any user can follow is available for Ollie.
 - 2 or more compilers can be available for one machine (GNU, intel), the user might choose 1 and its related compiling modules and libraries, shell needs be rewritten according to the changes done by the user.
 - The version of  the compilers often come with related libraries and options. Therefore, the compatibility in between modules needs to be checked.
