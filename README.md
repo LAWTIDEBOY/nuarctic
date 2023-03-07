@@ -1,5 +1,7 @@
 # nuArctic
 
+<img src="logos/logo4_whitebackground.png" alt="Drawing" style="width: 300px;">
+
 The nuArctic project is a BMBF project that aims at exploiting data aquired during the MOSAiC expedition to improve / implement biogeochemical models with regards to the remineralization / export of organic material (nutrients and carbon).
 
 nuArctic develop a 1D version of the biogeochemical model REcoM, combined with the assimilation framework PDAF and field data from MOSAiC.
@@ -7,6 +9,38 @@ nuArctic develop a 1D version of the biogeochemical model REcoM, combined with t
 contact:
 @LaurentOziel: laurent.oziel@awi.de
 @FlorentBirrien: florent.birrien@awi.de
+
+
+### Table of Contents
+
+* [0. Where to get it from](#0.)
+* [1. Required pre-processing steps](#1.)
+    * [1.1 How to define the time frame of the simulation](#1.1)
+    * [1.2 mesh creation and configuration](#1.2)
+    * [1.3 initial tracer conditions](#1.3)
+    * [1.4 Atmospheric deposition](#1.4)
+    * [1.5 In-situ forcing](#1.5)
+        * [1.5.1 Photo-synthetically Active Radiation (PAR)] (#1.5.1)
+        * [1.5.2 Temperature and salinity] (#1.5.2)
+        * [1.5.3  Vertical diffusion Kz] (#1.5.3)
+        * [1.5.4 Atmospheric conditions] (#1.5.4)
+        * [1.5.5 Ice cover] (#1.5.5)
+        * [1.5.6 Merging of all forcings in one file] (#1.5.6)
+* [2. Composition of the source code](#2.)
+    * [2.1 What’s new?](#2.1)
+    * [2.2 Composition of the difference source code files](#2.2)
+* [3. How to compile REcoM1D?](#3.)
+    * [3.1 Environment and specific modules](#3.1)
+    * [3.2 Compiling with Cmake](#3.1)
+    * [3.3 The compiling command](#3.1)
+* [4. How to run REcoM1D?](#4.)
+    * [4.1 Environment and path](#4.1)
+    * [4.2 Compiling with Cmake](#4.2)
+    * [4.3 Namelist files](#4.3)
+    * [4.4 How to run the model?](#4.4)
+    * [4.5 Outputs](#4.5)
+
+    
 
 # Getting started with REcoM1D
 
@@ -31,7 +65,7 @@ The main steps consists in providing:
 - Paths do not need to be changed in the following scripts, they are defined according to the current cloned/downloaded repository architecture.
 - the following extraction algorithms are based on the nearest neighbor approximation to estimate the track/mesh correspondence.
 
-### 1.a. How to define the time frame of the simulation: the file time.recom
+### 1.1. How to define the time frame of the simulation: the file time.recom
 The file time.recom (in folder REcoM1D/config/) defines the time frame of the simulation. All variables need to be tuned by the user according to simulation time requirement. The time configuration file also includes a spin-up variable, which is most of the time required in simulations.
 
 The various variables in time.recom are:
@@ -44,7 +78,7 @@ The various variables in time.recom are:
 - Whenever changes are performed for any of these time variables all the pre-processing steps need to be run once more, starting with the mesh scripts , to have consistent mesh/forcing data sets for the simulation.
 - Time variables from time.recom are systematically overwriting default values in the simulation namelists (namelist.config) whenever the model is run (see appropriate section below) in order to synchronize the changes.
 
-### 1.b mesh creation and configuration
+### 1.2. Mesh creation and configuration
 Folder: scripts/Create_Mesh/
 Jupyter python notebook: Create_REcoM1D_mesh.ipynb
 Data sets required: 	- observed instrument/vessel track
@@ -60,7 +94,7 @@ whereas
 
 #### Remark: The mesh-related script needs to be run first because all the other pre-processing steps are based on along-track extracted mesh.
 
-### 1.C initial tracer conditions
+### 1.3. Initial tracer conditions
 Folder: scripts/Create_Init/)
 Jupyter python notebook: 
 Create_init_climatology.ipynb
@@ -69,7 +103,7 @@ Output files: data/initialization/tracer_initialization.nc
 
 The model offers the choice to intialize the initial contions of REcoM tracers (DO2, DAlk, DIC, DIN, DSi, DFe) either from a climatology (World Ocean Atlas 2018) or from in situ profiles for example from the MOSAiC expedition.
 
-### 1.D atmospheric deposition
+### 1.4. Atmospheric deposition
 Folder: scripts/atm_deposition/
 Jupyter python notebook: Create_atm_deposition_forcing.ipynb
 Data sets required: - REcoM discretized mesh REcoM1D_mesh.nc
@@ -84,10 +118,10 @@ Atmospheric deposition of iron, carbon and nitrogen are used by the model whenev
 
 For each component (C, N, Fe), the deposition is extracted along the track accounting for data discretization in space (global vs gridded) and time (mainly monthly data).
 
-### 1.E in-situ forcing
+### 1.5. In-situ forcing
 The processing and formatting of the in-situ forcing gathers several observational data sets from different sources/instruments. Each data set required its own specific processing script. Here we classify the processing scripts available according to the observed variables that are required for the forcing.
 
-#### Photo-synthetically Active Radiation (PAR):
+#### 1.5.1. Photo-synthetically Active Radiation (PAR):
 The PAR can be given to the model in three different ways:
 1) above water shortwave radiations : in which case the model derives to air-to-sea transmission and will eventually require snow and sea-ice concentration to derive attenuation.
 2) surface water PAR (defaut) : in which case the model will derive attenuation at depth.
@@ -99,7 +133,7 @@ if variable's name  = 'PAR_surface' (case 2)
 if variable's name  = 'PAR' (case 3),
 
 
-#### Temperature and salinity:
+#### 1.5.2. Temperature and salinity:
 Folder: scripts/ITP_CTD/
 Jupyter python notebook: Process_CTD_data.ipynb
 Data sets required: - REcoM daily mesh : data/MESH/REcoM1D_daily_mesh.nc
@@ -118,7 +152,7 @@ The resulting file gathers the time series of daily salinity and temperature pro
 When other data sets are available for temperature and salinity profiles time series an other script
 needs to be written.
 
-#### Vertical diffusion Kz:
+#### 1.5.3. Vertical diffusion Kz:
 Folder: scripts/MSS/
 Jupyter python notebook: Process_Kz_daily.ipynb
 Data sets required: - REcoM daily mesh : data/MESH/REcoM1D_daily_mesh.nc
@@ -128,13 +162,13 @@ Output file: data/MSS/MOSAiC_MSS_daily_Kz.nc
 
 The script interpolate Kz on a fixed vertical axis and filled the missing values with 1e-7 at the bottom. The resulting Kz is a daily vertically discretized field.    
 
-#### Atmospheric conditions:
+#### 1.5.4. Atmospheric conditions:
 atmospheric conditions consist of wind and surface pressure data and have been extracted along the track from ERA5 hourly reanalysis data. The file data/METEO/ERA5_forcing_Polarstern.nc gathers all this information.
 
-#### Ice cover:
+#### 1.5.5. Ice cover:
 Ice cover (or fraction) has (for now) been set to 1, i.e, cell fully covered by ice. If in-situ ice and snow data are available, they can be easily added by writing a specific pre-preprocessing script and by adding some lines to the . When doing so, think also of changing some lines related to ice cover in the source code (cf. Shortwave transmission, etc...)
 
-#### Merging of all forcings in one file
+#### 1.5.6. Merging of all forcings in one file
 
 The REcoM forcing specific script gathers all information about forcing and interpolate the data according to the simulation time frame (time.recom). All data are then stored in REcoM1D_forcing.nc to be directly used as forcing by the model.
 
@@ -154,11 +188,11 @@ Output File: data/REcoM_forcing_data/REcoM1D_forcing.nc
 ## 2. Composition of the source code:
 All code source are contained in the folder: nuarctic/REcoM1D/src/
 
-### 2.A What’s new?
+### 2.1. What’s new?
 REcoM1D has been adapted from the original REcoM model and keep most of its architecture.
 Some of the modules have been rewritten accounting for Lagrangian requirements (both space and time evolution). Some modules dedicated to in-situ forcing and describing tracers evolution (inherited from FESOM) have been added to complete the stand-alone 1D model. Some variables have been rewritten according to 1D Lagrangian configuration. The different Fortran files have been reorganized as dedicated modules, except REcoM1D_main.F90 which is the main running program.
 
-### 2.B composition of the difference source code files
+### 2.2. Composition of the difference source code files
 
 The structure of REcoM remains mainly unchanged compare to the 3D version:
 
@@ -200,12 +234,12 @@ shell gathers command lines to load modules related to processing (python) and c
 - 2 or more compilers can be available for one machine (GNU, intel), the user might choose 1 and its related compiling modules and libraries, shell needs be rewritten according to the changes done by the user.
 - The version of  the compilers often come with related libraries and options. Therefore, the compatibility in between modules needs to be checked.
 
-### 3.b. compiling with Cmake
+### 3.2. Compiling with Cmake
  The source is compiled using Cmake and 2 CmakeLists.txt files, which defines path, executable file name, code dependency, libraries and compiling & linking options.
 The main CmakeLists.txt is located in the REcoM1D folder directly, compiling options such as verbose or debugging mode can be tuned on/off according to user needs and for verification (if bugs occur). More options can be added in the file in the same way. 
 This Cmake scripts calls another CmakeLists.txt file located in the  REcoM1D/src. In the latter file, path, executable file name, code dependency, libraries and compiling & linking options are effectively defined. Compiling options are specific to each compiler.
 
-### 3.c. The compiling command
+### 3.3. The compiling command
 When all those optional checking steps are performed (according to user/machine requirements), the code is simply compiled using the command line: ./configure.sh, which is related to the configuration scripts.
 
 The scripts performs the compiling and create to subfolder:
@@ -214,28 +248,28 @@ The scripts performs the compiling and create to subfolder:
 
 When no error message or warning, the model is ready to run. 
 
-## 4. How to run REcoM1D?:
+## 4. How to run REcoM1D?
 
-### 4.a. Environment and path
+### 4.1. Environment and path
 Simulation paths are exported using the script set_path_REcoM.sh. 
 The folders that contains required data sets are also created here, if they do not already exist.
 Remark: 
 No change is required in set_path_REcoM.sh. The different paths are related to the standard model architecture.
 
-### 4.b. Namelist files
+### 4.2. Namelist files
 In addition to time.recom, 2 namelist files (in REcoM1D/config/) are required to run a simulation:
 namelist.config gathers all information about simulation set-up time discretization, forcing and data file names and output frequencies. Time information from the time.recom systematically overwrite original time information from the namelist, as a matter of synchronization.
 namelist.recom gathers all usual REcoM1D parameters which deals with simulation options and physical processes.
 
-### 4.b data sets
+### 4.3. Data sets
 Several observation data sets are required to run the model (cf. pre-processing step).  The data are not stored in the different folders but a symbolic link (command ln -s ) is created that points in the respective data directories:
 - The discretized mesh REcoM1D_mesh.nc  (in REcoM/grid/) points to the data/MESH/ folder.
 -  Atmospheric deposition information (atm_deposition.nc) and tracer initialization files (tracer_initialization.nc) in the REcoM/data/ are pointing to data/atm_deposition/ and data/initialization/ respectively.
 -  The files containing all the model forcing REcoM1D_forcing.nc (in REcoM1D/forcing/) points to the folder data/REcoM_forcing_data/.
 
-### 4.d How to run the model?
+### 4.4. How to run the model?
 The model is run simply by launching the script ./run_REcoM1D.sh. 
 Result files are stored in the  REcoM/results folders and the simulation summary REcoM1D.out is stored in RecoM/bin/.
 
-### 4.e Outputs
+### 4.E. Outputs
 REcoM1d_diagnostics.nc and REcoM1d_outputs.nc are the 2 output files which gathers simulation diagnostics and 1D & 2D fields and state variables respectively.
