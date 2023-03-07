@@ -1,0 +1,742 @@
+The system is: Linux - 3.10.0-862.14.4.el7.x86_64 - x86_64
+Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+Compiler: /global/AWIsoft/gcc/9.4.0/bin/gcc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+
+The C compiler identification is GNU, found in "/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/3.22.0/CompilerIdC/a.out"
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+Compiler: /global/AWIsoft/gcc/9.4.0/bin/gcc 
+Build flags: 
+Id flags:  
+
+The output was:
+0
+
+
+Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+
+The CXX compiler identification is GNU, found in "/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/3.22.0/CompilerIdCXX/a.out"
+
+Detecting C compiler ABI info compiled with the following output:
+Change Dir: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a8941/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a8941.dir/build.make CMakeFiles/cmTC_a8941.dir/build
+gmake[1]: Entering directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o
+/global/AWIsoft/gcc/9.4.0/bin/gcc   -v -o CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -c /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCCompilerABI.c
+Using built-in specs.
+COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc
+Target: x86_64-pc-linux-gnu
+Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib
+Thread model: posix
+gcc version 9.4.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/cc1 -quiet -v /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -version -o /work/ollie/tmp/ccXQAvNe.s
+GNU C17 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../x86_64-pc-linux-gnu/include"
+ignoring duplicate directory "/global/AWIsoft/netcdf/4.7.4_gnu/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/include/c++/x86_64-pc-linux-gnu"
+#include "..." search starts here:
+#include <...> search starts here:
+ /global/AWIsoft/gcc/9.4.0/include/c++/9.4.0
+ /global/AWIsoft/netcdf/4.7.4_gnu/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include
+ /usr/local/include
+ /global/AWIsoft/gcc/9.4.0/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed
+ /usr/include
+End of search list.
+GNU C17 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: c8fd162d8cacd0cbb69f33a14fa33ef0
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o /work/ollie/tmp/ccXQAvNe.s
+GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-28.base.el7_5.1
+COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/
+LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64'
+Linking C executable cmTC_a8941
+/global/AWIsoft/cmake/3.22.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a8941.dir/link.txt --verbose=1
+/global/AWIsoft/gcc/9.4.0/bin/gcc  -v CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -o cmTC_a8941 
+Using built-in specs.
+COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc
+COLLECT_LTO_WRAPPER=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib
+Thread model: posix
+gcc version 9.4.0 (GCC) 
+COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/
+LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_a8941' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2 -plugin /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so -plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper -plugin-opt=-fresolution=/work/ollie/tmp/cc8Sb28k.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_a8941 /lib/../lib64/crt1.o /lib/../lib64/crti.o /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o -L/global/AWIsoft/gcc/9.4.0/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/../lib64 -L/global/AWIsoft/git/git-2.13.1/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/global/AWIsoft/netcdf/4.7.4_gnu/lib -L/global/AWIsoft/gcc/9.4.0/lib64 -L/global/AWIsoft/gcc/9.4.0/lib -L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric -L/global/AWIsoft/git/git-2.13.1/lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../.. CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_a8941' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed C implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0]
+    add: [/global/AWIsoft/netcdf/4.7.4_gnu/include]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+    add: [/usr/local/include]
+    add: [/global/AWIsoft/gcc/9.4.0/include]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0] ==> [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0]
+  collapse include dir [/global/AWIsoft/netcdf/4.7.4_gnu/include] ==> [/global/AWIsoft/netcdf/4.7.4_gnu/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/include] ==> [/global/AWIsoft/gcc/9.4.0/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0;/global/AWIsoft/netcdf/4.7.4_gnu/include;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include;/usr/local/include;/global/AWIsoft/gcc/9.4.0/include;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed;/usr/include]
+
+
+Parsed C implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_a8941/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_a8941.dir/build.make CMakeFiles/cmTC_a8941.dir/build]
+  ignore line: [gmake[1]: Entering directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building C object CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o]
+  ignore line: [/global/AWIsoft/gcc/9.4.0/bin/gcc   -v -o CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -c /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCCompilerABI.c]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 9.4.0 (GCC) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/cc1 -quiet -v /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCCompilerABI.c -quiet -dumpbase CMakeCCompilerABI.c -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -version -o /work/ollie/tmp/ccXQAvNe.s]
+  ignore line: [GNU C17 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 9.4.0  GMP version 6.0.0  MPFR version 3.1.1  MPC version 1.0.1  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [ignoring duplicate directory "/global/AWIsoft/netcdf/4.7.4_gnu/include"]
+  ignore line: [  as it is a non-system directory that duplicates a system directory]
+  ignore line: [ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include"]
+  ignore line: [  as it is a non-system directory that duplicates a system directory]
+  ignore line: [ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/include/c++/x86_64-pc-linux-gnu"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/include/c++/9.4.0]
+  ignore line: [ /global/AWIsoft/netcdf/4.7.4_gnu/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU C17 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 9.4.0  GMP version 6.0.0  MPFR version 3.1.1  MPC version 1.0.1  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [Compiler executable checksum: c8fd162d8cacd0cbb69f33a14fa33ef0]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o /work/ollie/tmp/ccXQAvNe.s]
+  ignore line: [GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-28.base.el7_5.1]
+  ignore line: [COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking C executable cmTC_a8941]
+  ignore line: [/global/AWIsoft/cmake/3.22.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_a8941.dir/link.txt --verbose=1]
+  ignore line: [/global/AWIsoft/gcc/9.4.0/bin/gcc  -v CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -o cmTC_a8941 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 9.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_a8941' '-mtune=generic' '-march=x86-64']
+  link line: [ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2 -plugin /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so -plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper -plugin-opt=-fresolution=/work/ollie/tmp/cc8Sb28k.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_a8941 /lib/../lib64/crt1.o /lib/../lib64/crti.o /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o -L/global/AWIsoft/gcc/9.4.0/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/../lib64 -L/global/AWIsoft/git/git-2.13.1/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/global/AWIsoft/netcdf/4.7.4_gnu/lib -L/global/AWIsoft/gcc/9.4.0/lib64 -L/global/AWIsoft/gcc/9.4.0/lib -L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric -L/global/AWIsoft/git/git-2.13.1/lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../.. CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o /lib/../lib64/crtn.o]
+    arg [/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/work/ollie/tmp/cc8Sb28k.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_a8941] ==> ignore
+    arg [/lib/../lib64/crt1.o] ==> obj [/lib/../lib64/crt1.o]
+    arg [/lib/../lib64/crti.o] ==> obj [/lib/../lib64/crti.o]
+    arg [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o] ==> obj [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib64/../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib64/../lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/../lib64]
+    arg [-L/global/AWIsoft/git/git-2.13.1/lib64/../lib64] ==> dir [/global/AWIsoft/git/git-2.13.1/lib64/../lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/global/AWIsoft/netcdf/4.7.4_gnu/lib] ==> dir [/global/AWIsoft/netcdf/4.7.4_gnu/lib]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib] ==> dir [/global/AWIsoft/gcc/9.4.0/lib]
+    arg [-L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric] ==> dir [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+    arg [-L/global/AWIsoft/git/git-2.13.1/lib64] ==> dir [/global/AWIsoft/git/git-2.13.1/lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..]
+    arg [CMakeFiles/cmTC_a8941.dir/CMakeCCompilerABI.c.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o] ==> obj [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o]
+    arg [/lib/../lib64/crtn.o] ==> obj [/lib/../lib64/crtn.o]
+  collapse obj [/lib/../lib64/crt1.o] ==> [/lib64/crt1.o]
+  collapse obj [/lib/../lib64/crti.o] ==> [/lib64/crti.o]
+  collapse obj [/lib/../lib64/crtn.o] ==> [/lib64/crtn.o]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib64/../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/git/git-2.13.1/lib64/../lib64] ==> [/global/AWIsoft/git/git-2.13.1/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/global/AWIsoft/netcdf/4.7.4_gnu/lib] ==> [/global/AWIsoft/netcdf/4.7.4_gnu/lib]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib] ==> [/global/AWIsoft/gcc/9.4.0/lib]
+  collapse library dir [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric] ==> [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+  collapse library dir [/global/AWIsoft/git/git-2.13.1/lib64] ==> [/global/AWIsoft/git/git-2.13.1/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..] ==> [/global/AWIsoft/gcc/9.4.0/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit objs: [/lib64/crt1.o;/lib64/crti.o;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o;/lib64/crtn.o]
+  implicit dirs: [/global/AWIsoft/gcc/9.4.0/lib64;/global/AWIsoft/git/git-2.13.1/lib64;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0;/lib64;/usr/lib64;/global/AWIsoft/netcdf/4.7.4_gnu/lib;/global/AWIsoft/gcc/9.4.0/lib;/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+  implicit fwks: []
+
+
+Detecting CXX compiler ABI info compiled with the following output:
+Change Dir: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f9681/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f9681.dir/build.make CMakeFiles/cmTC_f9681.dir/build
+gmake[1]: Entering directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp'
+Building CXX object CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o
+/global/AWIsoft/gcc/9.4.0/bin/gcc   -v -o CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -c /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp
+Using built-in specs.
+COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc
+Target: x86_64-pc-linux-gnu
+Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib
+Thread model: posix
+gcc version 9.4.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/cc1plus -quiet -v -D_GNU_SOURCE /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -version -o /work/ollie/tmp/ccGhNFqt.s
+GNU C++14 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../x86_64-pc-linux-gnu/include"
+ignoring duplicate directory "/global/AWIsoft/netcdf/4.7.4_gnu/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/include/c++/x86_64-pc-linux-gnu"
+ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0"
+  as it is a non-system directory that duplicates a system directory
+#include "..." search starts here:
+#include <...> search starts here:
+ /global/AWIsoft/netcdf/4.7.4_gnu/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/x86_64-pc-linux-gnu
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/backward
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include
+ /usr/local/include
+ /global/AWIsoft/gcc/9.4.0/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed
+ /usr/include
+End of search list.
+GNU C++14 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+Compiler executable checksum: 51083a2e29ec1e849e9b8f9397f52dee
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o /work/ollie/tmp/ccGhNFqt.s
+GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-28.base.el7_5.1
+COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/
+LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-mtune=generic' '-march=x86-64'
+Linking CXX executable cmTC_f9681
+/global/AWIsoft/cmake/3.22.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f9681.dir/link.txt --verbose=1
+/global/AWIsoft/gcc/9.4.0/bin/gcc  -v CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_f9681 
+Using built-in specs.
+COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc
+COLLECT_LTO_WRAPPER=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib
+Thread model: posix
+gcc version 9.4.0 (GCC) 
+COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/
+LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f9681' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2 -plugin /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so -plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper -plugin-opt=-fresolution=/work/ollie/tmp/ccSqiKUz.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_f9681 /lib/../lib64/crt1.o /lib/../lib64/crti.o /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o -L/global/AWIsoft/gcc/9.4.0/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/../lib64 -L/global/AWIsoft/git/git-2.13.1/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/global/AWIsoft/netcdf/4.7.4_gnu/lib -L/global/AWIsoft/gcc/9.4.0/lib64 -L/global/AWIsoft/gcc/9.4.0/lib -L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric -L/global/AWIsoft/git/git-2.13.1/lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../.. CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f9681' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed CXX implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/global/AWIsoft/netcdf/4.7.4_gnu/include]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/x86_64-pc-linux-gnu]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/backward]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+    add: [/usr/local/include]
+    add: [/global/AWIsoft/gcc/9.4.0/include]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/global/AWIsoft/netcdf/4.7.4_gnu/include] ==> [/global/AWIsoft/netcdf/4.7.4_gnu/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0] ==> [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/x86_64-pc-linux-gnu] ==> [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0/x86_64-pc-linux-gnu]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/backward] ==> [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0/backward]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/include] ==> [/global/AWIsoft/gcc/9.4.0/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/global/AWIsoft/netcdf/4.7.4_gnu/include;/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0;/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0/x86_64-pc-linux-gnu;/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0/backward;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include;/usr/local/include;/global/AWIsoft/gcc/9.4.0/include;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed;/usr/include]
+
+
+Parsed CXX implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_f9681/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f9681.dir/build.make CMakeFiles/cmTC_f9681.dir/build]
+  ignore line: [gmake[1]: Entering directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building CXX object CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o]
+  ignore line: [/global/AWIsoft/gcc/9.4.0/bin/gcc   -v -o CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -c /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 9.4.0 (GCC) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/cc1plus -quiet -v -D_GNU_SOURCE /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpbase CMakeCXXCompilerABI.cpp -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -version -o /work/ollie/tmp/ccGhNFqt.s]
+  ignore line: [GNU C++14 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 9.4.0  GMP version 6.0.0  MPFR version 3.1.1  MPC version 1.0.1  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [ignoring duplicate directory "/global/AWIsoft/netcdf/4.7.4_gnu/include"]
+  ignore line: [  as it is a non-system directory that duplicates a system directory]
+  ignore line: [ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include"]
+  ignore line: [  as it is a non-system directory that duplicates a system directory]
+  ignore line: [ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/include/c++/x86_64-pc-linux-gnu"]
+  ignore line: [ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0"]
+  ignore line: [  as it is a non-system directory that duplicates a system directory]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /global/AWIsoft/netcdf/4.7.4_gnu/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/x86_64-pc-linux-gnu]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../include/c++/9.4.0/backward]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU C++14 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 9.4.0  GMP version 6.0.0  MPFR version 3.1.1  MPC version 1.0.1  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [Compiler executable checksum: 51083a2e29ec1e849e9b8f9397f52dee]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o /work/ollie/tmp/ccGhNFqt.s]
+  ignore line: [GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-28.base.el7_5.1]
+  ignore line: [COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking CXX executable cmTC_f9681]
+  ignore line: [/global/AWIsoft/cmake/3.22.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f9681.dir/link.txt --verbose=1]
+  ignore line: [/global/AWIsoft/gcc/9.4.0/bin/gcc  -v CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_f9681 ]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gcc]
+  ignore line: [COLLECT_LTO_WRAPPER=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 9.4.0 (GCC) ]
+  ignore line: [COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_f9681' '-mtune=generic' '-march=x86-64']
+  link line: [ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2 -plugin /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so -plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper -plugin-opt=-fresolution=/work/ollie/tmp/ccSqiKUz.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_f9681 /lib/../lib64/crt1.o /lib/../lib64/crti.o /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o -L/global/AWIsoft/gcc/9.4.0/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/../lib64 -L/global/AWIsoft/git/git-2.13.1/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/global/AWIsoft/netcdf/4.7.4_gnu/lib -L/global/AWIsoft/gcc/9.4.0/lib64 -L/global/AWIsoft/gcc/9.4.0/lib -L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric -L/global/AWIsoft/git/git-2.13.1/lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../.. CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o /lib/../lib64/crtn.o]
+    arg [/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/work/ollie/tmp/ccSqiKUz.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_f9681] ==> ignore
+    arg [/lib/../lib64/crt1.o] ==> obj [/lib/../lib64/crt1.o]
+    arg [/lib/../lib64/crti.o] ==> obj [/lib/../lib64/crti.o]
+    arg [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o] ==> obj [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib64/../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib64/../lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/../lib64]
+    arg [-L/global/AWIsoft/git/git-2.13.1/lib64/../lib64] ==> dir [/global/AWIsoft/git/git-2.13.1/lib64/../lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/global/AWIsoft/netcdf/4.7.4_gnu/lib] ==> dir [/global/AWIsoft/netcdf/4.7.4_gnu/lib]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib] ==> dir [/global/AWIsoft/gcc/9.4.0/lib]
+    arg [-L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric] ==> dir [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+    arg [-L/global/AWIsoft/git/git-2.13.1/lib64] ==> dir [/global/AWIsoft/git/git-2.13.1/lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..]
+    arg [CMakeFiles/cmTC_f9681.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [-lc] ==> lib [c]
+    arg [-lgcc] ==> lib [gcc]
+    arg [--as-needed] ==> ignore
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [--no-as-needed] ==> ignore
+    arg [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o] ==> obj [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o]
+    arg [/lib/../lib64/crtn.o] ==> obj [/lib/../lib64/crtn.o]
+  collapse obj [/lib/../lib64/crt1.o] ==> [/lib64/crt1.o]
+  collapse obj [/lib/../lib64/crti.o] ==> [/lib64/crti.o]
+  collapse obj [/lib/../lib64/crtn.o] ==> [/lib64/crtn.o]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib64/../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/git/git-2.13.1/lib64/../lib64] ==> [/global/AWIsoft/git/git-2.13.1/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/global/AWIsoft/netcdf/4.7.4_gnu/lib] ==> [/global/AWIsoft/netcdf/4.7.4_gnu/lib]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib] ==> [/global/AWIsoft/gcc/9.4.0/lib]
+  collapse library dir [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric] ==> [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+  collapse library dir [/global/AWIsoft/git/git-2.13.1/lib64] ==> [/global/AWIsoft/git/git-2.13.1/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..] ==> [/global/AWIsoft/gcc/9.4.0/lib]
+  implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+  implicit objs: [/lib64/crt1.o;/lib64/crti.o;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o;/lib64/crtn.o]
+  implicit dirs: [/global/AWIsoft/gcc/9.4.0/lib64;/global/AWIsoft/git/git-2.13.1/lib64;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0;/lib64;/usr/lib64;/global/AWIsoft/netcdf/4.7.4_gnu/lib;/global/AWIsoft/gcc/9.4.0/lib;/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+  implicit fwks: []
+
+
+Compiling the Fortran compiler identification source file "CMakeFortranCompilerId.F" succeeded.
+Compiler: /global/AWIsoft/gcc/9.4.0/bin/gfortran 
+Build flags: 
+Id flags: -v 
+
+The output was:
+0
+Driving: /global/AWIsoft/gcc/9.4.0/bin/gfortran -v CMakeFortranCompilerId.F -l gfortran -l m -shared-libgcc
+Using built-in specs.
+COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gfortran
+COLLECT_LTO_WRAPPER=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib
+Thread model: posix
+gcc version 9.4.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/f951 CMakeFortranCompilerId.F -ffixed-form -cpp=/work/ollie/tmp/ccznQphH.f90 -quiet -v CMakeFortranCompilerId.F -quiet -dumpbase CMakeFortranCompilerId.F -mtune=generic -march=x86-64 -auxbase CMakeFortranCompilerId -version -fintrinsic-modules-path /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude -o /work/ollie/tmp/ccn33C8o.s
+GNU Fortran (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../x86_64-pc-linux-gnu/include"
+ignoring duplicate directory "/global/AWIsoft/netcdf/4.7.4_gnu/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/include/c++/x86_64-pc-linux-gnu"
+#include "..." search starts here:
+#include <...> search starts here:
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude
+ /global/AWIsoft/gcc/9.4.0/include/c++/9.4.0
+ /global/AWIsoft/netcdf/4.7.4_gnu/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include
+ /usr/local/include
+ /global/AWIsoft/gcc/9.4.0/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed
+ /usr/include
+End of search list.
+GNU Fortran2008 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o /work/ollie/tmp/cc88xa76.o /work/ollie/tmp/ccn33C8o.s
+GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-28.base.el7_5.1
+Reading specs from /global/AWIsoft/gcc/9.4.0/lib64/../lib64/libgfortran.spec
+rename spec lib to liborig
+COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/
+LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2 -plugin /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so -plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper -plugin-opt=-fresolution=/work/ollie/tmp/ccwDkO7O.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lquadmath -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 /lib/../lib64/crt1.o /lib/../lib64/crti.o /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o -L/global/AWIsoft/gcc/9.4.0/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/../lib64 -L/global/AWIsoft/git/git-2.13.1/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/global/AWIsoft/netcdf/4.7.4_gnu/lib -L/global/AWIsoft/gcc/9.4.0/lib64 -L/global/AWIsoft/gcc/9.4.0/lib -L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric -L/global/AWIsoft/git/git-2.13.1/lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../.. /work/ollie/tmp/cc88xa76.o -lgfortran -lm -lgcc_s -lgcc -lquadmath -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+
+
+Compilation of the Fortran compiler identification source "CMakeFortranCompilerId.F" produced "a.out"
+
+The Fortran compiler identification is GNU, found in "/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/3.22.0/CompilerIdFortran/a.out"
+
+Detecting Fortran compiler ABI info compiled with the following output:
+Change Dir: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp
+
+Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_90cc8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_90cc8.dir/build.make CMakeFiles/cmTC_90cc8.dir/build
+gmake[1]: Entering directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp'
+Building Fortran object CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o
+/global/AWIsoft/gcc/9.4.0/bin/gfortran   -v -c /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeFortranCompilerABI.F90 -o CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o
+Using built-in specs.
+COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gfortran
+Target: x86_64-pc-linux-gnu
+Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib
+Thread model: posix
+gcc version 9.4.0 (GCC) 
+COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/f951 /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeFortranCompilerABI.F90 -cpp=/work/ollie/tmp/ccRiuQBV.f90 -quiet -v /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeFortranCompilerABI.F90 -quiet -dumpbase CMakeFortranCompilerABI.F90 -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -version -fintrinsic-modules-path /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude -o /work/ollie/tmp/ccFMkGYD.s
+GNU Fortran (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../x86_64-pc-linux-gnu/include"
+ignoring duplicate directory "/global/AWIsoft/netcdf/4.7.4_gnu/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include"
+  as it is a non-system directory that duplicates a system directory
+ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/include/c++/x86_64-pc-linux-gnu"
+#include "..." search starts here:
+#include <...> search starts here:
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude
+ /global/AWIsoft/gcc/9.4.0/include/c++/9.4.0
+ /global/AWIsoft/netcdf/4.7.4_gnu/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include
+ /usr/local/include
+ /global/AWIsoft/gcc/9.4.0/include
+ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed
+ /usr/include
+End of search list.
+GNU Fortran2008 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)
+	compiled by GNU C version 9.4.0, GMP version 6.0.0, MPFR version 3.1.1, MPC version 1.0.1, isl version none
+GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64'
+ as -v --64 -o CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o /work/ollie/tmp/ccFMkGYD.s
+GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-28.base.el7_5.1
+COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/
+LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64'
+Linking Fortran executable cmTC_90cc8
+/global/AWIsoft/cmake/3.22.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_90cc8.dir/link.txt --verbose=1
+/global/AWIsoft/gcc/9.4.0/bin/gfortran  -v CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -o cmTC_90cc8 
+Driving: /global/AWIsoft/gcc/9.4.0/bin/gfortran -v CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -o cmTC_90cc8 -l gfortran -l m -shared-libgcc
+Using built-in specs.
+COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gfortran
+COLLECT_LTO_WRAPPER=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper
+Target: x86_64-pc-linux-gnu
+Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib
+Thread model: posix
+gcc version 9.4.0 (GCC) 
+Reading specs from /global/AWIsoft/gcc/9.4.0/lib64/../lib64/libgfortran.spec
+rename spec lib to liborig
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_90cc8' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/
+LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_90cc8' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2 -plugin /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so -plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper -plugin-opt=-fresolution=/work/ollie/tmp/ccV7vUnW.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lquadmath -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_90cc8 /lib/../lib64/crt1.o /lib/../lib64/crti.o /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o -L/global/AWIsoft/gcc/9.4.0/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/../lib64 -L/global/AWIsoft/git/git-2.13.1/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/global/AWIsoft/netcdf/4.7.4_gnu/lib -L/global/AWIsoft/gcc/9.4.0/lib64 -L/global/AWIsoft/gcc/9.4.0/lib -L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric -L/global/AWIsoft/git/git-2.13.1/lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../.. CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -lgfortran -lm -lgcc_s -lgcc -lquadmath -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o /lib/../lib64/crtn.o
+COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_90cc8' '-shared-libgcc' '-mtune=generic' '-march=x86-64'
+gmake[1]: Leaving directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp'
+
+
+
+Parsed Fortran implicit include dir info from above output: rv=done
+  found start of include info
+  found start of implicit include info
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude]
+    add: [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0]
+    add: [/global/AWIsoft/netcdf/4.7.4_gnu/include]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+    add: [/usr/local/include]
+    add: [/global/AWIsoft/gcc/9.4.0/include]
+    add: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+    add: [/usr/include]
+  end of search list found
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0] ==> [/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0]
+  collapse include dir [/global/AWIsoft/netcdf/4.7.4_gnu/include] ==> [/global/AWIsoft/netcdf/4.7.4_gnu/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+  collapse include dir [/usr/local/include] ==> [/usr/local/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/include] ==> [/global/AWIsoft/gcc/9.4.0/include]
+  collapse include dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+  collapse include dir [/usr/include] ==> [/usr/include]
+  implicit include dirs: [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude;/global/AWIsoft/gcc/9.4.0/include/c++/9.4.0;/global/AWIsoft/netcdf/4.7.4_gnu/include;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include;/usr/local/include;/global/AWIsoft/gcc/9.4.0/include;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed;/usr/include]
+
+
+Parsed Fortran implicit link information from above output:
+  link line regex: [^( *|.*[/\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\]+-)?ld|collect2)[^/\]*( |$)]
+  ignore line: [Change Dir: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp]
+  ignore line: []
+  ignore line: [Run Build Command(s):/usr/bin/gmake -f Makefile cmTC_90cc8/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_90cc8.dir/build.make CMakeFiles/cmTC_90cc8.dir/build]
+  ignore line: [gmake[1]: Entering directory `/home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/build/CMakeFiles/CMakeTmp']
+  ignore line: [Building Fortran object CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o]
+  ignore line: [/global/AWIsoft/gcc/9.4.0/bin/gfortran   -v -c /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeFortranCompilerABI.F90 -o CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gfortran]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 9.4.0 (GCC) ]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64']
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/f951 /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeFortranCompilerABI.F90 -cpp=/work/ollie/tmp/ccRiuQBV.f90 -quiet -v /global/AWIsoft/cmake/3.22.0/share/cmake-3.22/Modules/CMakeFortranCompilerABI.F90 -quiet -dumpbase CMakeFortranCompilerABI.F90 -mtune=generic -march=x86-64 -auxbase-strip CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -version -fintrinsic-modules-path /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude -o /work/ollie/tmp/ccFMkGYD.s]
+  ignore line: [GNU Fortran (GCC) version 9.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 9.4.0  GMP version 6.0.0  MPFR version 3.1.1  MPC version 1.0.1  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../x86_64-pc-linux-gnu/include"]
+  ignore line: [ignoring duplicate directory "/global/AWIsoft/netcdf/4.7.4_gnu/include"]
+  ignore line: [  as it is a non-system directory that duplicates a system directory]
+  ignore line: [ignoring duplicate directory "/global/AWIsoft/gcc/9.4.0/include"]
+  ignore line: [  as it is a non-system directory that duplicates a system directory]
+  ignore line: [ignoring nonexistent directory "/global/AWIsoft/gcc/9.4.0/include/c++/x86_64-pc-linux-gnu"]
+  ignore line: [#include "..." search starts here:]
+  ignore line: [#include <...> search starts here:]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/finclude]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/include/c++/9.4.0]
+  ignore line: [ /global/AWIsoft/netcdf/4.7.4_gnu/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include]
+  ignore line: [ /usr/local/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/include]
+  ignore line: [ /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/include-fixed]
+  ignore line: [ /usr/include]
+  ignore line: [End of search list.]
+  ignore line: [GNU Fortran2008 (GCC) version 9.4.0 (x86_64-pc-linux-gnu)]
+  ignore line: [	compiled by GNU C version 9.4.0  GMP version 6.0.0  MPFR version 3.1.1  MPC version 1.0.1  isl version none]
+  ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64']
+  ignore line: [ as -v --64 -o CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o /work/ollie/tmp/ccFMkGYD.s]
+  ignore line: [GNU assembler version 2.27 (x86_64-redhat-linux) using BFD version version 2.27-28.base.el7_5.1]
+  ignore line: [COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-c' '-o' 'CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o' '-mtune=generic' '-march=x86-64']
+  ignore line: [Linking Fortran executable cmTC_90cc8]
+  ignore line: [/global/AWIsoft/cmake/3.22.0/bin/cmake -E cmake_link_script CMakeFiles/cmTC_90cc8.dir/link.txt --verbose=1]
+  ignore line: [/global/AWIsoft/gcc/9.4.0/bin/gfortran  -v CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -o cmTC_90cc8 ]
+  ignore line: [Driving: /global/AWIsoft/gcc/9.4.0/bin/gfortran -v CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -o cmTC_90cc8 -l gfortran -l m -shared-libgcc]
+  ignore line: [Using built-in specs.]
+  ignore line: [COLLECT_GCC=/global/AWIsoft/gcc/9.4.0/bin/gfortran]
+  ignore line: [COLLECT_LTO_WRAPPER=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper]
+  ignore line: [Target: x86_64-pc-linux-gnu]
+  ignore line: [Configured with: ../configure --prefix=/global/AWIsoft/gcc/9.4.0 --disable-multilib]
+  ignore line: [Thread model: posix]
+  ignore line: [gcc version 9.4.0 (GCC) ]
+  ignore line: [Reading specs from /global/AWIsoft/gcc/9.4.0/lib64/../lib64/libgfortran.spec]
+  ignore line: [rename spec lib to liborig]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_90cc8' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  ignore line: [COMPILER_PATH=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/]
+  ignore line: [LIBRARY_PATH=/global/AWIsoft/gcc/9.4.0/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/../lib64/:/global/AWIsoft/git/git-2.13.1/lib64/../lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64/:/lib/../lib64/:/usr/lib/../lib64/:/global/AWIsoft/netcdf/4.7.4_gnu/lib/:/global/AWIsoft/gcc/9.4.0/lib64/:/global/AWIsoft/gcc/9.4.0/lib/:/global/AWIsoft/intel-python/2020.2.902/lib/libfabric/:/global/AWIsoft/git/git-2.13.1/lib64/:/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../:/lib/:/usr/lib/]
+  ignore line: [COLLECT_GCC_OPTIONS='-v' '-o' 'cmTC_90cc8' '-shared-libgcc' '-mtune=generic' '-march=x86-64']
+  link line: [ /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2 -plugin /global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so -plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper -plugin-opt=-fresolution=/work/ollie/tmp/ccV7vUnW.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lquadmath -plugin-opt=-pass-through=-lm -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_90cc8 /lib/../lib64/crt1.o /lib/../lib64/crti.o /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o -L/global/AWIsoft/gcc/9.4.0/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/../lib64 -L/global/AWIsoft/git/git-2.13.1/lib64/../lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64 -L/lib/../lib64 -L/usr/lib/../lib64 -L/global/AWIsoft/netcdf/4.7.4_gnu/lib -L/global/AWIsoft/gcc/9.4.0/lib64 -L/global/AWIsoft/gcc/9.4.0/lib -L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric -L/global/AWIsoft/git/git-2.13.1/lib64 -L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../.. CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o -lgfortran -lm -lgcc_s -lgcc -lquadmath -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o /lib/../lib64/crtn.o]
+    arg [/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/collect2] ==> ignore
+    arg [-plugin] ==> ignore
+    arg [/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/liblto_plugin.so] ==> ignore
+    arg [-plugin-opt=/global/AWIsoft/gcc/9.4.0/libexec/gcc/x86_64-pc-linux-gnu/9.4.0/lto-wrapper] ==> ignore
+    arg [-plugin-opt=-fresolution=/work/ollie/tmp/ccV7vUnW.res] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lquadmath] ==> ignore
+    arg [-plugin-opt=-pass-through=-lm] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lc] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+    arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+    arg [--eh-frame-hdr] ==> ignore
+    arg [-m] ==> ignore
+    arg [elf_x86_64] ==> ignore
+    arg [-dynamic-linker] ==> ignore
+    arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+    arg [-o] ==> ignore
+    arg [cmTC_90cc8] ==> ignore
+    arg [/lib/../lib64/crt1.o] ==> obj [/lib/../lib64/crt1.o]
+    arg [/lib/../lib64/crti.o] ==> obj [/lib/../lib64/crti.o]
+    arg [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o] ==> obj [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib64/../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib64/../lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/../lib64]
+    arg [-L/global/AWIsoft/git/git-2.13.1/lib64/../lib64] ==> dir [/global/AWIsoft/git/git-2.13.1/lib64/../lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64]
+    arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+    arg [-L/usr/lib/../lib64] ==> dir [/usr/lib/../lib64]
+    arg [-L/global/AWIsoft/netcdf/4.7.4_gnu/lib] ==> dir [/global/AWIsoft/netcdf/4.7.4_gnu/lib]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib64] ==> dir [/global/AWIsoft/gcc/9.4.0/lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib] ==> dir [/global/AWIsoft/gcc/9.4.0/lib]
+    arg [-L/global/AWIsoft/intel-python/2020.2.902/lib/libfabric] ==> dir [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+    arg [-L/global/AWIsoft/git/git-2.13.1/lib64] ==> dir [/global/AWIsoft/git/git-2.13.1/lib64]
+    arg [-L/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..] ==> dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..]
+    arg [CMakeFiles/cmTC_90cc8.dir/CMakeFortranCompilerABI.F90.o] ==> ignore
+    arg [-lgfortran] ==> lib [gfortran]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lquadmath] ==> lib [quadmath]
+    arg [-lm] ==> lib [m]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [-lc] ==> lib [c]
+    arg [-lgcc_s] ==> lib [gcc_s]
+    arg [-lgcc] ==> lib [gcc]
+    arg [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o] ==> obj [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o]
+    arg [/lib/../lib64/crtn.o] ==> obj [/lib/../lib64/crtn.o]
+  collapse obj [/lib/../lib64/crt1.o] ==> [/lib64/crt1.o]
+  collapse obj [/lib/../lib64/crti.o] ==> [/lib64/crti.o]
+  collapse obj [/lib/../lib64/crtn.o] ==> [/lib64/crtn.o]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib64/../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/git/git-2.13.1/lib64/../lib64] ==> [/global/AWIsoft/git/git-2.13.1/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0] ==> [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../../../lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/lib/../lib64] ==> [/lib64]
+  collapse library dir [/usr/lib/../lib64] ==> [/usr/lib64]
+  collapse library dir [/global/AWIsoft/netcdf/4.7.4_gnu/lib] ==> [/global/AWIsoft/netcdf/4.7.4_gnu/lib]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib64] ==> [/global/AWIsoft/gcc/9.4.0/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib] ==> [/global/AWIsoft/gcc/9.4.0/lib]
+  collapse library dir [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric] ==> [/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+  collapse library dir [/global/AWIsoft/git/git-2.13.1/lib64] ==> [/global/AWIsoft/git/git-2.13.1/lib64]
+  collapse library dir [/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/../../..] ==> [/global/AWIsoft/gcc/9.4.0/lib]
+  implicit libs: [gfortran;m;gcc_s;gcc;quadmath;m;gcc_s;gcc;c;gcc_s;gcc]
+  implicit objs: [/lib64/crt1.o;/lib64/crti.o;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtbegin.o;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0/crtend.o;/lib64/crtn.o]
+  implicit dirs: [/global/AWIsoft/gcc/9.4.0/lib64;/global/AWIsoft/git/git-2.13.1/lib64;/global/AWIsoft/gcc/9.4.0/lib/gcc/x86_64-pc-linux-gnu/9.4.0;/lib64;/usr/lib64;/global/AWIsoft/netcdf/4.7.4_gnu/lib;/global/AWIsoft/gcc/9.4.0/lib;/global/AWIsoft/intel-python/2020.2.902/lib/libfabric]
+  implicit fwks: []
+
+

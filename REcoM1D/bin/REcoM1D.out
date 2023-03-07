@@ -1,0 +1,22 @@
+ start initialization
+ #--------------------------------------------------------------------#
+ Namelist files read
+ Check model setup
+ simulation name: test
+ time (initial and step):    0.0000000000000000              105        2019   1800.0000000000000     
+ mesh filename: REcoM1D_mesh_v2.nc
+ #--------------------------------------------------------------------#
+ initializing tracers
+ ALE arrays
+ simulation time step (h):  0.500000000     diagnostic frequency (h)          24
+ Benthic layers are set
+ initialization tracer file: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/data/tracer_initialization.nc
+ Tracers have been initialized as spinup from WOA/glodap netcdf files
+ filename forcing: /home/ollie/loziel/nuarctic_temp/nuarctic/REcoM1D/forcing/REcoM1D_forcing_v2.nc
+ PAR (ocean surface) time series is specified as forcing
+ initialization done
+ start computation loop
+ computation done
+ start writing diagnostics and outputs
+ number of diagnostic steps         530
+ diagnostics and outputs written

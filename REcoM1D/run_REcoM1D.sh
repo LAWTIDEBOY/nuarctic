@@ -28,15 +28,15 @@ cd ../..
 # mesh
 cd grid
 rm *.nc
-ln -s ../../data/MESH/REcoM1D_mesh.nc
+ln -s ../../data/MESH/REcoM1D_mesh_v2.nc
 # forcing
 cd ../forcing
 rm *.nc
-ln -s ../../data/REcoM_forcing_data/REcoM1D_forcing.nc
+ln -s ../../data/REcoM_forcing_data/REcoM1D_forcing_v2.nc
 # atm deposition
 cd ../data
 rm *.nc
-ln -s ../../data/atm_deposition/atm_deposition.nc
+ln -s ../../data/atm_deposition/atm_deposition_v2.nc
 
 # tracer initialisation
 ln -s ../../data/initialization/tracer_initialization.nc

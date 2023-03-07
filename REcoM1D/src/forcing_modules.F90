@@ -536,7 +536,7 @@ subroutine get_forcing(istep)
     if (flag_PAR) then
     	PAR(:) = PAR_forcing(:, istep)
     elseif(.not. flag_PAR .and. flag_PAR_surface) then
-    	PAR_surface = PAR_surface_forcing(istep)
+    	PAR_surface = PAR_surface_forcing(istep) * 4
     else
     	shortwave = shortwave_forcing(istep)
     endif
