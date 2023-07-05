@@ -139,13 +139,13 @@ if variable's name  = 'PAR' (case 3),
 
 #### <span style="color:blue">1.5.2. Temperature and salinity:</span><a class="anchor" id="1.5.2"></a>
 
-Folder: scripts/ITP_CTD/
-Jupyter python notebook: Process_CTD_data.ipynb
+Folder: scripts/CTD/
+Jupyter python notebook: Process_CTD.ipynb
 Data sets required: - REcoM daily mesh : data/MESH/REcoM1D_daily_mesh.nc
 		      - Polarstern track (for verification): data/TRACK/Polarstern_daily_track.nc
-		      - files containing the ITP measurements:
-				data/ITP_Ben/mosaic.whoiitpmerged.newgrid.mat  
-Output file: data/ITP_CTD_Ben/ITP_daily_data.nc
+		      - files containing the ITP and Polarstern measurements:
+				data/CTD/ITP/mosaic.whoiitpmerged.newgrid.mat  and data/CTD/Polarstern/*.txt
+Output file: data/CTD/ITP_daily_data.nc
 
 The script processes the data from ITP 111 (cf. Rabe et al., 2021, Ocean MOSAiC paper) using a 3 steps approach:
 - Salinity and temperature profiles are extrapolated to the surface and high depth.
@@ -187,7 +187,7 @@ Data sets required:
 - REcoM discretized mesh : data/MESH/REcoM1D_mesh.nc
 - PAR observations: data/ITP_PAR/PAR_forcing.nc
 - Atm reanalysis data: data/METEO/ ERA5_forcing_Polarstern.nc
-- Temperature and salinity profiles: data/ITP_CTD_Ben/ITP_daily_data.nc
+- Temperature and salinity profiles: data/CTD/ITP_daily_data.nc
 - Vertical diffusion profiles: data/MSS/MOSAiC_MSS_daily_Kz.nc
 - Ice coverage (set to 1 for now).
 
