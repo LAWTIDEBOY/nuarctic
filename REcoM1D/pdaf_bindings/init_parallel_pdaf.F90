@@ -101,12 +101,6 @@ SUBROUTINE init_parallel_pdaf(dim_ens, screen)
   ! *** to the ensemble size we parse dim_ens from the command line.
   handle = 'dim_ens'
   CALL parse(handle, n_modeltasks)
- 
-  WRITE(*,*) "dim_ens=", dim_ens
-  WRITE(*,*) "n_modeltasks=", n_modeltasks
-
-  n_modeltasks = 9
-  WRITE(*,*) "n_modeltasks=", n_modeltasks
 
   ! *** Initialize communicators for ensemble evaluations ***
   IF (mype_world == 0) &

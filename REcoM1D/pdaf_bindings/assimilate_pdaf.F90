@@ -59,22 +59,24 @@ SUBROUTINE assimilate_pdaf()
 
   ! Call assimilate routine for global or local filter
   IF (localfilter==1) THEN
-     ! CALL PDAFomi_assimilate_local(collect_state_pdaf, distribute_state_pdaf, &
-     !      init_dim_obs_pdafomi, obs_op_pdafomi, prepoststep_ens_pdaf, init_n_domains_pdaf, &
-     !      init_dim_l_pdaf, init_dim_obs_l_pdafomi, g2l_state_pdaf, l2g_state_pdaf, &
-     !      next_observation_pdaf, status_pdaf)
+    !  CALL PDAFomi_assimilate_local(collect_state_pdaf, distribute_state_pdaf, &
+    !       init_dim_obs_pdafomi, obs_op_pdafomi, prepoststep_ens_pdaf, init_n_domains_pdaf, &
+    !       init_dim_l_pdaf, init_dim_obs_l_pdafomi, g2l_state_pdaf, l2g_state_pdaf, &
+    !       next_observation_pdaf, status_pdaf)
      WRITE(*,*) "ERROR!!! can not be a local filter!"
   ELSE
      IF (filtertype/=8) THEN
         ! All global filters, except LEnKF
+
         CALL PDAFomi_assimilate_global(collect_state_pdaf, distribute_state_pdaf, &
              init_dim_obs_pdafomi, obs_op_pdafomi, prepoststep_ens_pdaf, &
              next_observation_pdaf, status_pdaf)
      ELSE
         ! localized EnKF has its own OMI interface routine
-        CALL PDAFomi_assimilate_lenkf(collect_state_pdaf, distribute_state_pdaf, &
-             init_dim_obs_pdafomi, obs_op_pdafomi, prepoststep_ens_pdaf, &
-             localize_covar_pdafomi, next_observation_pdaf, status_pdaf)
+        ! CALL PDAFomi_assimilate_lenkf(collect_state_pdaf, distribute_state_pdaf, &
+        !      init_dim_obs_pdafomi, obs_op_pdafomi, prepoststep_ens_pdaf, &
+        !      localize_covar_pdafomi, next_observation_pdaf, status_pdaf)
+        WRITE(*,*) "ERROR!!! localized EnKF filter!"
      END IF
   END IF
 

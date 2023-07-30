@@ -25,11 +25,11 @@
 SUBROUTINE next_observation_pdaf(stepnow, nsteps, doexit, time)
 
   USE mod_assimilation, &     ! Assimilation variables
-       ONLY: step_null, delt_obs
+       ONLY: step_null, step_assim, init_delt_obs, delt_obs
   USE mod_parallel_pdaf, &    ! Parallelization variables
        ONLY: mype_world
-  USE recom_clock, ONLY: timeold, timenew  ! !time in a day, unit: sec
-  USE general_config,  ONLY: dt            ! Model time step variables
+  USE obs_chla_pdafomi, &
+      ONLY: chla_steps, dim_step
 
 
   IMPLICIT NONE
@@ -39,22 +39,46 @@ SUBROUTINE next_observation_pdaf(stepnow, nsteps, doexit, time)
   INTEGER, INTENT(out) :: nsteps   !< Number of time steps until next obs
   INTEGER, INTENT(out) :: doexit   !< Whether to exit forecasting (1 for exit)
   REAL, INTENT(out)    :: time     !< Current model (physical) time
-
+  ! Local variables 
+  INTEGER   :: i, id 
 
 ! *******************************************************
 ! *** Set number of time steps until next observation ***
 ! *******************************************************
-  IF (stepnow-step_null==0) THEN
-    nsteps=3600
+! C
+!   IF (stepnow - step_null==0) THEN
+!     step_assim = 0
+!     nsteps = init_delt_obs  
+!   ELSE
+!     step_assim = step_assim + 1
+!     nsteps = delt_obs
+!   END IF
+
+
+
+
+  id = 0
+  Do i = 1, dim_step
+    IF(chla_steps(i)==stepnow) id = i 
+  END DO 
+
+  IF (stepnow - step_null==0) THEN
+    step_assim = 0
+    nsteps = init_delt_obs        
+    IF (mype_world == 0) WRITE (*, '(i7, 3x, a, i7)') & 
+      stepnow, 'First observation at time step=', init_delt_obs
   ELSE
-    ! nsteps = delt_obs   ! This assumes a constant time step interval
-    nsteps=24
+    step_assim = step_assim + 1
+    nsteps = chla_steps(id+1) - chla_steps(id) 
+    IF (mype_world == 0) WRITE (*, '(i7, 3x, a, i7)') &
+      stepnow, 'Next observation at time step', stepnow + nsteps
   END IF
 
-     doexit = 0          ! Do not exit assimilation
+  IF (mype_world == 0) WRITE(*,*) 'step_assim= ', step_assim
 
-     IF (mype_world == 0) WRITE (*, '(i7, 3x, a, i7)') &
-          stepnow, 'Next observation at time step', stepnow + nsteps
+  doexit = 0 ! Do not exit assimilation
+  
+
 
 
 END SUBROUTINE next_observation_pdaf

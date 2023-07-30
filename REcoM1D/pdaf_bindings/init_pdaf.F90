@@ -25,315 +25,76 @@ SUBROUTINE init_pdaf()
        COMM_model, COMM_filter, COMM_couple, filterpe, abort_parallel
 
   USE mod_assimilation, &         ! Variables for assimilation
-       ONLY: dim_state_p, screen, filtertype, subtype, dim_ens, &
-       incremental, type_forget, forget, &
-       rank_analysis_enkf, locweight, cradius, sradius, &
-       filename, type_trans, type_sqrt, delt_obs, &
-       type_winf, limit_winf, pf_res_type, pf_noise_type, pf_noise_amp, &
-       type_hyb, hyb_gamma, hyb_kappa, n_fields_1d, n_fields_0d, &
-       n_params, off_fields, dim_fields, dim_field_1d, f_id, tr_id, &
-       step_null, perturb_scale
+       ONLY: dim_state_p, screen, filtertype, subtype, dim_ens, incremental,  &
+       type_forget, forget, rank_analysis_enkf, locweight, cradius, sradius,  &
+       filename, type_trans, type_sqrt, delt_obs, init_delt_obs, type_winf,   &
+       limit_winf, pf_res_type, pf_noise_type, pf_noise_amp, type_hyb,        &
+       hyb_gamma, hyb_kappa, n_fields_1d, n_fields_0d, n_params, off_fields,  & 
+       dim_fields, dim_field_1d, f_id, tr_id, step_null, perturb_scale,       &
+       write_ens, parameter_estimation, n_fields, bgc_layer, step_assim
 
-  USE recom_config, &             ! REcoM parameters
-      ONLY: NCuptakeRatio, NCUptakeRatio_d, k_din, k_din_d, &
-      Chl2N_max, Chl2N_max_d, deg_Chl, deg_Chl_d, &
-      graz_max, graz_max2, grazEff, grazEff2, lossN, lossN_d, &
-      lossN_z, lossC_z, lossN_z2, lossC_z2, reminN, reminC
+  USE mod_utils, &
+      ONLY: file_exist, error_handler, get_unit,  e_warn, e_err
+
+  USE obs_chla_pdafomi, &
+      ONLY: assim_chla, rms_obs_chla, chla_steps, chla_depths, dim_step, dim_depth, &
+      MOSAiC_Chla
 
   USE ocean_module, ONLY: tr_arr   ! Array containing all the tracers
 
   USE recom_clock, ONLY: timeold, timenew
 
-  USE mod_perturbation_pdaf, ONLY:  perturb_lognorm
+
+
+  USE netcdf
+
 
   IMPLICIT NONE
 
 ! *** Local variables ***
-  INTEGER :: i, j, k      ! counters
-  INTEGER :: iseed(4)               ! Seed for random number
-  INTEGER :: filter_param_i(7) ! Integer parameter array for filter
-  REAL    :: filter_param_r(3) ! Real parameter array for filter
-  INTEGER :: status_pdaf       ! PDAF status flag
-  INTEGER :: doexit, steps     ! Not used in this implementation
-  REAL    :: timenow           ! Not used in this implementation
+  INTEGER         :: i, j, k      ! counters  
+  INTEGER         :: filter_param_i(7) ! Integer parameter array for filter
+  REAL(kind=8)    :: filter_param_r(3) ! Real parameter array for filter
+  INTEGER         :: status_pdaf       ! PDAF status flag
+  INTEGER         :: doexit, steps     ! Not used in this implementation
+  REAL(kind=8)    :: timenow           ! Not used in this implementation
+
+  INTEGER         :: dbg_id  ! Debugging flag: >0 for debug output; =0 for no debug output
+  
+  CHARACTER(len=110)          :: chla_obs_file 
+  INTEGER                     :: ncid, dimid_step, dimid_depth, varid_chla
+  INTEGER                     :: ierr, nc_status
+   
+  INTEGER                     :: startv(2), cntv(2)
+  CHARACTER(len=256)          :: msgstring      ! String for error handling message 
 
 ! *** External subroutines ***
   EXTERNAL :: init_ens_pdaf            ! Ensemble initialization
-  EXTERNAL :: next_observation_pdaf, & ! Provide time step, model time,
-                                       ! and dimension of next observation
-       distribute_state_pdaf, &        ! Routine to distribute a state vector to model fields
-       prepoststep_ens_pdaf                ! User supplied pre/poststep routine
+  EXTERNAL :: next_observation_pdaf, & ! Provide time step, model time, and dimension of next observation
+              distribute_state_pdaf, & ! Routine to distribute a state vector to model fields
+              prepoststep_ens_pdaf     ! User supplied pre/poststep routine
 
 
 ! ***************************
 ! ***   Initialize PDAF   ***
 ! ***************************
 
-!  IF (mype_world == 0) THEN
-     WRITE (*,'(/1x,a)') 'INITIALIZE PDAF - ONLINE MODE'
-!  END IF
+  IF (mype_world == 0)  WRITE (*,'(/1x,a)') '--- INITIALIZE PDAF ---'
 
-  perturb_scale = 0.25
-
-  dim_ens = 9
-
-WRITE(*,*) 'dim_ens = ', dim_ens
-
-! assign tracer ids
-  f_id%DIN        = 1
-  f_id%DIC        = 2
-  f_id%DSi        = 3
-  f_id%NanoN      = 4
-  f_id%NanoC      = 5
-  f_id%NanoChl    = 6
-  f_id%DiaN       = 7
-  f_id%DiaC       = 8
-  f_id%DiaChl     = 9
-  f_id%DiaSi      = 10
-  f_id%NanoCaCO3  = 11
-  f_id%TotChl     = 12
-  f_id%DON        = 0
-  f_id%DOC        = 0
-  f_id%DetN       = 0
-  f_id%DetC       = 0
-  f_id%NPP        = 0
+! set debug flag 
+  dbg_id = 0 !0 for no debug output
+  CALL PDAF_set_debug_flag(dbg_id) 
 
 
-
-  WRITE(*,*) f_id
-
-
-! assign tracer ids
-  tr_id%Temp          = 1
-  tr_id%Salt          = 2
-  tr_id%DIN           = 3
-  tr_id%DIC           = 4
-  tr_id%ALK           = 5
-  tr_id%NanoN         = 6
-  tr_id%NanoC         = 7
-  tr_id%NanoChl       = 8
-  tr_id%DetN          = 9
-  tr_id%DetC          = 10
-  tr_id%HetN          = 11
-  tr_id%HetC          = 12
-  tr_id%DON           = 13
-  tr_id%DOC           = 14
-  tr_id%DiaN          = 15
-  tr_id%DiaC          = 16
-  tr_id%DiaChl        = 17
-  tr_id%DiaSi         = 18
-  tr_id%DetSi         = 19
-  tr_id%DSi           = 20
-  tr_id%DFe           = 21
-  tr_id%NanoCaCO3      = 22
-  tr_id%DetCaCO3      = 23
-  tr_id%DO2           = 24
-  tr_id%ZooN          = 24
-  tr_id%ZooC          = 26
-  tr_id%DetZooN       = 27
-  tr_id%DetZooC       = 28
-  tr_id%DetZooSi      = 29
-  tr_id%DetZooCalCO3  = 30
-
-  WRITE(*,*) 'tr_id = ', tr_id
-
-
-
-
-! *** Define state dimension ***
-
-
-  n_fields_1d = 14
-  n_fields_0d = 0
-  n_params = 0
-
-  dim_field_1d = 25
-
-
-  WRITE(*,*) 'dim_field_1d = ', dim_field_1d
-
-  ALLOCATE(dim_fields(n_fields_1d))
-
-  DO i = 1, n_fields_1d
-    dim_fields(i) =  dim_field_1d
-  END DO
-
-  WRITE(*,*) 'dim_fields = ', dim_fields
-
-  ! DO i = 1, n_fields_0d
-  !   dim_fields(n_fields_1d + i) =  1
-  ! END DO
-
-  ! DO i = 1, n_params
-  !   dim_fields(n_fields_1d + n_fields_0d + i) =  1
-  ! END DO
-
-  ALLOCATE(off_fields(n_fields_1d))
-  DO i = 1, n_fields_1d
-    off_fields(i) =  dim_field_1d * (i - 1)
-  END DO
-
-  WRITE(*,*) 'off_fields = ', off_fields
-
-  ! DO i =  1, n_fields_0d
-  !   off_fields(n_fields_1d + i) =  dim_field_1d*n_fields_1d + i - 1
-  ! END DO
-
-  ! DO i =  1, n_params
-  !   off_fields(n_fields_1d + n_fields_0d + i) =  dim_field_1d*n_fields_1d + i - 1
-  ! END DO
-
-
-
-  dim_state_p = n_fields_1d * dim_field_1d + n_fields_0d + n_params
-
-  WRITE(*,*) 'dim_state_p = ', dim_state_p
-
-
-!  NCuptakeRatio
-  iseed(1)=1
-  iseed(2)=3
-  iseed(3)=20*task_id + 1
-  iseed(4)=41
-  NCuptakeRatio = perturb_lognorm(NCuptakeRatio, perturb_scale, iseed)
-
-!  NCUptakeRatio_d
-  iseed(1)=2
-  iseed(2)=5
-  iseed(3)=19*task_id + 2
-  iseed(4)=39
-  NCuptakeRatio = perturb_lognorm(NCUptakeRatio_d, perturb_scale, iseed)
-
-!  k_din
-  iseed(1)=3
-  iseed(2)=7
-  iseed(3)=18*task_id + 3
-  iseed(4)=37
-  NCuptakeRatio = perturb_lognorm(k_din, perturb_scale, iseed)
-
-!  k_din_d
-  iseed(1)=4
-  iseed(2)=11
-  iseed(3)=17*task_id + 4
-  iseed(4)=35
-  NCuptakeRatio = perturb_lognorm(k_din_d, perturb_scale, iseed)
-
-!  Chl2N_max
-  iseed(1)=5
-  iseed(2)=13
-  iseed(3)=16*task_id + 5
-  iseed(4)=33
-  NCuptakeRatio = perturb_lognorm(Chl2N_max, perturb_scale, iseed)
-
-!  Chl2N_max_d
-  iseed(1)=6
-  iseed(2)=17
-  iseed(3)=15*task_id + 6
-  iseed(4)=31
-  NCuptakeRatio = perturb_lognorm(Chl2N_max_d, perturb_scale, iseed)
-
-!  deg_Chl
-  iseed(1)=7
-  iseed(2)=19
-  iseed(3)=14*task_id + 7
-  iseed(4)=29
-  NCuptakeRatio = perturb_lognorm(deg_Chl, perturb_scale, iseed)
-
-!  deg_Chl_d
-  iseed(1)=8
-  iseed(2)=23
-  iseed(3)=13*task_id + 8
-  iseed(4)=27
-  NCuptakeRatio = perturb_lognorm(deg_Chl_d, perturb_scale, iseed)
-
-!  graz_max
-  iseed(1)=9
-  iseed(2)=29
-  iseed(3)=12*task_id + 9
-  iseed(4)=25
-  NCuptakeRatio = perturb_lognorm(graz_max, perturb_scale, iseed)
-
-!  graz_max2
-  iseed(1)=10
-  iseed(2)=1
-  iseed(3)=11*task_id + 10
-  iseed(4)=23
-  NCuptakeRatio = perturb_lognorm(graz_max2, perturb_scale, iseed)
-
-!  grazEff
-  iseed(1)=11
-  iseed(2)=31
-  iseed(3)=10*task_id + 11
-  iseed(4)=21
-  NCuptakeRatio = perturb_lognorm(grazEff, perturb_scale, iseed)
-
-!  grazEff2
-  iseed(1)=12
-  iseed(2)=37
-  iseed(3)=9*task_id + 12
-  iseed(4)=19
-  NCuptakeRatio = perturb_lognorm(grazEff2, perturb_scale, iseed)
-
-!  lossN
-  iseed(1)=13
-  iseed(2)=41
-  iseed(3)=8*task_id + 13
-  iseed(4)=17
-  NCuptakeRatio = perturb_lognorm(lossN, perturb_scale, iseed)
-
-!  lossN_d
-  iseed(1)=14
-  iseed(2)=43
-  iseed(3)=7*task_id + 14
-  iseed(4)=15
-  NCuptakeRatio = perturb_lognorm(lossN_d, perturb_scale, iseed)
-
-!  lossN_z
-  iseed(1)=15
-  iseed(2)=47
-  iseed(3)=6*task_id + 15
-  iseed(4)=13
-  NCuptakeRatio = perturb_lognorm(lossN_z, perturb_scale, iseed)
-
-!  lossC_z
-  iseed(1)=16
-  iseed(2)=53
-  iseed(3)=5*task_id + 16
-  iseed(4)=11
-  NCuptakeRatio = perturb_lognorm(lossC_z, perturb_scale, iseed)
-
-!  lossN_z2
-  iseed(1)=17
-  iseed(2)=59
-  iseed(3)=4*task_id + 17
-  iseed(4)=9
-  NCuptakeRatio = perturb_lognorm(lossN_z2, perturb_scale, iseed)
-
-!  lossC_z2
-  iseed(1)=18
-  iseed(2)=61
-  iseed(3)=3*task_id + 18
-  iseed(4)=7
-  NCuptakeRatio = perturb_lognorm(lossC_z2, perturb_scale, iseed)
-
-!  reminN
-  iseed(1)=19
-  iseed(2)=67
-  iseed(3)=2*task_id + 19
-  iseed(4)=5
-  NCuptakeRatio = perturb_lognorm(reminN, perturb_scale, iseed)
-
-!  reminC
-  iseed(1)=20
-  iseed(2)=71
-  iseed(3)=1*task_id + 20
-  iseed(4)=3
-  NCuptakeRatio = perturb_lognorm(reminC, perturb_scale, iseed)
+  parameter_estimation = .FALSE.
+  step_null = 0
+  step_assim = step_null
+  assim_chla = .TRUE.
+  rms_obs_chla = 3.0D-01
 
 ! **********************************************************
 ! ***   CONTROL OF PDAF - used in call to PDAF_init      ***
 ! **********************************************************
-
 ! *** IO options ***
   screen      = 2  ! Write screen output (1) for output, (2) add timings
 
@@ -423,7 +184,7 @@ WRITE(*,*) 'dim_ens = ', dim_ens
   type_hyb = 0      ! LKNETF: Type of hybrid weight:
                     !   (0) use fixed hybrid weight hyb_gamma
                     !   (1) use gamma_lin: (1 - N_eff/N_e)*hyb_gamma
-                    !   (2) use gamma_alpha: hybrid weight from N_eff/N>=hyb_gamma
+                    !   (2) use gamma_alfa: hybrid weight from N_eff/N>=hyb_gamma
                     !   (3) use gamma_ska: 1 - min(s,k)/sqrt(hyb_kappa) with N_eff/N>=hyb_gamma
                     !   (4) use gamma_sklin: 1 - min(s,k)/sqrt(hyb_kappa) >= 1-N_eff/N>=hyb_gamma
   hyb_gamma =  1.0  ! Hybrid filter weight for state (1.0: LETKF, 0.0: LNETF)
@@ -461,35 +222,299 @@ WRITE(*,*) 'dim_ens = ', dim_ens
   sradius = cradius ! Support radius for 5th-order polynomial
                     ! or radius for 1/e for exponential weighting
 
-! *** File names
-  filename = 'output.dat'
+  perturb_scale = 0.5D+00
+  bgc_layer     = 47
 
-
-! ***********************************
-! *** Some optional functionality ***
-! ***********************************
 
 ! *** Parse command line options   ***
-! *** This is optional, but useful ***
+! ***              OR              ***
+! ***   Read from namelist file    ***
 
-!  call init_pdaf_parse()
+  call init_pdaf_parse()
+
+
+
+! ***         set dimessions         ***
+! assign tracer ids
+  f_id%DIN        = 1
+  f_id%DIC        = 2
+  f_id%DSi        = 3
+  f_id%NanoN      = 4
+  f_id%NanoC      = 5
+  f_id%NanoChl    = 6
+  f_id%DiaN       = 7
+  f_id%DiaC       = 8
+  f_id%DiaChl     = 9
+  f_id%DiaSi      = 10
+  f_id%NanoCaCO3  = 11
+  f_id%DON        = 0
+  f_id%DOC        = 0
+  f_id%DetN       = 0
+  f_id%DetC       = 0
+  f_id%TotChl     = 12
+  f_id%NPP        = 0
+! parameters      
+  f_id%NCuptakeRatio    = 13
+  f_id%NCUptakeRatio_d  = 14
+  f_id%k_din            = 15
+  f_id%k_din_d          = 16
+  f_id%alfa             = 17
+  f_id%alfa_d           = 18
+  f_id%P_cm             = 0
+  f_id%P_cm_d           = 0
+  f_id%Chl2N_max        = 19
+  f_id%Chl2N_max_d      = 20
+  f_id%deg_Chl          = 21
+  f_id%deg_Chl_d        = 22
+  f_id%graz_max         = 23
+  f_id%graz_max2        = 24
+  f_id%grazEff          = 0
+  f_id%grazEff2         = 0
+  f_id%lossN            = 0
+  f_id%lossN_d          = 0
+  f_id%lossN_z          = 0
+  f_id%lossN_z2         = 0
+  f_id%lossC_z          = 0
+  f_id%lossC_z2         = 0
+  f_id%reminN           = 0
+  f_id%reminC           = 0
+
+! assign tracer ids
+  tr_id%Temp      = 1
+  tr_id%Salt      = 2
+  tr_id%DIN       = 3
+  tr_id%DIC       = 4
+  tr_id%ALK       = 5
+  tr_id%NanoN     = 6
+  tr_id%NanoC     = 7
+  tr_id%NanoChl   = 8
+  tr_id%DetN      = 9
+  tr_id%DetC      = 10
+  tr_id%HetN      = 11
+  tr_id%HetC      = 12
+  tr_id%DON       = 13
+  tr_id%DOC       = 14
+  tr_id%DiaN      = 15
+  tr_id%DiaC      = 16
+  tr_id%DiaChl    = 17
+  tr_id%DiaSi     = 18
+  tr_id%DetSi     = 19
+  tr_id%DSi       = 20
+  tr_id%DFe       = 21
+  tr_id%NanoCaCO3 = 22
+  tr_id%DetCaCO3  = 23
+  tr_id%DO2       = 24
+  tr_id%ZooN      = 24
+  tr_id%ZooC      = 26
+  tr_id%DetZooN   = 27
+  tr_id%DetZooC   = 28
+  tr_id%DetZooSi  = 29
+  tr_id%DetZooCalCO3 = 30
+
+! ***         Define state dimension         ***
+  n_fields_1d = 12
+  n_fields_0d = 0
+  n_fields = n_fields_1d + n_fields_0d
+  n_params = 12
+
+  dim_field_1d = bgc_layer
+
+  ALLOCATE(dim_fields(n_fields + n_params))
+  IF (n_fields_1d /= 0) THEN 
+    DO i = 1, n_fields_1d
+      dim_fields(i) =  dim_field_1d
+    END DO
+  END IF 
+
+  IF (n_fields_0d /= 0) THEN 
+    DO i = n_fields_1d + 1, n_fields_1d + n_fields_0d
+      dim_fields(i) =  1
+    END DO
+  END IF 
+
+  DO i = n_fields + 1, n_fields + n_params
+    dim_fields(i) = 1
+  END DO 
+
+
+
+  ALLOCATE(off_fields(n_fields + n_params))
+
+  IF (n_fields_1d /= 0) THEN 
+    DO i = 1, n_fields_1d
+      off_fields(i) =  dim_field_1d * (i - 1)
+    END DO
+  END IF 
+
+  IF (n_fields_0d /= 0) THEN 
+    DO i = 1, n_fields_0d
+      off_fields(n_fields_1d + i) =  dim_field_1d*n_fields_1d + i - 1
+    END DO
+  END IF 
+
+  DO i = 1, n_params
+    off_fields(n_fields + i) = dim_field_1d*n_fields_1d + n_fields_0d + i -1
+  END DO 
+
+
+
+! state dimenssion 
+  dim_state_p = n_fields_1d * dim_field_1d + n_fields_0d + n_params
+  IF (mype_world==0) WRITE(*,*) 'dim_state_p = ', dim_state_p
+
 
 
 ! *** Initial Screen output ***
 ! *** This is optional      ***
+  IF (mype_world==0) THEN
+    WRITE (*,*) '-- Overview of PDAF configuration ------'
+    WRITE (*,*) 'PDAF [../config/pdaf.nml]:'
+    WRITE (*,*) 'dim_ens: ',        dim_ens
+    WRITE (*,*) 'screen: ',         screen
+    WRITE (*,*) 'filtertype: ',     filtertype
+    WRITE (*,*) 'subtype: ',        subtype
+    WRITE (*,*) 'type_trans: ',     type_trans
+    WRITE (*,*) 'type_forget: ',    type_forget
+    WRITE (*,*) 'forget: ',         forget
+    WRITE (*,*) 'perturb_scale: ',  perturb_scale
+    WRITE (*,*) 'init_delt_obs: ',  init_delt_obs
+    WRITE (*,*) 'delt_obs: ',       delt_obs
+    ! WRITE (*,*)      'assim_din: ',      assim_din
+    ! WRITE (*,*)  'rms_obs_din: ',    rms_obs_din
+    WRITE (*,*) 'write_ens: ',      write_ens
+    WRITE (*,*) '-- End of PDAF configuration -----------'
+  ENDIF
 
-! IF (mype_world == 0) call init_pdaf_info()
+
+
+
+  ! *************************************
+  ! ***   Read observations here ***
+  ! *************************************
+
+  chla_obs_file &
+    = TRIM('/albedo/work/user/nmamnun/nuarctic/data/MOSAiC_Chla_forLaurent_20220905.nc')
+
+  IF ( file_exist(chla_obs_file) ) THEN
+    IF(mype_world==0) WRITE(*,*) '--- read observation from file ', chla_obs_file
+    ! Open the MOSAiC_Chla NetCDF file
+    nc_status = NF90_OPEN(chla_obs_file, nf90_nowrite, ncid)
+    IF (nc_status /= NF90_NOERR) THEN
+      WRITE(msgstring, * ) "Error in opening ", TRIM(chla_obs_file)
+      CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+    ENDIF
+
+  ELSE 
+
+    WRITE(msgstring, * ) TRIM(chla_obs_file), " does not exist"
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )
+
+  ENDIF
+
+    dim_step = 49
+  
+  ! Allocate the data_array with the appropriate size
+  ALLOCATE( chla_steps(dim_step) )
+
+  ! Get dimension ID 
+  nc_status = NF90_INQ_DIMID(ncid, "step", dimid_step)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting step dimension ID", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )    
+  ENDIF
+
+
+  ! Get the dimension values
+  nc_status = nf90_get_var(ncid, dimid_step, chla_steps)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting dimension values for step", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+  ENDIF
+
+
+! C
+!   ! Get the dimension size 
+!   nc_status = NF90_INQ_DIMLEN(ncid, dimid_step, dim_step)
+!   IF (nc_status /= NF90_NOERR) THEN
+!     nc_status = NF90_CLOSE(ncid) 
+!     WRITE(msgstring, * ) "Error getting dimension of chl step", TRIM(chla_obs_file)
+!     CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+!   ENDIF
+  
+!   nc_status = NF90_INQ_DIMLEN(ncid, dimid_depth, dim_depth)
+!   IF (nc_status /= NF90_NOERR) THEN
+!     nc_status = NF90_CLOSE(ncid) 
+!     WRITE(msgstring, * ) "Error getting dimension of chl depth", TRIM(chla_obs_file)
+!     CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+!   ENDIF
+
+! I get errors saying This name does not have a type, and must have an explicit type.   [NF90_INQ_DIMLEN]  
+! But I know the lenth of dimession because I wrote the file. I use the known value for the time being. 
+
+
+  dim_depth = 20
+  ALLOCATE( chla_depths(dim_depth) )
+
+
+
+  nc_status = NF90_INQ_DIMID(ncid, "depth", dimid_depth)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting depth dimension ID", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )    
+  ENDIF
+
+  nc_status = nf90_get_var(ncid, dimid_step, chla_depths)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting dimension values for depth", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+  ENDIF
 
 
 
 
 
+  
+  IF(mype_world==0) WRITE(*,*) 'chla_steps:', chla_steps
+  IF(mype_world==0) WRITE(*,*) 'chla_depths:', chla_depths
 
-  WRITE(*,*) "dim_ens = ", dim_ens
-  WRITE(*,*) "filtertype = ", filtertype
-  WRITE(*,*) "subtype  = ", subtype 
+
+  ! read chl-a data 
+  ALLOCATE(MOSAiC_Chla( dim_step, dim_depth ))
+
+  ! Get variable ID 
+  nc_status = NF90_INQ_VARID(ncid, "Chl_a", varid_chla)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ID ", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )    
+  ENDIF
+  
+  ! Read the variable
+  startv(1) = 1 ! depth 
+  startv(2) = 1 ! step 
+  cntv(1) = dim_depth
+  cntv(2) = dim_step
+       
+  nc_status = NF90_GET_VAR(ncid, varid_chla, MOSAiC_Chla, start=startv, count=cntv)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = nf90_close(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )
+  endif
+
+  nc_status = nf90_close(ncid)
+  IF (nc_status /= NF90_NOERR) THEN
+  nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )
+  ENDIF
 
 
+  IF(mype_world==0) WRITE(*,*) 'MOSAiC_Chla', MOSAiC_Chla 
 
 
 

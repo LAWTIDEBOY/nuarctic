@@ -1,4 +1,4 @@
-!$Id: mod_obs_A_pdaf.F90 251 2019-11-19 08:43:39Z lnerger $
+!$Id: mod_obs_chla_pdaf.F90 251 2019-11-19 08:43:39Z lnerger $
 !> callback_obs_pdafomi
 !!
 !! This file provides interface routines between the call-back routines
@@ -33,7 +33,7 @@
 SUBROUTINE init_dim_obs_pdafomi(step, dim_obs)
 
   ! ! Include functions for different observations
-  ! USE obs_A_pdafomi, ONLY: assim_A, init_dim_obs_A
+  USE obs_chla_pdafomi, ONLY: assim_chla, init_dim_obs_chla
   ! USE obs_B_pdafomi, ONLY: assim_B, init_dim_obs_B
   ! USE obs_C_pdafomi, ONLY: assim_C, init_dim_obs_C
 
@@ -44,9 +44,9 @@ SUBROUTINE init_dim_obs_pdafomi(step, dim_obs)
   INTEGER, INTENT(out) :: dim_obs  !< Dimension of full observation vector
 
 ! *** Local variables ***
-  INTEGER :: dim_obs_A ! Observation dimensions
-  INTEGER :: dim_obs_B ! Observation dimensions
-  INTEGER :: dim_obs_C ! Observation dimensions
+  INTEGER :: dim_obs_chla ! Observation dimensions
+  ! INTEGER :: dim_obs_B ! Observation dimensions
+  ! INTEGER :: dim_obs_C ! Observation dimensions
 
 
 ! *********************************************
@@ -54,18 +54,18 @@ SUBROUTINE init_dim_obs_pdafomi(step, dim_obs)
 ! *********************************************
 
   ! Initialize number of observations
-  dim_obs_A = 0
-  dim_obs_B = 0
-  dim_obs_C = 0
+  dim_obs_chla = 0
+  ! dim_obs_B = 0
+  ! dim_obs_C = 0
 
   ! ! Call observation-specific routines
   ! ! The routines are independent, so it is not relevant
   ! ! in which order they are called
-  ! IF (assim_A) CALL init_dim_obs_A(step, dim_obs_A)
+  IF (assim_chla) CALL init_dim_obs_chla(step, dim_obs_chla)
   ! IF (assim_B) CALL init_dim_obs_B(step, dim_obs_B)
   ! IF (assim_C) CALL init_dim_obs_C(step, dim_obs_C)
 
-  dim_obs = dim_obs_A + dim_obs_B + dim_obs_C
+  dim_obs = dim_obs_chla ! + dim_obs_B + dim_obs_C
 
 END SUBROUTINE init_dim_obs_pdafomi
 
@@ -80,7 +80,7 @@ END SUBROUTINE init_dim_obs_pdafomi
 SUBROUTINE obs_op_pdafomi(step, dim_p, dim_obs, state_p, ostate)
 
   ! ! Include functions for different observations
-  ! USE obs_A_pdafomi, ONLY: obs_op_A
+  USE obs_chla_pdafomi, ONLY: obs_op_chla
   ! USE obs_B_pdafomi, ONLY: obs_op_B
   ! USE obs_C_pdafomi, ONLY: obs_op_C
 
@@ -102,7 +102,7 @@ SUBROUTINE obs_op_pdafomi(step, dim_p, dim_obs, state_p, ostate)
   ! of the overall observation vector is defined by the
   ! order of the calls in init_dim_obs_pdafomi
 
-  ! CALL obs_op_A(dim_p, dim_obs, state_p, ostate)
+  CALL obs_op_chla(dim_p, dim_obs, state_p, ostate)
   ! CALL obs_op_B(dim_p, dim_obs, state_p, ostate)
   ! CALL obs_op_C(dim_p, dim_obs, state_p, ostate)
 
@@ -116,32 +116,33 @@ END SUBROUTINE obs_op_pdafomi
 !! This routine calls the routine PDAFomi_init_dim_obs_l
 !! for each observation type
 !!
-SUBROUTINE init_dim_obs_l_pdafomi(domain_p, step, dim_obs, dim_obs_l)
+! C
+! SUBROUTINE init_dim_obs_l_pdafomi(domain_p, step, dim_obs, dim_obs_l)
 
-  ! ! Include functions for different observations
-  ! USE obs_A_pdafomi, ONLY: init_dim_obs_l_A
-  ! USE obs_B_pdafomi, ONLY: init_dim_obs_l_B
-  ! USE obs_C_pdafomi, ONLY: init_dim_obs_l_C
+!   ! ! Include functions for different observations
+!   USE obs_chla_pdafomi, ONLY: init_dim_obs_l_chla
+!   ! USE obs_B_pdafomi, ONLY: init_dim_obs_l_B
+!   ! USE obs_C_pdafomi, ONLY: init_dim_obs_l_C
 
-  IMPLICIT NONE
+!   IMPLICIT NONE
 
-! *** Arguments ***
-  INTEGER, INTENT(in)  :: domain_p   !< Index of current local analysis domain
-  INTEGER, INTENT(in)  :: step       !< Current time step
-  INTEGER, INTENT(in)  :: dim_obs    !< Full dimension of observation vector
-  INTEGER, INTENT(out) :: dim_obs_l  !< Local dimension of observation vector
+! ! *** Arguments ***
+!   INTEGER, INTENT(in)  :: domain_p   !< Index of current local analysis domain
+!   INTEGER, INTENT(in)  :: step       !< Current time step
+!   INTEGER, INTENT(in)  :: dim_obs    !< Full dimension of observation vector
+!   INTEGER, INTENT(out) :: dim_obs_l  !< Local dimension of observation vector
 
 
-! **********************************************
-! *** Initialize local observation dimension ***
-! **********************************************
+! ! **********************************************
+! ! *** Initialize local observation dimension ***
+! ! **********************************************
 
-  ! ! Call init_dim_obs_l specific for each observation
-  ! CALL init_dim_obs_l_A(domain_p, step, dim_obs, dim_obs_l)
-  ! CALL init_dim_obs_l_B(domain_p, step, dim_obs, dim_obs_l)
-  ! CALL init_dim_obs_l_C(domain_p, step, dim_obs, dim_obs_l)
+!   ! ! Call init_dim_obs_l specific for each observation
+!   CALL init_dim_obs_l_chla(domain_p, step, dim_obs, dim_obs_l)
+!   ! CALL init_dim_obs_l_B(domain_p, step, dim_obs, dim_obs_l)
+!   ! CALL init_dim_obs_l_C(domain_p, step, dim_obs, dim_obs_l)
 
-END SUBROUTINE init_dim_obs_l_pdafomi
+! END SUBROUTINE init_dim_obs_l_pdafomi
 
 
 
@@ -152,36 +153,37 @@ END SUBROUTINE init_dim_obs_l_pdafomi
 !! for each observation type to apply covariance
 !! localization in the LEnKF.
 !!
-SUBROUTINE localize_covar_pdafomi(dim_p, dim_obs, HP_p, HPH)
+! C
+! SUBROUTINE localize_covar_pdafomi(dim_p, dim_obs, HP_p, HPH)
 
-  ! ! Include functions for different observations
-  ! USE obs_A_pdafomi, ONLY: localize_covar_A
-  ! USE obs_B_pdafomi, ONLY: localize_covar_B
-  ! USE obs_C_pdafomi, ONLY: localize_covar_C
-
-
-  IMPLICIT NONE
-
-! *** Arguments ***
-  INTEGER, INTENT(in) :: dim_p                 !< PE-local state dimension
-  INTEGER, INTENT(in) :: dim_obs               !< number of observations
-  REAL, INTENT(inout) :: HP_p(dim_obs, dim_p)  !< PE local part of matrix HP
-  REAL, INTENT(inout) :: HPH(dim_obs, dim_obs) !< Matrix HPH
-
-! *** local variables ***
-  INTEGER :: i, j, cnt               ! Counters
-  REAL, ALLOCATABLE :: coords_p(:,:) ! Coordinates of PE-local state vector entries
+!   ! ! Include functions for different observations
+!   USE obs_chla_pdafomi, ONLY: localize_covar_chla
+!   ! USE obs_B_pdafomi, ONLY: localize_covar_B
+!   ! USE obs_C_pdafomi, ONLY: localize_covar_C
 
 
-! **********************
-! *** INITIALIZATION ***
-! **********************
-  !
-  ! ! Call localize_covar specific for each observation
-  ! CALL localize_covar_A(dim_p, dim_obs, HP_p, HPH, coords_p)
-  ! CALL localize_covar_B(dim_p, dim_obs, HP_p, HPH, coords_p)
-  ! CALL localize_covar_C(dim_p, dim_obs, HP_p, HPH, coords_p)
+!   IMPLICIT NONE
+
+! ! *** Arguments ***
+!   INTEGER, INTENT(in) :: dim_p                 !< PE-local state dimension
+!   INTEGER, INTENT(in) :: dim_obs               !< number of observations
+!   REAL, INTENT(inout) :: HP_p(dim_obs, dim_p)  !< PE local part of matrix HP
+!   REAL, INTENT(inout) :: HPH(dim_obs, dim_obs) !< Matrix HPH
+
+! ! *** local variables ***
+!   INTEGER :: i, j, cnt               ! Counters
+!   REAL, ALLOCATABLE :: coords_p(:,:) ! Coordinates of PE-local state vector entries
+
+
+! ! **********************
+! ! *** INITIALIZATION ***
+! ! **********************
+!   !
+!   ! ! Call localize_covar specific for each observation
+!   CALL localize_covar_chla(dim_p, dim_obs, HP_p, HPH, coords_p)
+!   ! CALL localize_covar_B(dim_p, dim_obs, HP_p, HPH, coords_p)
+!   ! CALL localize_covar_C(dim_p, dim_obs, HP_p, HPH, coords_p)
 
 
 
-END SUBROUTINE localize_covar_pdafomi
+! END SUBROUTINE localize_covar_pdafomi

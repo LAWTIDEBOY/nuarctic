@@ -75,14 +75,14 @@ call clock_newyear
 
 !=============================================================================!
 CALL init_pdaf()
-print*, 'initialization pdaf done'
+! print*, 'initialization pdaf done'
 !=============================================================================!
 !
 ! main loop of the model
 !
 print*, 'start computation loop'
 do istep=1,nsteps
-        !print*, istep, nsteps
+
 	! update time
 	call clock
 
@@ -98,6 +98,7 @@ do istep=1,nsteps
 
 	! perform diagnostics
 	if (mask_diagnostic(istep)) call store_diagnostics(index_diagnostic(istep))
+  CALL assimilate_pdaf()
 enddo
 
 print*, 'computation done'
