@@ -29,12 +29,12 @@ MODULE mod_assimilation
 
 ! Settings for time stepping - available as command line options
   LOGICAL :: model_error   !< Control application of model error
-  REAL    :: model_err_amp !< Amplitude for model error
+  REAL(kind=8)    :: model_err_amp !< Amplitude for model error
 
 ! Settings for observations - available as command line options
+  INTEGER :: init_delt_obs !< time step interval between model initialization and assimilation step
   INTEGER :: delt_obs      !< time step interval between assimilation steps
-  LOGICAL :: twin_experiment  !< Whether to run an twin experiment with synthetic observations
-
+  LOGICAL :: parameter_estimation  !< Whether to estimate parameter
 ! General control of PDAF - available as command line options
   INTEGER :: screen       !< Control verbosity of PDAF
                           !< * (0) no outputs
@@ -108,7 +108,7 @@ MODULE mod_assimilation
 ! Filter settings - available as command line options
 !    ! General
   INTEGER :: type_forget  !< Type of forgetting factor
-  REAL    :: forget       !< Forgetting factor for filter analysis
+  REAL(kind=8)    :: forget       !< Forgetting factor for filter analysis
   INTEGER :: dim_bias     !< dimension of bias vector
 !    ! ENKF
   INTEGER :: rank_analysis_enkf  !< Rank to be considered for inversion of HPH
@@ -135,14 +135,14 @@ MODULE mod_assimilation
                            !< (0) use random orthonormal transformation orthogonal to (1,...,1)^T
                            !< (1) use identity transformation
 !    ! LSEIK/LETKF/LESTKF/LNETF/LKNETF
-  REAL    :: cradius       !< Cut-off radius for local observation domain
+  REAL(kind=8)    :: cradius       !< Cut-off radius for local observation domain
   INTEGER :: locweight     !< * Type of localizing weighting of observations
                            !<   (0) constant weight of 1
                            !<   (1) exponentially decreasing with SRADIUS
                            !<   (2) use 5th-order polynomial
                            !<   (3) regulated localization of R with mean error variance
                            !<   (4) regulated localization of R with single-point error variance
-  REAL    :: sradius       !< Support radius for 5th order polynomial
+  REAL(kind=8)    :: sradius       !< Support radius for 5th order polynomial
                            !<   or radius for 1/e for exponential weighting
 !    ! SEIK-subtype4/LSEIK-subtype4/ESTKF/LESTKF
   INTEGER :: type_sqrt     !< * Type of the transform matrix square-root
@@ -150,7 +150,7 @@ MODULE mod_assimilation
                            !<   (1) Cholesky decomposition
 !    ! NETF/LNETF
   INTEGER :: type_winf     !< Set weights inflation: (1) activate
-  REAL    :: limit_winf    !< Limit for weights inflation: N_eff/N>limit_winf
+  REAL(kind=8)    :: limit_winf    !< Limit for weights inflation: N_eff/N>limit_winf
 !    ! hybrid LKNETF
   INTEGER :: type_hyb      !< * Type of hybrid weight:
                     !<   (0) use fixed hybrid weight hyb_gamma
@@ -158,8 +158,8 @@ MODULE mod_assimilation
                     !<   (2) use gamma_alpha: hybrid weight from N_eff/N>=hyb_gamma
                     !<   (3) use gamma_ska: 1 - min(s,k)/sqrt(hyb_kappa) with N_eff/N>=hyb_gamma
                     !<   (4) use gamma_sklin: 1 - min(s,k)/sqrt(hyb_kappa) >= 1-N_eff/N>=hyb_gamma
-  REAL    :: hyb_gamma     !< Hybrid filter weight for state (1.0: LETKF, 0.0 LNETF)
-  REAL    :: hyb_kappa     !< Hybrid norm for using skewness and kurtosis
+  REAL(kind=8)    :: hyb_gamma     !< Hybrid filter weight for state (1.0: LETKF, 0.0 LNETF)
+  REAL(kind=8)    :: hyb_kappa     !< Hybrid norm for using skewness and kurtosis
 !    ! Particle filter
   INTEGER :: pf_res_type   !< * Resampling type for PF
                            !<   (1) probabilistic resampling
@@ -168,125 +168,135 @@ MODULE mod_assimilation
   INTEGER :: pf_noise_type !< * Resampling type for PF
                            !<   (0) no perturbations, (1) constant stddev,
                            !<   (2) amplitude of stddev relative of ensemble variance
-  REAL :: pf_noise_amp     !< Noise amplitude (>=0.0, only used if pf_noise_type>0)
+  REAL(kind=8) :: pf_noise_amp     !< Noise amplitude (>=0.0, only used if pf_noise_type>0)
 
-!    ! 3D-Var
-  INTEGER :: type_opt      !< * Type of minimizer for 3DVar
-                           !<   (1) LBFGS (default)
-                           !<   (2) CG+
-                           !<   (3) plain CG
-                           !<   (12) CG+ parallelized
-                           !<   (13) plain CG parallelized
-  INTEGER :: dim_cvec = 0  !< Size of control vector (parameterized part; for subtypes 0,1)
-  INTEGER :: dim_cvec_ens = 0   !< Size of control vector (ensemble part; for subtypes 1,2)
-  INTEGER :: mcols_cvec_ens = 1 !< Multiplication factor for number of columns for ensemble control vector
-  REAL :: beta_3dvar = 0.5 !< Hybrid weight for hybrid 3D-Var
-  INTEGER :: solver_iparam1 = 2 ! Solver specific parameter
-                                !  LBFGS: parameter m (default=5)
-                                !       Number of corrections used in limited memory matrix; 3<=m<=20
-                                !  CG+: parameter method (default=2)
-                                !       (1) Fletcher-Reeves, (2) Polak-Ribiere, (3) positive Polak-Ribiere
-                                !  CG: maximum number of iterations (default=200)
-  INTEGER :: solver_iparam2 = 1 ! Solver specific parameter
-                                !  LBFGS: - not used -
-                                !  CG+: parameter irest (default=1)
-                                !       (0) no restarts; (n>0) restart every n steps
-                                !  CG: - not used -
-  REAL :: solver_rparam1 = 1.0e-6 ! Solver specific parameter
-                                !  LBFGS: limit for stopping iterations 'pgtol' (default=1.0e-5)
-                                !  CG+: convergence parameter 'eps' (default=1.0e-5)
-                                !  CG: conpergence parameter 'eps' (default=1.0e-6)
-  REAL :: solver_rparam2 = 1.0e+7 ! Solver specific parameter
-                                !  LBFGS: tolerance in termination test 'factr' (default=1.0e+7)
-                                !  CG+: - not used -
-                                !  CG: - not used -
-  INTEGER :: step_null = 0  ! initial time step of assimilation
+
+  INTEGER :: step_null   ! initial time step of assimilation
+  INTEGER :: step_assim = 0
 
 !    ! File output - available as a command line option
   CHARACTER(len=110) :: filename  !< file name for assimilation output
 
 !    ! Other variables - _NOT_ available as command line options!
-  REAL    :: time          !< model time
+  REAL(kind=8)    :: time          !< model time
 
-  REAL :: coords_l(2)      !< Coordinates of local analysis domain
+  REAL(kind=8) :: coords_l(2)      !< Coordinates of local analysis domain
   INTEGER, ALLOCATABLE :: id_lstate_in_pstate(:) !< Indices of local state vector in PE-local global state vector
 
 ! *** Variables to handle multiple fields in the state vector ***
 
   INTEGER :: n_fields_1d      !< number of 1d fields in state vector
   INTEGER :: n_fields_0d      !< number of 0d fields in state vector
-  INTEGER :: n_params      !< number of parameters in state vector
+  INTEGER :: n_fields         !< n_fields_1d + n_fields_0d
+  INTEGER :: n_params         !< number of parameters in state vector
+
   INTEGER, ALLOCATABLE :: off_fields(:) !< Offsets of fields in state vector
   INTEGER, ALLOCATABLE :: dim_fields(:) !< Dimension of fields in state vector
 
   INTEGER :: dim_field_1d
-  REAL :: perturb_scale
+  INTEGER :: bgc_layer
+  REAL(kind=8) :: perturb_scale
+  LOGICAL :: write_ens  !< Whether to ensemble outputs 
+
+
+  CHARACTER(len=110) :: out_dir
+
+
+
+
+  
+
+
+
+
+
 
   ! Declare Fortran type holding the indices of model fields in the state vector
   ! This can be extended to any number of fields - it severs to give each field a name
   TYPE field_ids
-     INTEGER :: DIN
-     INTEGER :: DIC
-     INTEGER :: DSi
-     INTEGER :: NanoN
-     INTEGER :: NanoC
-     INTEGER :: NanoChl
-     INTEGER :: DiaN
-     INTEGER :: DiaC
-     INTEGER :: DiaChl
-     INTEGER :: DiaSi
-     INTEGER :: NanoCaCO3
-     INTEGER :: DON
-     INTEGER :: DOC
-     INTEGER :: DetN
-     INTEGER :: DetC
-     INTEGER :: TotChl
-     INTEGER :: NPP
+      INTEGER :: DIN
+      INTEGER :: DIC
+      INTEGER :: DSi
+      INTEGER :: NanoN
+      INTEGER :: NanoC
+      INTEGER :: NanoChl
+      INTEGER :: DiaN
+      INTEGER :: DiaC
+      INTEGER :: DiaChl
+      INTEGER :: DiaSi
+      INTEGER :: NanoCaCO3
+      INTEGER :: DON
+      INTEGER :: DOC
+      INTEGER :: DetN
+      INTEGER :: DetC
+      INTEGER :: TotChl
+      INTEGER :: NPP
+!     parameters 
+      INTEGER :: NCuptakeRatio
+      INTEGER :: NCUptakeRatio_d
+      INTEGER :: k_din
+      INTEGER :: k_din_d
+      INTEGER :: alfa
+      INTEGER :: alfa_d
+      INTEGER :: P_cm
+      INTEGER :: P_cm_d
+      INTEGER :: Chl2N_max
+      INTEGER :: Chl2N_max_d
+      INTEGER :: deg_Chl
+      INTEGER :: deg_Chl_d
+      INTEGER :: graz_max
+      INTEGER :: graz_max2
+      INTEGER :: grazEff
+      INTEGER :: grazEff2
+      INTEGER :: lossN
+      INTEGER :: lossN_d
+      INTEGER :: lossN_z
+      INTEGER :: lossN_z2
+      INTEGER :: lossC_z
+      INTEGER :: lossC_z2
+      INTEGER :: reminN
+      INTEGER :: reminC      
+      INTEGER :: VDet
+      INTEGER :: VDet_zoo2
   END TYPE field_ids
 
   TYPE(field_ids) :: f_id
 
 
   TYPE tracer_ids
-     INTEGER :: Temp
-     INTEGER :: Salt
-     INTEGER :: DIN
-     INTEGER :: DIC
-     INTEGER :: ALK
-     INTEGER :: NanoN
-     INTEGER :: NanoC
-     INTEGER :: NanoChl
-     INTEGER :: DetN
-     INTEGER :: DetC
-     INTEGER :: HetN
-     INTEGER :: HetC
-     INTEGER :: DON
-     INTEGER :: DOC
-     INTEGER :: DiaN
-     INTEGER :: DiaC
-     INTEGER :: DiaChl
-     INTEGER :: DiaSi
-     INTEGER :: DetSi
-     INTEGER :: DSi
-     INTEGER :: DFe
-     INTEGER :: NanoCaCO3
-     INTEGER :: DetCaCO3
-     INTEGER :: DO2
-     INTEGER :: ZooN
-     INTEGER :: ZooC
-     INTEGER :: DetZooN
-     INTEGER :: DetZooC
-     INTEGER :: DetZooSi
-     INTEGER :: DetZooCalCO3
+      INTEGER :: Temp
+      INTEGER :: Salt
+      INTEGER :: DIN
+      INTEGER :: DIC
+      INTEGER :: ALK
+      INTEGER :: NanoN
+      INTEGER :: NanoC
+      INTEGER :: NanoChl
+      INTEGER :: DetN
+      INTEGER :: DetC
+      INTEGER :: HetN
+      INTEGER :: HetC
+      INTEGER :: DON
+      INTEGER :: DOC
+      INTEGER :: DiaN
+      INTEGER :: DiaC
+      INTEGER :: DiaChl
+      INTEGER :: DiaSi
+      INTEGER :: DetSi
+      INTEGER :: DSi
+      INTEGER :: DFe
+      INTEGER :: NanoCaCO3
+      INTEGER :: DetCaCO3
+      INTEGER :: DO2
+      INTEGER :: ZooN
+      INTEGER :: ZooC
+      INTEGER :: DetZooN
+      INTEGER :: DetZooC
+      INTEGER :: DetZooSi
+      INTEGER :: DetZooCalCO3
   END TYPE tracer_ids
 
   TYPE(tracer_ids) :: tr_id
 
-
-
-
-
-
-!$OMP THREADPRIVATE(coords_l, id_lstate_in_pstate)
 
 END MODULE mod_assimilation

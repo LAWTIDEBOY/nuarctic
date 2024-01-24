@@ -1,57 +1,12 @@
-!$Id: obs_chla_pdafomi.F90 1012 2022-03-31 12:31:09Z lnerger $
+!$Id: obs_dsi_pdafomi.F90 2024-01-20 nmamnun $
 !> PDAF-OMI observation module for type A observations
 !!
-!! This module handles operations for one data type (called 'module-type' below):
-!! TYPE = A
-!!
-!! __Observation type A:__
-!! The observation type A in this tutorial are 28 observations at specified 
-!! model grid points.
-!!
-!! The subroutines in this module are for the particular handling of
-!! a single observation type.
-!! The routines are called by the different call-back routines of PDAF.
-!! Most of the routines are generic so that in practice only 2 routines
-!! need to be adapted for a particular data type. These are the routines
-!! for the initialization of the observation information (init_dim_obs)
-!! and for the observation operator (obs_op).
-!!
-!! The module and the routines are named according to the observation type.
-!! This allows to distinguish the observation type and the routines in this
-!! module from other observation types.
-!!
-!! The module uses two derived data type (obs_f and obs_l), which contain
-!! all information about the full and local observations. Only variables
-!! of the type obs_f need to be initialized in this module. The variables
-!! in the type obs_l are initilized by the generic routines from PDAFomi.
-!!
-!!
-!! These 2 routines need to be adapted for the particular observation type:
-!! * init_dim_obs_TYPE \n
-!!           Count number of process-local and full observations; 
-!!           initialize vector of observations and their inverse variances;
-!!           initialize coordinate array and index array for indices of
-!!           observed elements of the state vector.
-!! * obs_op_TYPE \n
-!!           observation operator to get full observation vector of this type. Here
-!!           one has to choose a proper observation operator or implement one.
-!!
-!! In addition, there are two optional routine, which are required if filters 
-!! with localization are used:
-!! * init_dim_obs_l_TYPE \n
-!!           Only required if domain-localized filters (e.g. LESTKF, LETKF) are used:
-!!           Count number of local observations of module-type according to
-!!           their coordinates (distance from local analysis domain). Initialize
-!!           module-internal distances and index arrays.
-!! * localize_covar_TYPE \n
-!!           Only required if the localized EnKF is used:
-!!           Apply covariance localization in the LEnKF.
 !!
 !! __Revision history:__
-!! * 2019-06 - Lars Nerger - Initial code
+!! * 2024-01 - Nabir Mamnun- Initial code
 !! * Later revisions - see repository log
 !!
-MODULE obs_chla_pdafomi
+MODULE obs_dsi_pdafomi
 
   USE mod_parallel_pdaf, &
        ONLY: mype_world, mype_filter    ! Rank of filter process
@@ -62,14 +17,14 @@ MODULE obs_chla_pdafomi
   SAVE
 
   ! Variables which are inputs to the module (usually set in init_pdaf)
-  LOGICAL :: assim_chla        !< Whether to assimilate this data type
-  REAL(kind=8)    :: rms_obs_chla = 0.3D+00     !< Observation error standard deviation (for constant errors)
+  LOGICAL :: assim_dsi        !< Whether to assimilate this data type
+  REAL(kind=8)    :: rms_obs_dsi = 0.3D+00     !< Observation error standard deviation (for constant errors)
 
   ! One can declare further variables, e.g. for file names which can
   ! be use-included in init_pdaf() and initialized there.
-  INTEGER                     :: dim_step_chla, dim_depth_chla
-  INTEGER, ALLOCATABLE        :: chla_steps(:), chla_depths(:)
-  REAL(kind=8), ALLOCATABLE   :: MOSAiC_Chla(:, :)
+  INTEGER                     :: dim_step_dsi, dim_depth_dsi
+  INTEGER, ALLOCATABLE        :: dsi_steps(:), dsi_depths(:)
+  REAL(kind=8), ALLOCATABLE   :: MOSAiC_DSI(:, :)
 
 ! ***********************************************************************
 ! *** The following two data types are used in PDAFomi                ***
@@ -161,7 +116,7 @@ CONTAINS
 !!
 !! Further variables are set when the routine PDAFomi_gather_obs is called.
 !!
-  SUBROUTINE init_dim_obs_chla(step, dim_obs)
+  SUBROUTINE init_dim_obs_dsi(step, dim_obs)
 
     USE PDAFomi, &
          ONLY: PDAFomi_gather_obs
@@ -176,28 +131,28 @@ CONTAINS
     INTEGER, INTENT(inout) :: dim_obs    !< Dimension of full observation vector
 
 ! *** Local variables ***
-    INTEGER         :: i, j, index                    ! Counters
-    REAL(kind=8)    :: chla_file 
-    REAL(kind=8)    :: rmsd, sigma2
-    INTEGER         :: dim_obs_p                 ! Number of process-local observations
+    INTEGER                   :: i, j, index                      ! Counters
+    REAL(kind=8)              :: dsi_file 
+    REAL(kind=8)              :: rmsd, sigma2
+    INTEGER                   :: dim_obs_p                 ! Number of process-local observations
     REAL(kind=8), ALLOCATABLE :: obs_p(:)        ! PE-local observation vector
     REAL(kind=8), ALLOCATABLE :: ivar_obs_p(:)   ! PE-local inverse observation error variance
     REAL(kind=8), ALLOCATABLE :: ocoord_p(:,:)   ! PE-local observation coordinates 
-    INTEGER :: cnt, cnt0                 ! Counters
+    INTEGER                   :: cnt, cnt0                 ! Counters
     REAL(kind=8), ALLOCATABLE :: obs_field(:)  ! Observation field read from file
-    CHARACTER(len=2) :: stepstr          ! String for time step
+    CHARACTER(len=2)          :: stepstr          ! String for time step
 
-    INTEGER       :: obs_loc(1)
-    LOGICAL       :: do_assim_now=.FALSE.
+    INTEGER                   :: obs_loc(1)
+    LOGICAL                   :: do_assim_now
 ! *********************************************
 ! *** Initialize full observation dimension ***
 ! *********************************************
 
     IF (mype_world==0) &
-         WRITE (*,'(8x,a)') 'Assimilate MOSAiC_Chla'
+         WRITE (*,'(8x,a)') 'Assimilate MOSAiC_DSi'
 
     ! Store whether to assimilate this observation type (used in routines below)
-    IF (assim_chla) thisobs%doassim = 1
+    IF (assim_dsi) thisobs%doassim = 1
 
     ! Specify type of distance computation
     thisobs%disttype = 0   ! 0=Cartesian
@@ -212,41 +167,40 @@ CONTAINS
 ! **********************************
 
   do_assim_now = .FALSE.
-  
-  Do i = 1, dim_step_chla
-    IF(chla_steps(i)==step) THEN 
+  Do i = 1, dim_step_dsi
+    IF(dsi_steps(i)==step) THEN 
       do_assim_now = .TRUE. 
       index = i
     END IF 
   END DO 
 
+  WRITE(*,*) 'step: ', step, 'DSi assim ', do_assim_now
+
  
   ! dim_obs_p = 0
-  ! dim_obs = 0
+  ! dim_obs = 0   
 
   IF (do_assim_now) THEN
-    ALLOCATE( obs_field(dim_depth_chla) )
-    ! obs_loc = FINDLOC(chla_steps, step) 
-    ! WRITE(*,*) 'obs_loc (FINDLOC) = ', obs_loc
-    ! i = obs_loc(1)
-    obs_field(:) = MOSAiC_Chla(index, :)
-    IF (mype_world==0) WRITE(*,*) "Chla obs at step ", step, ':', obs_field
-    ! *** Count valid observations that lie at thi step ***
+    ALLOCATE(obs_field(dim_depth_dsi) )
+    obs_field(:) = MOSAiC_DSi(index, :)
+    IF (mype_world==0) WRITE(*,*) "dsi obs at step ", step, ':', obs_field
+! *** Count valid observations that lie at thi step ***
     cnt = 0
-    DO i= 1, dim_depth_chla
+    DO i= 1, dim_depth_dsi
       IF (obs_field(i) > 0.0D+00) cnt = cnt + 1
     END DO
-
     dim_obs_p = cnt
     dim_obs = cnt
-  ELSE     
+
+  ELSE 
     dim_obs_p = 0
-    dim_obs = 0  
-  END IF 
+    dim_obs = 0
+  END IF   
 
 
-  IF (mype_filter==0) &
-      WRITE (*,'(8x, a, i6)') 'CHL number of full observations', dim_obs
+  IF(mype_filter==0) &
+    WRITE (*,'(8x, a, i6)') 'dsi number of full observations', dim_obs
+
 
 
   IF (dim_obs_p > 0) THEN
@@ -262,26 +216,23 @@ CONTAINS
     ALLOCATE(thisobs%id_obs_p(1, dim_obs_p))
     cnt = 0
     cnt0 = 0
-    DO i= 1, dim_depth_chla
+    DO i= 1, dim_depth_dsi
       cnt0 = cnt0 + 1
       IF (obs_field(i) > 0.0D+00) THEN
         cnt = cnt + 1
         thisobs%id_obs_p(1, cnt) = cnt0
-        chla_file = obs_field(i)        
+        dsi_file = obs_field(i)
+        obs_p(cnt) = dsi_file 
         ! Define observation errors for process-local observations
-        ! We assume 30% RMSD of actual concentration (rms_obs_chla = 0.3)
-        rmsd = chla_file * rms_obs_chla 
-        ! Calculate the variance of the log-normal distribution (σ^2 )
-        sigma2 = log(1.0D+00 + (rmsd**2 / chla_file**2))
-        ! Calculate the log-transformed mean
-        obs_p(cnt) = log(chla_file) - (sigma2 / 2.0D+00)
+        ! We assume 30% RMSD of actual concentration (rms_obs_dsi = 0.3)
+        rmsd = dsi_file * rms_obs_dsi         
         ! *** Set inverse observation error variances ***
-        ivar_obs_p(cnt) = 1.0D+00 / sigma2
+        ivar_obs_p(cnt) = 1.0D+00 / rmsd
         ocoord_p(1, cnt) = REAL(i, 8)
       END IF
     END DO
-    ! add total Chla off-set to the state vector 
-    thisobs%id_obs_p = thisobs%id_obs_p + off_fields(f_id%TotChl)
+   ! add total dsi off-set to the state vector 
+    thisobs%id_obs_p = thisobs%id_obs_p + off_fields(f_id%DSi)
     
   ELSE 
     ALLOCATE(obs_p(1))
@@ -291,13 +242,11 @@ CONTAINS
 
   END IF 
 
-
 ! ****************************************
 ! *** Gather global observation arrays ***
 ! ****************************************
-
-    CALL PDAFomi_gather_obs(thisobs, dim_obs_p, obs_p, ivar_obs_p, ocoord_p, &
-         thisobs%ncoord, cradius, dim_obs)
+  CALL PDAFomi_gather_obs(thisobs, dim_obs_p, obs_p, ivar_obs_p, ocoord_p, &
+       thisobs%ncoord, cradius, dim_obs)
 
 
 
@@ -305,11 +254,10 @@ CONTAINS
 ! *** Finishing up ***
 ! ********************
 
+
   ! Deallocate all local arrays
   IF(do_assim_now) DEALLOCATE(obs_field)
   DEALLOCATE(obs_p, ocoord_p, ivar_obs_p)
-
-    
 
 
 
@@ -318,7 +266,7 @@ CONTAINS
     ! Arrays in THISOBS have to be deallocated after the analysis step
     ! by a call to deallocate_obs() in prepoststep_pdaf.
 
-  END SUBROUTINE init_dim_obs_chla
+  END SUBROUTINE init_dim_obs_dsi
 
 
 
@@ -334,7 +282,7 @@ CONTAINS
 !!
 !! The routine is called by all filter processes.
 !!
-  SUBROUTINE obs_op_chla(dim_p, dim_obs, state_p, ostate)
+  SUBROUTINE obs_op_dsi(dim_p, dim_obs, state_p, ostate)
 
     USE PDAFomi, &
          ONLY: PDAFomi_obs_op_gridpoint
@@ -355,7 +303,7 @@ CONTAINS
     ! observation operator for observed grid point values
     CALL PDAFomi_obs_op_gridpoint(thisobs, state_p, ostate)
 
-  END SUBROUTINE obs_op_chla
+  END SUBROUTINE obs_op_dsi
 
 
 
@@ -376,7 +324,7 @@ CONTAINS
 !! for each observation type and  local analysis domain.
 !!
 ! C 
-!   SUBROUTINE init_dim_obs_l_chla(domain_p, step, dim_obs, dim_obs_l)
+!   SUBROUTINE init_dim_obs_l_dsi(domain_p, step, dim_obs, dim_obs_l)
 
 !     ! Include PDAFomi function
 !     USE PDAFomi, ONLY: PDAFomi_init_dim_obs_l
@@ -401,7 +349,7 @@ CONTAINS
 !     CALL PDAFomi_init_dim_obs_l(thisobs_l, thisobs, coords_l, &
 !          locweight, local_range, srange, dim_obs_l)
 
-!   END SUBROUTINE init_dim_obs_l_chla
+!   END SUBROUTINE init_dim_obs_l_dsi
 
 
 
@@ -418,7 +366,7 @@ CONTAINS
 ! !! different localization radius and localization functions
 ! !! for each observation type.
 ! !!
-!   SUBROUTINE localize_covar_chla(dim_p, dim_obs, HP_p, HPH, coords_p)
+!   SUBROUTINE localize_covar_dsi(dim_p, dim_obs, HP_p, HPH, coords_p)
 
 !     ! Include PDAFomi function
 !     USE PDAFomi, ONLY: PDAFomi_localize_covar
@@ -444,6 +392,6 @@ CONTAINS
 !     CALL PDAFomi_localize_covar(thisobs, dim_p, locweight, local_range, srange, &
 !          coords_p, HP_p, HPH)
 
-!   END SUBROUTINE localize_covar_chla
+!   END SUBROUTINE localize_covar_dsi
 
-END MODULE obs_chla_pdafomi
+END MODULE obs_dsi_pdafomi

@@ -32,7 +32,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
       ONLY: NCuptakeRatio, NCUptakeRatio_d, k_din, k_din_d, alfa, alfa_d, P_cm,     & 
       P_cm_d, Chl2N_max, Chl2N_max_d, deg_Chl, deg_Chl_d, graz_max, graz_max2,      &
       grazEff, grazEff2, lossN, lossN_d, lossN_z, lossC_z, lossN_z2, lossC_z2,      &
-      reminN, reminC
+      reminN, reminC, VDet, VDet_zoo2
 
   USE mod_perturbation_pdaf, &
       ONLY:  perturb_lognorm, perturb_lognorm_ens, perturb_beta_ens
@@ -81,6 +81,9 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
   REAL(kind=8)  :: reminN_ens(dim_ens)
   REAL(kind=8)  :: reminC_ens(dim_ens)
 
+  REAL(kind=8)  :: VDet_ens(dim_ens)
+  REAL(kind=8)  :: VDet_zoo2_ens(dim_ens)
+
 
   ! **********************
   ! *** INITIALIZATION ***
@@ -113,10 +116,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
   ! ***               Parameter Perturbation               ***
       !  NCuptakeRatio
     IF (f_id%NCuptakeRatio /= 0) THEN 
-      iseed(1)=1
-      iseed(2)=3
-      iseed(3)=20
-      iseed(4)=41
+      iseed = (/478, 1927, 221, 3605/)
       NCuptakeRatio_ens = perturb_lognorm_ens(  NCuptakeRatio, &
                                                 perturb_scale, &
                                                 dim_ens, iseed)     
@@ -128,10 +128,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  NCUptakeRatio_d
     IF (f_id%NCUptakeRatio_d /= 0) THEN 
-      iseed(1)=2
-      iseed(2)=5
-      iseed(3)=19
-      iseed(4)=39
+      iseed = (/126, 293, 1870, 177/)
       NCUptakeRatio_d_ens = perturb_lognorm_ens(  NCUptakeRatio_d, &
                                                   perturb_scale, &
                                                   dim_ens, iseed)     
@@ -143,10 +140,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  k_din
     IF (f_id%k_din /= 0) THEN 
-      iseed(1)=3
-      iseed(2)=7
-      iseed(3)=18
-      iseed(4)=37
+      iseed = (/3786, 1403, 1552, 1069/)
       k_din_ens = perturb_lognorm_ens(  k_din, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -158,10 +152,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  k_din_d
     IF (f_id%k_din_d /= 0) THEN 
-      iseed(1)=4
-      iseed(2)=11
-      iseed(3)=17
-      iseed(4)=35
+      iseed = (/3035, 2794, 2464, 2505/)
       k_din_d_ens = perturb_lognorm_ens(  k_din_d, &
                                           perturb_scale, &
                                           dim_ens, iseed)     
@@ -173,10 +164,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  alfa
     IF (f_id%alfa /= 0) THEN 
-      iseed(1)=13
-      iseed(2)=5
-      iseed(3)=16
-      iseed(4)=99
+      iseed = (/2911, 2490, 1042, 1441/)
       alfa_ens = perturb_lognorm_ens(  alfa, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -188,10 +176,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  alfa_d
     IF (f_id%alfa_d /= 0) THEN 
-      iseed(1)=17
-      iseed(2)=6
-      iseed(3)=15
-      iseed(4)=97
+      iseed = (/379, 2434, 13, 1343/)
       alfa_d_ens = perturb_lognorm_ens(  alfa_d, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -203,10 +188,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !   P_cm
     IF (f_id%P_cm /= 0) THEN 
-      iseed(1)=17
-      iseed(2)=6
-      iseed(3)=15
-      iseed(4)=97
+      iseed = (/2133, 3284, 2572, 1797/)
       P_cm_ens = perturb_lognorm_ens(  P_cm, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -217,10 +199,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
     END IF
     !   P_cm_d
     IF (f_id%P_cm_d /= 0) THEN 
-      iseed(1)=17
-      iseed(2)=6
-      iseed(3)=15
-      iseed(4)=97
+      iseed = (/3769, 1543, 29, 671/)
       P_cm_d_ens = perturb_lognorm_ens(  P_cm_d, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -232,10 +211,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  Chl2N_max
     IF (f_id%Chl2N_max /= 0) THEN 
-      iseed(1)=5
-      iseed(2)=13
-      iseed(3)=16*member + 5
-      iseed(4)=33
+      iseed = (/503, 3237, 1066, 2627/)
       Chl2N_max_ens = perturb_lognorm_ens(  Chl2N_max, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -247,10 +223,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  Chl2N_max_d
     IF (f_id%Chl2N_max_d /= 0) THEN
-      iseed(1)=6
-      iseed(2)=17
-      iseed(3)=15*member + 6
-      iseed(4)=31
+      iseed = (/3056, 3948, 2634, 4015/)
       Chl2N_max_d_ens = perturb_lognorm_ens(  Chl2N_max_d, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -262,10 +235,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  deg_Chl
     IF (f_id%deg_Chl /= 0) THEN
-      iseed(1)=7
-      iseed(2)=19
-      iseed(3)=14*member + 7
-      iseed(4)=29  
+      iseed = (/1029, 686, 491, 3863/)
       deg_Chl_ens = perturb_lognorm_ens(  deg_Chl, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -277,10 +247,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  deg_Chl_d
     IF (f_id%deg_Chl_d /= 0) THEN
-      iseed(1)=8
-      iseed(2)=23
-      iseed(3)=13*member + 8
-      iseed(4)=27
+      iseed = (/1084, 3015, 2325, 1877/)
       deg_Chl_d_ens = perturb_lognorm_ens(  deg_Chl_d, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -292,10 +259,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  graz_max
     IF (f_id%graz_max /= 0) THEN
-      iseed(1)=9
-      iseed(2)=29
-      iseed(3)=12*member + 9
-      iseed(4)=25
+      iseed = (/2744, 2001, 2997, 2729/)
       graz_max_ens = perturb_lognorm_ens(  graz_max, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -307,10 +271,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  graz_max2
     IF (f_id%graz_max2 /= 0) THEN
-      iseed(1)=10
-      iseed(2)=1
-      iseed(3)=11*member + 10
-      iseed(4)=23
+      iseed = (/451, 2858, 3472, 3871/)
       graz_max2_ens = perturb_lognorm_ens(  graz_max2, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -322,10 +283,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  grazEff
     IF (f_id%grazEff /= 0) THEN
-      iseed(1)=11
-      iseed(2)=31
-      iseed(3)=10*member + 11
-      iseed(4)=21
+      iseed = (/2331, 2119, 3579, 909/)
       grazEff_ens = perturb_lognorm_ens(  grazEff, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -337,11 +295,8 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  grazEff2
     IF (f_id%grazEff2 /= 0) THEN
-      iseed(1)=12
-      iseed(2)=37
-      iseed(3)=9*member + 12
-      iseed(4)=19
-      grazEff2_ens = perturb_lognorm_ens(  grazEff2, &
+      iseed = (/1758, 1975, 1378, 2519/)
+      grazEff2_ens = perturb_lognorm_ens(grazEff2, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
       DO member = 1, dim_ens
@@ -352,10 +307,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  lossN
     IF (f_id%lossN /= 0) THEN
-      iseed(1)=13
-      iseed(2)=41
-      iseed(3)=8*member + 13
-      iseed(4)=17
+      iseed = (/720, 3498, 2865, 3553/)
       lossN_ens = perturb_lognorm_ens(  lossN, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -367,10 +319,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  lossN_d
     IF (f_id%lossN_d /= 0) THEN
-      iseed(1)=14
-      iseed(2)=43
-      iseed(3)=7*member + 14
-      iseed(4)=15
+      iseed = (/527, 3342, 46, 521/)
       lossN_d_ens = perturb_lognorm_ens(  lossN_d, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -382,10 +331,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  lossN_z
     IF (f_id%lossN_z /= 0) THEN
-      iseed(1)=15
-      iseed(2)=47
-      iseed(3)=6*member + 15
-      iseed(4)=13
+      iseed = (/2209, 1656, 2423, 1055/)
       lossN_z_ens = perturb_lognorm_ens(  lossN_z, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -397,10 +343,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  lossC_z
     IF (f_id%lossC_z /= 0) THEN
-      iseed(1)=16
-      iseed(2)=53
-      iseed(3)=5*member + 16
-      iseed(4)=11
+      iseed = (/66, 10, 89, 51/)
       lossC_z_ens = perturb_lognorm_ens(  lossC_z, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -412,10 +355,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  lossN_z2
     IF (f_id%lossC_z /= 0) THEN
-      iseed(1)=17
-      iseed(2)=59
-      iseed(3)=4*member + 17
-      iseed(4)=9
+      iseed = (/4, 38, 85, 11/)
       lossC_z_ens = perturb_lognorm_ens(  lossC_z, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -427,10 +367,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  lossC_z2
     IF (f_id%lossC_z2 /= 0) THEN
-      iseed(1)=18
-      iseed(2)=61
-      iseed(3)=3*member + 18
-      iseed(4)=7
+      iseed = (/21, 34, 36, 83/)
       lossC_z2_ens = perturb_lognorm_ens(  lossC_z2, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -442,10 +379,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  reminN
     IF (f_id%reminN /= 0) THEN
-      iseed(1)=19
-      iseed(2)=67
-      iseed(3)=2*member + 19
-      iseed(4)=5
+      iseed = (/31, 71, 90, 73/)
       reminN_ens = perturb_lognorm_ens(  reminN, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -457,10 +391,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
     !  reminC
     IF (f_id%reminC /= 0) THEN
-      iseed(1)=20
-      iseed(2)=71
-      iseed(3)=1*member + 20
-      iseed(4)=3
+      iseed = (/68, 7, 74, 35/)
       reminC_ens = perturb_lognorm_ens(  reminC, &
                                         perturb_scale, &
                                         dim_ens, iseed)     
@@ -473,252 +404,39 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
 
 
 
-! C 
-!   ! ***               Parameter Perturbation               ***
-!   DO member = 1, dim_ens
 
 
-!     !  NCuptakeRatio
-!     IF (f_id%NCuptakeRatio /= 0) THEN 
-!       iseed(1)=1
-!       iseed(2)=3
-!       iseed(3)=20*member + 1
-!       iseed(4)=41
-!       ens_p(off_fields(f_id%NCuptakeRatio) + 1, member)         &
-!         = perturb_lognorm(NCuptakeRatio, perturb_scale, iseed)
-!     END IF 
+    !  VDet
+    IF (f_id%VDet /= 0) THEN
+      iseed = (/68, 7, 74, 33/)
+      VDet_ens = perturb_lognorm_ens(  VDet, &
+                                        perturb_scale, &
+                                        dim_ens, iseed)     
+      DO member = 1, dim_ens
+        ens_p(off_fields(f_id%VDet) + 1, member) = VDet_ens(member)
+      END DO
+      WRITE(*,*)"VDet_ens:", VDet_ens
+    END IF
 
-!     !  NCUptakeRatio_d
-!     IF (f_id%NCUptakeRatio_d /= 0) THEN 
-!       iseed(1)=2
-!       iseed(2)=5
-!       iseed(3)=19*member + 2
-!       iseed(4)=39      
-!       ens_p(off_fields(f_id%NCUptakeRatio_d) + 1, member)       &
-!         = perturb_lognorm(NCUptakeRatio_d, perturb_scale, iseed)
-!     END IF 
 
-!     !  k_din
-!     IF (f_id%k_din /= 0) THEN 
-!       iseed(1)=3
-!       iseed(2)=7
-!       iseed(3)=18*member + 3
-!       iseed(4)=37
-!       ens_p(off_fields(f_id%k_din) + 1, member)                 &
-!         = perturb_lognorm(k_din, perturb_scale, iseed)
-!     END IF
 
-!     !  k_din_d
-!     IF (f_id%k_din_d /= 0) THEN 
-!       iseed(1)=4
-!       iseed(2)=11
-!       iseed(3)=17*member + 4
-!       iseed(4)=35
-!       ens_p(off_fields(f_id%k_din_d) + 1, member)               &
-!         = perturb_lognorm(k_din_d, perturb_scale, iseed)
-!     END IF
+    !  VDet_zoo2
+    IF (f_id%VDet_zoo2 /= 0) THEN
+      iseed = (/68, 7, 74, 31/)
+      VDet_zoo2_ens = perturb_lognorm_ens(  VDet_zoo2, &
+                                        perturb_scale, &
+                                        dim_ens, iseed)     
+      DO member = 1, dim_ens
+        ens_p(off_fields(f_id%VDet_zoo2) + 1, member) = VDet_zoo2_ens(member)
+      END DO
+      WRITE(*,*)"VDet_zoo2_ens:", VDet_zoo2_ens
+    END IF
 
-!     !  alfa
-!     IF (f_id%alfa /= 0) THEN 
-!       iseed(1)=13
-!       iseed(2)=5
-!       iseed(3)=16*member + 5
-!       iseed(4)=99
-!       ens_p(off_fields(f_id%alfa) + 1, member)                  &
-!         = perturb_lognorm(alfa, perturb_scale, iseed)
-!     END IF
 
-!     !  alfa_d
-!     IF (f_id%alfa_d /= 0) THEN 
-!       iseed(1)=17
-!       iseed(2)=6
-!       iseed(3)=15*member + 6
-!       iseed(4)=97      
-!       ens_p(off_fields(f_id%alfa_d) + 1, member)                &
-!         = perturb_lognorm(alfa_d, perturb_scale, iseed)
-!     END IF
 
-!     !   P_cm
-!     IF (f_id%P_cm /= 0) THEN 
-!       iseed(1)=17
-!       iseed(2)=6
-!       iseed(3)=15*member + 6
-!       iseed(4)=97      
-!       ens_p(off_fields(f_id%P_cm) + 1, member)                  &
-!         = perturb_lognorm(P_cm, perturb_scale, iseed)
-!     END IF
-!     !   P_cm_d
-!     IF (f_id%P_cm_d /= 0) THEN 
-!       iseed(1)=17
-!       iseed(2)=6
-!       iseed(3)=15*member + 6
-!       iseed(4)=97      
-!       ens_p(off_fields(f_id%P_cm_d) + 1, member)                &
-!         = perturb_lognorm(P_cm_d, perturb_scale, iseed)
-!     END IF
 
-!     !  Chl2N_max
-!     IF (f_id%Chl2N_max /= 0) THEN 
-!       iseed(1)=5
-!       iseed(2)=13
-!       iseed(3)=16*member + 5
-!       iseed(4)=33
-!       ens_p(off_fields(f_id%Chl2N_max) + 1, member)             &
-!         = perturb_lognorm(Chl2N_max, perturb_scale, iseed)
-!     END IF
 
-!     !  Chl2N_max_d
-!     IF (f_id%Chl2N_max_d /= 0) THEN
-!       iseed(1)=6
-!       iseed(2)=17
-!       iseed(3)=15*member + 6
-!       iseed(4)=31
-!       ens_p(off_fields(f_id%Chl2N_max_d) + 1, member)           &
-!         = perturb_lognorm(Chl2N_max_d, perturb_scale, iseed)
-!     END IF
 
-!     !  deg_Chl
-!     IF (f_id%deg_Chl /= 0) THEN
-!       iseed(1)=7
-!       iseed(2)=19
-!       iseed(3)=14*member + 7
-!       iseed(4)=29      
-!       ens_p(off_fields(f_id%deg_Chl) + 1, member)               &
-!         = perturb_lognorm(deg_Chl, perturb_scale, iseed)
-!     END IF
-
-!     !  deg_Chl_d
-!     IF (f_id%deg_Chl_d /= 0) THEN
-!       iseed(1)=8
-!       iseed(2)=23
-!       iseed(3)=13*member + 8
-!       iseed(4)=27
-!       ens_p(off_fields(f_id%deg_Chl_d) + 1, member)             &
-!         = perturb_lognorm(deg_Chl_d, perturb_scale, iseed)
-!     END IF
-
-!     !  graz_max
-!     IF (f_id%graz_max /= 0) THEN
-!       iseed(1)=9
-!       iseed(2)=29
-!       iseed(3)=12*member + 9
-!       iseed(4)=25
-!       ens_p(off_fields(f_id%graz_max) + 1, member)              &
-!         = perturb_lognorm(graz_max, perturb_scale, iseed)
-!     END IF
-
-!     !  graz_max2
-!     IF (f_id%graz_max2 /= 0) THEN
-!       iseed(1)=10
-!       iseed(2)=1
-!       iseed(3)=11*member + 10
-!       iseed(4)=23
-!       ens_p(off_fields(f_id%graz_max2) + 1, member)              &
-!         = perturb_lognorm(graz_max2, perturb_scale, iseed)
-!     END IF
-
-!     !  grazEff
-!     IF (f_id%grazEff /= 0) THEN
-!       iseed(1)=11
-!       iseed(2)=31
-!       iseed(3)=10*member + 11
-!       iseed(4)=21
-!       ens_p(off_fields(f_id%grazEff) + 1, member)              &
-!         = perturb_lognorm(grazEff, perturb_scale, iseed)
-!     END IF
-
-!     !  grazEff2
-!     IF (f_id%grazEff2 /= 0) THEN
-!       iseed(1)=12
-!       iseed(2)=37
-!       iseed(3)=9*member + 12
-!       iseed(4)=19
-!       ens_p(off_fields(f_id%grazEff2) + 1, member)              &
-!         = perturb_lognorm(grazEff2, perturb_scale, iseed)
-!     END IF
-
-!     !  lossN
-!     IF (f_id%lossN /= 0) THEN
-!       iseed(1)=13
-!       iseed(2)=41
-!       iseed(3)=8*member + 13
-!       iseed(4)=17
-!       ens_p(off_fields(f_id%lossN) + 1, member)              &
-!         = perturb_lognorm(lossN, perturb_scale, iseed)
-!     END IF
-
-!     !  lossN_d
-!     IF (f_id%lossN_d /= 0) THEN
-!       iseed(1)=14
-!       iseed(2)=43
-!       iseed(3)=7*member + 14
-!       iseed(4)=15
-!       ens_p(off_fields(f_id%lossN_d) + 1, member)              &
-!         = perturb_lognorm(lossN_d, perturb_scale, iseed)
-!     END IF
-
-!     !  lossN_z
-!     IF (f_id%lossN_z /= 0) THEN
-!       iseed(1)=15
-!       iseed(2)=47
-!       iseed(3)=6*member + 15
-!       iseed(4)=13
-!       ens_p(off_fields(f_id%lossN_z) + 1, member)              &
-!         = perturb_lognorm(lossN_z, perturb_scale, iseed)
-!     END IF
-
-!     !  lossC_z
-!     IF (f_id%lossC_z /= 0) THEN
-!       iseed(1)=16
-!       iseed(2)=53
-!       iseed(3)=5*member + 16
-!       iseed(4)=11
-!       lossC_z = perturb_lognorm(lossC_z, perturb_scale, iseed)
-!       ens_p(off_fields(f_id%lossC_z) + 1, member)              &
-!         = perturb_lognorm(lossC_z, perturb_scale, iseed)
-!     END IF
-
-!     !  lossN_z2
-!     IF (f_id%lossC_z /= 0) THEN
-!       iseed(1)=17
-!       iseed(2)=59
-!       iseed(3)=4*member + 17
-!       iseed(4)=9
-!       ens_p(off_fields(f_id%lossN_z2) + 1, member)              &
-!         = perturb_lognorm(lossN_z2, perturb_scale, iseed)
-!     END IF
-
-!     !  lossC_z2
-!     IF (f_id%lossC_z2 /= 0) THEN
-!       iseed(1)=18
-!       iseed(2)=61
-!       iseed(3)=3*member + 18
-!       iseed(4)=7
-!       ens_p(off_fields(f_id%lossC_z2) + 1, member)              &
-!         = perturb_lognorm(lossC_z2, perturb_scale, iseed)
-!     END IF
-
-!     !  reminN
-!     IF (f_id%reminN /= 0) THEN
-!       iseed(1)=19
-!       iseed(2)=67
-!       iseed(3)=2*member + 19
-!       iseed(4)=5
-!       ens_p(off_fields(f_id%reminN) + 1, member)              &
-!         = perturb_lognorm(reminN, perturb_scale, iseed)
-!     END IF
-
-!     !  reminC
-!     IF (f_id%reminC /= 0) THEN
-!       iseed(1)=20
-!       iseed(2)=71
-!       iseed(3)=1*member + 20
-!       iseed(4)=3
-!       ens_p(off_fields(f_id%reminC) + 1, member)              &
-!         = perturb_lognorm(reminC, perturb_scale, iseed)
-!     END IF
-
-!   END DO 
 
 
 
@@ -901,6 +619,15 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
     WRITE (*,*) 'reminC=', mean_state(off_fields(f_id%reminC)+1), &
                 'Spread=', varience_state(off_fields(f_id%reminC)+1)
 
+  
+  IF (f_id%VDet /= 0) &
+    WRITE (*,*) 'VDet=', mean_state(off_fields(f_id%VDet)+1), &
+                'Spread=', varience_state(off_fields(f_id%VDet)+1)
+
+  
+  IF (f_id%VDet_zoo2 /= 0) &
+    WRITE (*,*) 'VDet_zoo2=', mean_state(off_fields(f_id%VDet_zoo2)+1), &
+                'Spread=', varience_state(off_fields(f_id%VDet_zoo2)+1)
 
 
 

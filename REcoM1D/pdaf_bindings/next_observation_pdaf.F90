@@ -29,7 +29,11 @@ SUBROUTINE next_observation_pdaf(stepnow, nsteps, doexit, time)
   USE mod_parallel_pdaf, &    ! Parallelization variables
        ONLY: mype_world
   USE obs_chla_pdafomi, &
-      ONLY: chla_steps, dim_step
+      ONLY: chla_steps, dim_step_chla
+
+  USE obs_din_pdafomi, &
+      only: din_steps, dim_step_din
+
 
 
   IMPLICIT NONE
@@ -40,28 +44,12 @@ SUBROUTINE next_observation_pdaf(stepnow, nsteps, doexit, time)
   INTEGER, INTENT(out) :: doexit   !< Whether to exit forecasting (1 for exit)
   REAL, INTENT(out)    :: time     !< Current model (physical) time
   ! Local variables 
-  INTEGER   :: i, id 
+  INTEGER   :: i, id_chla, id_din 
+  INTEGER   :: next_step, nsteps_din, nsteps_chla
 
 ! *******************************************************
 ! *** Set number of time steps until next observation ***
 ! *******************************************************
-! C
-!   IF (stepnow - step_null==0) THEN
-!     step_assim = 0
-!     nsteps = init_delt_obs  
-!   ELSE
-!     step_assim = step_assim + 1
-!     nsteps = delt_obs
-!   END IF
-
-
-
-
-  id = 0
-  Do i = 1, dim_step
-    IF(chla_steps(i)==stepnow) id = i 
-  END DO 
-
   IF (stepnow - step_null==0) THEN
     step_assim = 0
     nsteps = init_delt_obs        
@@ -69,7 +57,46 @@ SUBROUTINE next_observation_pdaf(stepnow, nsteps, doexit, time)
       stepnow, 'First observation at time step=', init_delt_obs
   ELSE
     step_assim = step_assim + 1
-    nsteps = chla_steps(id+1) - chla_steps(id) 
+
+
+
+    id_din = 0
+    Do i = 1, dim_step_din
+      IF(din_steps(i)==stepnow) id_din = i 
+    END DO 
+
+    IF (id_din == 0) THEN 
+      Do i = 1, dim_step_din
+        IF(din_steps(i)>stepnow) THEN
+          next_step = din_steps(i)
+          EXIT 
+        END IF 
+      END DO
+      nsteps_din = next_step - stepnow
+    ELSE
+      nsteps_din = din_steps(id_din+1) - din_steps(id_din)
+    END IF  
+
+
+    id_chla = 0
+    Do i = 1, dim_step_chla
+      IF(chla_steps(i)==stepnow) id_chla = i 
+    END DO 
+
+    IF (id_chla == 0) THEN 
+      Do i = 1, dim_step_chla
+        IF(chla_steps(i)>stepnow) THEN
+          next_step = chla_steps(i)
+          EXIT 
+        END IF 
+      END DO
+      nsteps_chla = next_step - stepnow
+    ELSE
+      nsteps_chla = chla_steps(id_chla+1) - chla_steps(id_chla)
+    END IF  
+
+    nsteps = MIN(nsteps_din, nsteps_chla)
+
     IF (mype_world == 0) WRITE (*, '(i7, 3x, a, i7)') &
       stepnow, 'Next observation at time step', stepnow + nsteps
   END IF

@@ -30,7 +30,7 @@ SUBROUTINE distribute_state_pdaf(dim_p, state_p)
       ONLY: NCuptakeRatio, NCUptakeRatio_d, k_din, k_din_d, alfa, alfa_d, P_cm,     & 
       P_cm_d, Chl2N_max, Chl2N_max_d, deg_Chl, deg_Chl_d, graz_max, graz_max2,      &
       grazEff, grazEff2, lossN, lossN_d, lossN_z, lossC_z, lossN_z2, lossC_z2,      &
-      reminN, reminC
+      reminN, reminC,  VDet, VDet_zoo2
 
   USE mod_assimilation, &
       ONLY: parameter_estimation, off_fields, dim_fields, dim_field_1d, &
@@ -123,6 +123,8 @@ SUBROUTINE distribute_state_pdaf(dim_p, state_p)
     IF (f_id%lossC_z2 /= 0)         lossC_z2 = state_p(off_fields(f_id%lossC_z2)+1)
     IF (f_id%reminN /= 0)           reminN = state_p(off_fields(f_id%reminN)+1)
     IF (f_id%reminC /= 0)           reminC = state_p(off_fields(f_id%reminC)+1)
+    IF (f_id%VDet /= 0)             VDet = state_p(off_fields(f_id%VDet)+1)
+    IF (f_id%VDet_zoo2 /= 0)           VDet_zoo2 = state_p(off_fields(f_id%VDet_zoo2)+1)
   ! END IF 
 
 END SUBROUTINE distribute_state_pdaf

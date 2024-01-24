@@ -1,4 +1,4 @@
-!$Id: assimilate_pdaf.F90 1077 2023-02-15 12:15:19Z lnerger $
+!$Id: assimilate_pdaf.F90 2023-02-15 12:15:19Z nmamnun $
 !>  Routine to call PDAF for analysis step
 !!
 !! This routine is called during the model integrations at each time
@@ -7,7 +7,6 @@
 !! completed. If so, the analysis step is computed inside PDAF
 !!
 !! __Revision history:__
-!! * 2013-08 - Lars Nerger - Initial code
 !! * Later revisions - see repository log
 !!
 SUBROUTINE assimilate_pdaf()

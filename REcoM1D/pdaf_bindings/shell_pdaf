@@ -24,3 +24,4 @@ export HDF5_USE_FILE_LOCKING=FALSE
 
 export PDAF_DIR=/albedo/home/nmamnun/PDAF_trunk
 export PDAF_ARCH=linux_mpiifort_impi
+

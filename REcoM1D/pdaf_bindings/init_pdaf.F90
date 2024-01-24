@@ -1,18 +1,16 @@
-!$Id: init_pdaf.F90 1093 2023-02-17 13:32:58Z lnerger $
+!$Id: init_pdaf.F90 1093 2023-02-17 13:32:58Z nmamnun $
 !>  Interface routine to call initialization of PDAF
 !!
 !! This routine collects the initialization of variables for PDAF.
-!! In addition, the initialization routine PDAF_init is called
+!! The initialization routine PDAF_init is called
 !! to perform the internal initialization of PDAF.
 !!
-!! This variant is for the online mode of PDAF.
+!! This subroutine call read_param_selection where the selected parameters
+!! are read from a 
 !!
-!! This routine is generic. However, it assumes a constant observation
-!! error (rms_obs). Further, with parallelization the local state
-!! dimension dim_state_p is used.
+!! In addition, the observations are read from the NetCDF files. 
 !!
 !! __Revision history:__
-!! * 2008-10 - Lars Nerger - Initial code
 !! * Later revisions - see repository log
 !!
 SUBROUTINE init_pdaf()
@@ -37,8 +35,21 @@ SUBROUTINE init_pdaf()
       ONLY: file_exist, error_handler, get_unit,  e_warn, e_err
 
   USE obs_chla_pdafomi, &
-      ONLY: assim_chla, rms_obs_chla, chla_steps, chla_depths, dim_step, dim_depth, &
+      ONLY: assim_chla, rms_obs_chla, chla_steps, chla_depths, dim_step_chla, dim_depth_chla, &
       MOSAiC_Chla
+
+
+
+  USE obs_din_pdafomi, &
+      only: assim_din, rms_obs_din, din_steps, din_depths, dim_step_din, dim_depth_din, &
+      MOSAiC_DIN
+
+
+  USE obs_dsi_pdafomi, &
+      only: assim_dsi, rms_obs_dsi, dsi_steps, dsi_depths, dim_step_dsi, dim_depth_dsi, &
+      MOSAiC_DSi
+
+
 
   USE ocean_module, ONLY: tr_arr   ! Array containing all the tracers
 
@@ -61,8 +72,8 @@ SUBROUTINE init_pdaf()
 
   INTEGER         :: dbg_id  ! Debugging flag: >0 for debug output; =0 for no debug output
   
-  CHARACTER(len=110)          :: chla_obs_file 
-  INTEGER                     :: ncid, dimid_step, dimid_depth, varid_chla
+  CHARACTER(len=110)          :: chla_obs_file, din_obs_file, dsi_obs_file 
+  INTEGER                     :: ncid, dimid_step, dimid_depth, varid_chla, varid_din, varid_dsi
   INTEGER                     :: ierr, nc_status
    
   INTEGER                     :: startv(2), cntv(2)
@@ -86,11 +97,22 @@ SUBROUTINE init_pdaf()
   CALL PDAF_set_debug_flag(dbg_id) 
 
 
-  parameter_estimation = .FALSE.
+  parameter_estimation = .TRUE.
   step_null = 0
   step_assim = step_null
+
   assim_chla = .TRUE.
   rms_obs_chla = 3.0D-01
+
+  assim_din = .TRUE.
+  rms_obs_din = 3.0D-01
+
+
+
+  assim_dsi = .TRUE.
+  rms_obs_dsi = 3.0D-01
+
+
 
 ! **********************************************************
 ! ***   CONTROL OF PDAF - used in call to PDAF_init      ***
@@ -253,31 +275,16 @@ SUBROUTINE init_pdaf()
   f_id%DetC       = 0
   f_id%TotChl     = 12
   f_id%NPP        = 0
-! parameters      
-  f_id%NCuptakeRatio    = 13
-  f_id%NCUptakeRatio_d  = 14
-  f_id%k_din            = 15
-  f_id%k_din_d          = 16
-  f_id%alfa             = 17
-  f_id%alfa_d           = 18
-  f_id%P_cm             = 0
-  f_id%P_cm_d           = 0
-  f_id%Chl2N_max        = 19
-  f_id%Chl2N_max_d      = 20
-  f_id%deg_Chl          = 21
-  f_id%deg_Chl_d        = 22
-  f_id%graz_max         = 23
-  f_id%graz_max2        = 24
-  f_id%grazEff          = 0
-  f_id%grazEff2         = 0
-  f_id%lossN            = 0
-  f_id%lossN_d          = 0
-  f_id%lossN_z          = 0
-  f_id%lossN_z2         = 0
-  f_id%lossC_z          = 0
-  f_id%lossC_z2         = 0
-  f_id%reminN           = 0
-  f_id%reminC           = 0
+
+
+  n_fields_1d = 12
+  n_fields_0d = 0
+  n_fields = n_fields_1d + n_fields_0d
+
+
+
+  CALL read_param_selection() 
+
 
 ! assign tracer ids
   tr_id%Temp      = 1
@@ -311,12 +318,7 @@ SUBROUTINE init_pdaf()
   tr_id%DetZooSi  = 29
   tr_id%DetZooCalCO3 = 30
 
-! ***         Define state dimension         ***
-  n_fields_1d = 12
-  n_fields_0d = 0
-  n_fields = n_fields_1d + n_fields_0d
-  n_params = 12
-
+! ***         Define state dimension         ***  
   dim_field_1d = bgc_layer
 
   ALLOCATE(dim_fields(n_fields + n_params))
@@ -379,8 +381,10 @@ SUBROUTINE init_pdaf()
     WRITE (*,*) 'perturb_scale: ',  perturb_scale
     WRITE (*,*) 'init_delt_obs: ',  init_delt_obs
     WRITE (*,*) 'delt_obs: ',       delt_obs
-    ! WRITE (*,*)      'assim_din: ',      assim_din
-    ! WRITE (*,*)  'rms_obs_din: ',    rms_obs_din
+    WRITE (*,*) 'assim_din: ',      assim_din
+    WRITE (*,*) 'rms_obs_din: ',    rms_obs_din
+    WRITE (*,*) 'assim_dsi: ',      assim_dsi
+    WRITE (*,*) 'rms_obs_dsi: ',    rms_obs_dsi
     WRITE (*,*) 'write_ens: ',      write_ens
     WRITE (*,*) '-- End of PDAF configuration -----------'
   ENDIF
@@ -401,27 +405,27 @@ SUBROUTINE init_pdaf()
     nc_status = NF90_OPEN(chla_obs_file, nf90_nowrite, ncid)
     IF (nc_status /= NF90_NOERR) THEN
       WRITE(msgstring, * ) "Error in opening ", TRIM(chla_obs_file)
-      CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+      CALL error_handler( e_err, "init_pdaf", msgstring )      
     ENDIF
 
   ELSE 
 
     WRITE(msgstring, * ) TRIM(chla_obs_file), " does not exist"
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )
+    CALL error_handler( e_err, "init_pdaf", msgstring )
 
   ENDIF
 
-    dim_step = 49
+    dim_step_chla = 49
   
   ! Allocate the data_array with the appropriate size
-  ALLOCATE( chla_steps(dim_step) )
+  ALLOCATE( chla_steps(dim_step_chla) )
 
   ! Get dimension ID 
   nc_status = NF90_INQ_DIMID(ncid, "step", dimid_step)
   IF (nc_status /= NF90_NOERR) THEN
     nc_status = NF90_CLOSE(ncid) 
     WRITE(msgstring, * ) "Error getting step dimension ID", TRIM(chla_obs_file)
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )    
+    CALL error_handler( e_err, "init_pdaf", msgstring )    
   ENDIF
 
 
@@ -430,32 +434,12 @@ SUBROUTINE init_pdaf()
   IF (nc_status /= NF90_NOERR) THEN
     nc_status = NF90_CLOSE(ncid) 
     WRITE(msgstring, * ) "Error getting dimension values for step", TRIM(chla_obs_file)
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+    CALL error_handler( e_err, "init_pdaf", msgstring )      
   ENDIF
 
 
-! C
-!   ! Get the dimension size 
-!   nc_status = NF90_INQ_DIMLEN(ncid, dimid_step, dim_step)
-!   IF (nc_status /= NF90_NOERR) THEN
-!     nc_status = NF90_CLOSE(ncid) 
-!     WRITE(msgstring, * ) "Error getting dimension of chl step", TRIM(chla_obs_file)
-!     CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
-!   ENDIF
-  
-!   nc_status = NF90_INQ_DIMLEN(ncid, dimid_depth, dim_depth)
-!   IF (nc_status /= NF90_NOERR) THEN
-!     nc_status = NF90_CLOSE(ncid) 
-!     WRITE(msgstring, * ) "Error getting dimension of chl depth", TRIM(chla_obs_file)
-!     CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
-!   ENDIF
-
-! I get errors saying This name does not have a type, and must have an explicit type.   [NF90_INQ_DIMLEN]  
-! But I know the lenth of dimession because I wrote the file. I use the known value for the time being. 
-
-
-  dim_depth = 20
-  ALLOCATE( chla_depths(dim_depth) )
+  dim_depth_chla = 20
+  ALLOCATE( chla_depths(dim_depth_chla) )
 
 
 
@@ -463,14 +447,14 @@ SUBROUTINE init_pdaf()
   IF (nc_status /= NF90_NOERR) THEN
     nc_status = NF90_CLOSE(ncid) 
     WRITE(msgstring, * ) "Error getting depth dimension ID", TRIM(chla_obs_file)
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )    
+    CALL error_handler( e_err, "init_pdaf", msgstring )    
   ENDIF
 
-  nc_status = nf90_get_var(ncid, dimid_step, chla_depths)
+  nc_status = NF90_GET_VAR(ncid, dimid_depth, chla_depths)
   IF (nc_status /= NF90_NOERR) THEN
     nc_status = NF90_CLOSE(ncid) 
     WRITE(msgstring, * ) "Error getting dimension values for depth", TRIM(chla_obs_file)
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )      
+    CALL error_handler( e_err, "init_pdaf", msgstring )      
   ENDIF
 
 
@@ -483,38 +467,186 @@ SUBROUTINE init_pdaf()
 
 
   ! read chl-a data 
-  ALLOCATE(MOSAiC_Chla( dim_step, dim_depth ))
+  ALLOCATE(MOSAiC_Chla( dim_step_chla, dim_depth_chla ))
 
   ! Get variable ID 
   nc_status = NF90_INQ_VARID(ncid, "Chl_a", varid_chla)
   IF (nc_status /= NF90_NOERR) THEN
     nc_status = NF90_CLOSE(ncid) 
-    WRITE(msgstring, * ) "Error in getting variable ID ", TRIM(chla_obs_file)
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )    
+    WRITE(msgstring, * ) "Error in getting variable ID for Chl_a", TRIM(chla_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )    
   ENDIF
   
   ! Read the variable
   startv(1) = 1 ! depth 
   startv(2) = 1 ! step 
-  cntv(1) = dim_depth
-  cntv(2) = dim_step
+  cntv(1) = dim_depth_chla
+  cntv(2) = dim_step_chla
        
   nc_status = NF90_GET_VAR(ncid, varid_chla, MOSAiC_Chla, start=startv, count=cntv)
   IF (nc_status /= NF90_NOERR) THEN
     nc_status = nf90_close(ncid) 
     WRITE(msgstring, * ) "Error in getting variable ", TRIM(chla_obs_file)
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )
+    CALL error_handler( e_err, "init_pdaf", msgstring )
   endif
 
   nc_status = nf90_close(ncid)
   IF (nc_status /= NF90_NOERR) THEN
   nc_status = NF90_CLOSE(ncid) 
     WRITE(msgstring, * ) "Error in getting variable ", TRIM(chla_obs_file)
-    CALL error_handler( e_err, "prepoststep_ens_pdaf", msgstring )
+    CALL error_handler( e_err, "init_pdaf", msgstring )
   ENDIF
 
 
   IF(mype_world==0) WRITE(*,*) 'MOSAiC_Chla', MOSAiC_Chla 
+
+
+
+
+  din_obs_file = '/albedo/work/user/nmamnun/nuarctic/data/PS122_NUTRIENTS.nc'
+  IF ( file_exist(din_obs_file) ) THEN
+    IF(mype_world==0) WRITE(*,*) '--- read observation from file ', din_obs_file
+    ! Open the PS122_NUTRIENTS.nc  file
+    nc_status = NF90_OPEN(din_obs_file, nf90_nowrite, ncid)
+    IF (nc_status /= NF90_NOERR) THEN
+      WRITE(msgstring, * ) "Error in opening ", TRIM(din_obs_file)
+      CALL error_handler( e_err, "init_pdaf", msgstring )      
+    ENDIF
+
+  ELSE 
+
+    WRITE(msgstring, * ) TRIM(din_obs_file), " does not exist"
+    CALL error_handler( e_err, "init_pdaf", msgstring )
+
+  ENDIF
+
+  dim_step_din = 63
+  dim_step_dsi = 63
+
+
+
+  ! Allocate the data_array with the appropriate size
+  ALLOCATE( din_steps(dim_step_din) )
+  ALLOCATE( dsi_steps(dim_step_dsi) )
+
+
+  ! Get dimension ID 
+  nc_status = NF90_INQ_DIMID(ncid, "step", dimid_step)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting step dimension ID", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )    
+  ENDIF
+
+
+  ! Get the dimension values
+  nc_status = NF90_GET_VAR(ncid, dimid_step, din_steps)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting dimension values for step", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )      
+  ENDIF
+
+
+
+  dim_depth_din = 47
+  ALLOCATE( din_depths(dim_depth_din) )
+  dim_depth_dsi = 47
+  ALLOCATE( dsi_depths(dim_depth_dsi) )
+
+
+
+  nc_status = NF90_INQ_DIMID(ncid, "depth", dimid_depth)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting depth dimension ID", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )    
+  ENDIF
+
+  nc_status = nf90_get_var(ncid, dimid_depth, din_depths)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error getting dimension values for depth ", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )      
+  ENDIF
+
+
+  
+  IF(mype_world==0) WRITE(*,*) 'chla_steps:', chla_steps
+  IF(mype_world==0) WRITE(*,*) 'chla_depths:', chla_depths
+  
+  IF(mype_world==0) WRITE(*,*) 'din_steps:', din_steps
+  IF(mype_world==0) WRITE(*,*) 'din_depths:', din_depths
+
+
+  ! read DIN data 
+  ALLOCATE(MOSAiC_DIN( dim_step_din, dim_depth_din ))
+  ! read DSi data 
+  ALLOCATE(MOSAiC_dsi( dim_step_dsi, dim_depth_dsi ))
+
+  ! Get variable ID 
+  nc_status = NF90_INQ_VARID(ncid, "DIN", varid_DIN)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ID for DIN ", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )    
+  ENDIF
+  
+  ! Read the variable
+  startv(1) = 1 ! depth 
+  startv(2) = 1 ! step 
+  cntv(1) = dim_depth_din
+  cntv(2) = dim_step_din
+       
+  nc_status = NF90_GET_VAR(ncid, varid_DIN, MOSAiC_DIN, start=startv, count=cntv)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = nf90_close(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )
+  endif
+
+
+
+
+  ! Get variable ID 
+  nc_status = NF90_INQ_VARID(ncid, "DSi", varid_dsi)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ID for DSi ", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )    
+  ENDIF
+  
+  ! Read the variable
+  startv(1) = 1 ! depth 
+  startv(2) = 1 ! step 
+  cntv(1) = dim_depth_dsi
+  cntv(2) = dim_step_dsi
+       
+  nc_status = NF90_GET_VAR(ncid, varid_dsi, MOSAiC_dsi, start=startv, count=cntv)
+  IF (nc_status /= NF90_NOERR) THEN
+    nc_status = nf90_close(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )
+  endif
+
+
+
+
+
+
+  nc_status = nf90_close(ncid)
+  IF (nc_status /= NF90_NOERR) THEN
+  nc_status = NF90_CLOSE(ncid) 
+    WRITE(msgstring, * ) "Error in getting variable ", TRIM(din_obs_file)
+    CALL error_handler( e_err, "init_pdaf", msgstring )
+  ENDIF
+
+
+  IF(mype_world==0) WRITE(*,*) 'MOSAiC_DIN', MOSAiC_DIN 
+  IF(mype_world==0) WRITE(*,*) 'MOSAiC_dsi', MOSAiC_dsi 
+
+
+
 
 
 

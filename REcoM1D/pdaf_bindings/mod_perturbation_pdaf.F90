@@ -69,45 +69,62 @@ MODULE mod_perturbation_pdaf
     END FUNCTION perturb_lognorm
 
 ! ---------------------------------
-    !   procedure for log-normal parameters
-    FUNCTION perturb_lognorm_ens (val_in, relvar, N, rnd_seed) result(perturbed_array)
-      !   FUNCTION - generate random perturbation of parameters in a lognormal distribution
-      !   and provide ensemble of perturbed value in an array 
+  FUNCTION perturb_lognorm_ens(val_in, relvar, N, rnd_seed) result(perturbed_array)
+      ! This function generates an ensemble of perturbed values based on a lognormal distribution.
+
       IMPLICIT NONE
-      !   Data dictionary
-      REAL(kind=rdk), INTENT(IN)  :: val_in ! param value
-      REAL(kind=rdk), INTENT(IN)  :: relvar ! perturbation scale
-      INTEGER, INTENT(IN)       :: N     ! Ensemble size   
-      INTEGER, INTENT(IN), OPTIONAL :: rnd_seed(4) ! seed for random number generation
-      ! Output
-      REAL(kind=rdk) :: perturbed_array(N)  ! Output array containing lognormal-distributed perturbed values
-      !   Local variable
-      REAL(kind=rdk)  :: rnd_num(N)  ! output of the random number generation
-      REAL(kind=rdk)  :: logval !
-      REAL(kind=rdk)  ::sigma2 ! for perturbation
-      INTEGER       :: f_seed(4)
-      INTEGER       :: i ! index 
-      !   define seed for random number genaration
+
+      ! Input parameters
+      REAL(kind=rdk), INTENT(IN) :: val_in      ! Original parameter value
+      REAL(kind=rdk), INTENT(IN) :: relvar      ! Perturbation scale (relative variance)
+      INTEGER, INTENT(IN)       :: N            ! Ensemble size
+      INTEGER, INTENT(IN), OPTIONAL :: rnd_seed(4)  ! Seed for random number generation
+
+      ! Output parameter
+      REAL(kind=rdk) :: perturbed_array(N)      ! Output array with lognormal-distributed perturbed values
+
+      ! Local variables
+      REAL(kind=rdk) :: rnd_num(N)              ! Array to store generated random numbers
+      REAL(kind=rdk) :: logval                 ! Log-transformed input value
+      REAL(kind=rdk) :: sigma2                 ! Variance used for perturbation
+      INTEGER       :: f_seed(4)               ! Final seed for random number generation
+      INTEGER       :: i                       ! Loop index
+
+      ! Set the seed for random number generation
       IF (PRESENT(rnd_seed)) THEN
-        f_seed = rnd_seed
+          f_seed = rnd_seed
       ELSE
-        f_seed(1)=19
-        f_seed(2)=23
-        f_seed(3)=143
-        f_seed(4)=17
+          f_seed = (/ 19, 23, 143, 17 /)       ! Default seed values
       END IF
-      
-      !   generate random number
+
+      ! Generate random numbers
       CALL DLARNV(3, f_seed, N, rnd_num)
 
+      ! Calculate variance and log-transformed value for perturbation
       sigma2 = LOG(1.0D+00 + relvar*relvar)
-      logval = LOG(val_in) - 5.0D-01 * sigma2
+      logval = LOG(val_in) - 0.5D0 * sigma2
 
-      DO i = 1, N      
-      perturbed_array(i) = EXP( logval + SQRT(sigma2) * rnd_num(i) )
-      END DO 
+      ! Generate the perturbed ensemble
+      DO i = 1, N
+          perturbed_array(i) = EXP(logval + SQRT(sigma2) * rnd_num(i))
+      END DO
 
-    END FUNCTION perturb_lognorm_ens
+  END FUNCTION perturb_lognorm_ens
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
