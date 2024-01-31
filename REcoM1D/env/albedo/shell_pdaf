@@ -12,6 +12,7 @@ NC_LIB="-L${NETCDFFROOT}/lib -lnetcdff"
 NC_INC="-I${NETCDFFROOT}/include"
 LIBS="$LIBS -L/albedo/home/nmamnun/PDAF_trunk/lib -lpdaf-d -mkl"
 
+
 export CC=mpiicc FC=mpiifort F90C=mpiifort
 export HCOLL_ENABLE_MCAST_ALL="0"
 export HCOLL_MAIN_IB=mlx5_0:1
