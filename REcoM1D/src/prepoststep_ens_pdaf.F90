@@ -1142,11 +1142,64 @@ SUBROUTINE prepoststep_ens_pdaf(step, dim_p, dim_ens, dim_ens_p, dim_obs_p, &
         END IF
 
         CLOSE(UNIT=iunit)
+      
+      END IF 
 
-      ! END IF 
 
 
-    END IF 
+      IF (f_id%VDet /= 0) THEN
+
+        file_name = TRIM(out_dir)//'VDet.dat'
+        iunit = get_unit()
+
+        IF (file_exist(file_name) ) THEN
+          OPEN(UNIT=iunit, FILE=file_name, STATUS='OLD', POSITION='APPEND', ACTION='WRITE', IOSTAT=io)
+        ELSE
+          OPEN(UNIT=iunit, FILE=file_name, STATUS='NEW', ACTION='WRITE', IOSTAT=io)
+        END IF
+
+        IF (io /= 0) THEN
+          WRITE(msgstring, * ) "cannot open (",io,") file ", TRIM(file_name)
+          CALL error_handler(e_warn, "prepoststep_ens_pdaf", msgstring )
+        ELSE
+          WRITE(iunit, *) 'VDet  ', anastr, step, '=', &
+              state_p(off_fields(f_id%VDet)+1)
+
+        END IF
+
+        CLOSE(UNIT=iunit)
+
+      END IF 
+
+
+
+
+      IF (f_id%VDet_zoo2 /= 0) THEN
+
+        file_name = TRIM(out_dir)//'VDet_zoo2.dat'
+        iunit = get_unit()
+
+        IF (file_exist(file_name) ) THEN
+          OPEN(UNIT=iunit, FILE=file_name, STATUS='OLD', POSITION='APPEND', ACTION='WRITE', IOSTAT=io)
+        ELSE
+          OPEN(UNIT=iunit, FILE=file_name, STATUS='NEW', ACTION='WRITE', IOSTAT=io)
+        END IF
+
+        IF (io /= 0) THEN
+          WRITE(msgstring, * ) "cannot open (",io,") file ", TRIM(file_name)
+          CALL error_handler(e_warn, "prepoststep_ens_pdaf", msgstring )
+        ELSE
+          WRITE(iunit, *) 'VDet_zoo2  ', anastr, step, '=', &
+              state_p(off_fields(f_id%VDet_zoo2)+1)
+
+        END IF
+
+        CLOSE(UNIT=iunit)
+
+      END IF 
+
+
+
 
 
 
