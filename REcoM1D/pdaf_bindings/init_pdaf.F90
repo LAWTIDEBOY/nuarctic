@@ -29,7 +29,8 @@ SUBROUTINE init_pdaf()
        limit_winf, pf_res_type, pf_noise_type, pf_noise_amp, type_hyb,        &
        hyb_gamma, hyb_kappa, n_fields_1d, n_fields_0d, n_params, off_fields,  & 
        dim_fields, dim_field_1d, f_id, tr_id, step_null, perturb_scale,       &
-       write_ens, parameter_estimation, n_fields, bgc_layer, step_assim
+       write_ens, parameter_estimation, n_fields, bgc_layer, step_assim,      &
+       obs_dir, write_state_variable
 
   USE mod_utils, &
       ONLY: file_exist, error_handler, get_unit,  e_warn, e_err
@@ -98,6 +99,7 @@ SUBROUTINE init_pdaf()
 
 
   parameter_estimation = .TRUE.
+  write_state_variable = .TRUE.
   step_null = 0
   step_assim = step_null
 
@@ -386,6 +388,7 @@ SUBROUTINE init_pdaf()
     WRITE (*,*) 'assim_dsi: ',      assim_dsi
     WRITE (*,*) 'rms_obs_dsi: ',    rms_obs_dsi
     WRITE (*,*) 'write_ens: ',      write_ens
+    WRITE (*,*) 'write_state_variable:', write_state_variable
     WRITE (*,*) '-- End of PDAF configuration -----------'
   ENDIF
 
@@ -395,9 +398,8 @@ SUBROUTINE init_pdaf()
   ! *************************************
   ! ***   Read observations here ***
   ! *************************************
-
-  chla_obs_file &
-    = TRIM('/albedo/work/user/nmamnun/nuarctic/data/MOSAiC_Chla_forLaurent_20220905.nc')
+  obs_dir = '../../data'
+  chla_obs_file  = TRIM(obs_dir)//TRIM('/MOSAiC_Chla_forLaurent_20220905.nc')
 
   IF ( file_exist(chla_obs_file) ) THEN
     IF(mype_world==0) WRITE(*,*) '--- read observation from file ', chla_obs_file
@@ -501,9 +503,7 @@ SUBROUTINE init_pdaf()
   IF(mype_world==0) WRITE(*,*) 'MOSAiC_Chla', MOSAiC_Chla 
 
 
-
-
-  din_obs_file = '/albedo/work/user/nmamnun/nuarctic/data/PS122_NUTRIENTS.nc'
+  din_obs_file = TRIM(obs_dir)//TRIM('/PS122_NUTRIENTS.nc')
   IF ( file_exist(din_obs_file) ) THEN
     IF(mype_world==0) WRITE(*,*) '--- read observation from file ', din_obs_file
     ! Open the PS122_NUTRIENTS.nc  file
@@ -570,10 +570,6 @@ SUBROUTINE init_pdaf()
     CALL error_handler( e_err, "init_pdaf", msgstring )      
   ENDIF
 
-
-  
-  IF(mype_world==0) WRITE(*,*) 'chla_steps:', chla_steps
-  IF(mype_world==0) WRITE(*,*) 'chla_depths:', chla_depths
   
   IF(mype_world==0) WRITE(*,*) 'din_steps:', din_steps
   IF(mype_world==0) WRITE(*,*) 'din_depths:', din_depths

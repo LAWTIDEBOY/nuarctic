@@ -19,5 +19,6 @@
   rms_obs_dsi = 3.0D-01,
   assim_chla = .TRUE.,
   rms_obs_chla = 3.0D-01,
-  parameter_estimation = .TRUE.
+  parameter_estimation = .TRUE.,
+  write_state_variable = .TRUE.
 /

@@ -52,7 +52,7 @@ SUBROUTINE read_param_selection()
   f_id%reminN           = 0
   f_id%reminC           = 0
   f_id%VDet             = 0
-  f_id%VDet_zoo2           = 0
+  f_id%VDet_zoo2        = 0
 
 
 ! read namelist file
@@ -229,37 +229,40 @@ SUBROUTINE read_param_selection()
   END IF 
 
 
-  WRITE(*,*) "f_id%NCuptakeRatio    =", f_id%NCuptakeRatio
-  WRITE(*,*) "f_id%NCUptakeRatio_d  =", f_id%NCUptakeRatio_d
-  WRITE(*,*) "f_id%k_din            =", f_id%k_din
-  WRITE(*,*) "f_id%k_din_d          =", f_id%k_din_d
-  WRITE(*,*) "f_id%alfa             =", f_id%alfa
-  WRITE(*,*) "f_id%alfa_d           =", f_id%alfa_d 
-  WRITE(*,*) "f_id%P_cm             =", f_id%P_cm
-  WRITE(*,*) "f_id%P_cm_d           =", f_id%P_cm_d
-  WRITE(*,*) "f_id%Chl2N_max        =", f_id%Chl2N_max
-  WRITE(*,*) "f_id%Chl2N_max_d      =", f_id%Chl2N_max_d
-  WRITE(*,*) "f_id%deg_Chl          =", f_id%deg_Chl
-  WRITE(*,*) "f_id%deg_Chl_d        =", f_id%deg_Chl_d
-  WRITE(*,*) "f_id%graz_max         =", f_id%graz_max
-  WRITE(*,*) "f_id%graz_max2        =", f_id%graz_max2
-  WRITE(*,*) "f_id%grazEff          =", f_id%grazEff
-  WRITE(*,*) "f_id%grazEff2         =", f_id%grazEff2
-  WRITE(*,*) "f_id%lossN            =", f_id%lossN
-  WRITE(*,*) "f_id%lossN_d          =", f_id%lossN_d
-  WRITE(*,*) "f_id%lossN_z          =", f_id%lossN_z
-  WRITE(*,*) "f_id%lossN_z2         =", f_id%lossN_z2
-  WRITE(*,*) "f_id%lossC_z          =", f_id%lossC_z
-  WRITE(*,*) "f_id%lossC_z2         =", f_id%lossC_z2
-  WRITE(*,*) "f_id%reminN           =", f_id%reminN
-  WRITE(*,*) "f_id%reminC           =", f_id%reminC
-  WRITE(*,*) "f_id%VDet             =", f_id%VDet
-  WRITE(*,*) "f_id%VDet_zoo2           =", f_id%VDet_zoo2
+  IF (mype_world==0) THEN
 
+    WRITE(*,*) "!! * * * * * * * * * * * * * * * * * * !!"
+    WRITE(*,*) "f_id%NCuptakeRatio    =", f_id%NCuptakeRatio
+    WRITE(*,*) "f_id%NCUptakeRatio_d  =", f_id%NCUptakeRatio_d
+    WRITE(*,*) "f_id%k_din            =", f_id%k_din
+    WRITE(*,*) "f_id%k_din_d          =", f_id%k_din_d
+    WRITE(*,*) "f_id%alfa             =", f_id%alfa
+    WRITE(*,*) "f_id%alfa_d           =", f_id%alfa_d 
+    WRITE(*,*) "f_id%P_cm             =", f_id%P_cm
+    WRITE(*,*) "f_id%P_cm_d           =", f_id%P_cm_d
+    WRITE(*,*) "f_id%Chl2N_max        =", f_id%Chl2N_max
+    WRITE(*,*) "f_id%Chl2N_max_d      =", f_id%Chl2N_max_d
+    WRITE(*,*) "f_id%deg_Chl          =", f_id%deg_Chl
+    WRITE(*,*) "f_id%deg_Chl_d        =", f_id%deg_Chl_d
+    WRITE(*,*) "f_id%graz_max         =", f_id%graz_max
+    WRITE(*,*) "f_id%graz_max2        =", f_id%graz_max2
+    WRITE(*,*) "f_id%grazEff          =", f_id%grazEff
+    WRITE(*,*) "f_id%grazEff2         =", f_id%grazEff2
+    WRITE(*,*) "f_id%lossN            =", f_id%lossN
+    WRITE(*,*) "f_id%lossN_d          =", f_id%lossN_d
+    WRITE(*,*) "f_id%lossN_z          =", f_id%lossN_z
+    WRITE(*,*) "f_id%lossN_z2         =", f_id%lossN_z2
+    WRITE(*,*) "f_id%lossC_z          =", f_id%lossC_z
+    WRITE(*,*) "f_id%lossC_z2         =", f_id%lossC_z2
+    WRITE(*,*) "f_id%reminN           =", f_id%reminN
+    WRITE(*,*) "f_id%reminC           =", f_id%reminC
+    WRITE(*,*) "f_id%VDet             =", f_id%VDet
+    WRITE(*,*) "f_id%VDet_zoo2        =", f_id%VDet_zoo2
 
-  WRITE(*,*) "* * * * * * * * * * * * * * * * * *"
-  WRITE(*,*) "n_params = ", n_params
+    WRITE(*,*) "* * * * * * * * * * * * * * * * * *"
+    WRITE(*,*) "n_params = ", n_params
+    WRITE(*,*) "!! * * * * * * * * * * * * * * * * * * !!"
 
-
+  END IF 
 
 END SUBROUTINE read_param_selection

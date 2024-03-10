@@ -35,6 +35,7 @@ MODULE mod_assimilation
   INTEGER :: init_delt_obs !< time step interval between model initialization and assimilation step
   INTEGER :: delt_obs      !< time step interval between assimilation steps
   LOGICAL :: parameter_estimation  !< Whether to estimate parameter
+  LOGICAL :: write_state_variable  !< Whether to state variable to output files. 
 ! General control of PDAF - available as command line options
   INTEGER :: screen       !< Control verbosity of PDAF
                           !< * (0) no outputs
@@ -200,6 +201,7 @@ MODULE mod_assimilation
 
 
   CHARACTER(len=110) :: out_dir
+  CHARACTER(len=110) :: obs_dir
 
 
 
