@@ -22,7 +22,7 @@ SUBROUTINE init_pdaf_parse()
       ONLY: dim_ens, screen, filtertype, subtype, type_trans,       &
       type_forget, forget, type_sqrt, perturb_scale,                & 
       init_delt_obs, delt_obs, write_ens, bgc_layer,                &
-      parameter_estimation
+      parameter_estimation, write_state_variable
 
   USE obs_chla_pdafomi, &
       ONLY: assim_chla, rms_obs_chla
@@ -42,7 +42,8 @@ SUBROUTINE init_pdaf_parse()
   NAMELIST  /pdaf_nml/dim_ens, screen, filtertype, subtype, type_trans,       &
       type_forget, forget, type_sqrt, bgc_layer, perturb_scale,               &
       init_delt_obs, delt_obs, write_ens, assim_din, rms_obs_din, assim_dsi,  &
-      rms_obs_dsi, assim_chla, rms_obs_chla, parameter_estimation
+      rms_obs_dsi, assim_chla, rms_obs_chla, parameter_estimation,            &
+      write_state_variable
       
   ! *** Read namelist for PDAF config ***
   IF (mype_world==0) WRITE (*,'(5x,a)') 'Read namelist for PDAF configuration'

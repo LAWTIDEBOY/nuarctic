@@ -63,7 +63,7 @@ MODULE obs_din_pdafomi
 
   ! Variables which are inputs to the module (usually set in init_pdaf)
   LOGICAL :: assim_din        !< Whether to assimilate this data type
-  REAL(kind=8)    :: rms_obs_din = 0.3D+00     !< Observation error standard deviation (for constant errors)
+  REAL(kind=8)    :: rms_obs_din  !< Observation error standard deviation (for constant errors)
 
   ! One can declare further variables, e.g. for file names which can
   ! be use-included in init_pdaf() and initialized there.

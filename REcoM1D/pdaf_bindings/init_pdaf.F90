@@ -520,8 +520,8 @@ SUBROUTINE init_pdaf()
 
   ENDIF
 
-  dim_step_din = 63
-  dim_step_dsi = 63
+  dim_step_din = 111
+  dim_step_dsi = 111
 
 
 
@@ -602,7 +602,7 @@ SUBROUTINE init_pdaf()
   endif
 
 
-
+  dsi_steps = din_steps
 
   ! Get variable ID 
   nc_status = NF90_INQ_VARID(ncid, "DSi", varid_dsi)

@@ -1699,7 +1699,7 @@ SUBROUTINE prepoststep_ens_pdaf(step, dim_p, dim_ens, dim_ens_p, dim_obs_p, &
       !! Write out the parameters ensemble to the files
       !! only in analysis step because the the nextt forcast step has the same values. 
 
-      IF (step<0) THEN
+      IF (step>=0) THEN
         
         IF (f_id%NCuptakeRatio /= 0) THEN
 
