@@ -1,23 +1,23 @@
 # Namelist file for PDAF configuration
 &pdaf_nml
-  dim_ens = 512,
+  dim_ens = 750,
   screen = 1, 
   filtertype = 6, 
   subtype = 0,
   type_trans = 0
   type_forget = 0
   forget = 1.0, 
-  type_sqrt = 0
-  bgc_layer = 47
-  perturb_scale = 0.5
+  type_sqrt = 0,
+  bgc_layer = 47,
+  perturb_scale = 3.0D-01,
   init_delt_obs = 15864,
   delt_obs = 240, 
   write_ens = .FALSE.,
-  assim_din = .TRUE.,
+  assim_din = .FALSE.,
   rms_obs_din = 3.0D-01,
-  assim_dsi = .TRUE.,
+  assim_dsi = .FALSE.,
   rms_obs_dsi = 3.0D-01,
-  assim_chla = .TRUE.,
+  assim_chla = .FALSE.,
   rms_obs_chla = 3.0D-01,
   parameter_estimation = .TRUE.,
   write_state_variable = .TRUE.
