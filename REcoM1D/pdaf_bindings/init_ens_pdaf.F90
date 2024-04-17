@@ -32,7 +32,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
       ONLY: NCuptakeRatio, NCUptakeRatio_d, k_din, k_din_d, alfa, alfa_d, P_cm,     & 
       P_cm_d, Chl2N_max, Chl2N_max_d, deg_Chl, deg_Chl_d, graz_max, graz_max2,      &
       grazEff, grazEff2, lossN, lossN_d, lossN_z, lossC_z, lossN_z2, lossC_z2,      &
-      reminN, reminC, VDet, VDet_zoo2
+      reminN, reminC, VDet, VDet_zoo2, SiCUptakeRatio
 
   USE mod_perturbation_pdaf, &
       ONLY:  perturb_lognorm, perturb_lognorm_ens, perturb_beta_ens
@@ -136,6 +136,18 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
         ens_p(off_fields(f_id%NCUptakeRatio_d) + 1, member) = NCUptakeRatio_d_ens(member)
       END DO 
       WRITE(*,*)"NCUptakeRatio_d_ens:", NCUptakeRatio_d_ens
+    END IF 
+
+    !  SiCUptakeRatio
+    IF (f_id%SiCUptakeRatio /= 0) THEN 
+      iseed = (/125, 291, 1871, 177/)
+      SiCUptakeRatio_ens = perturb_lognorm_ens(  SiCUptakeRatio, &
+                                                  perturb_scale, &
+                                                  dim_ens, iseed)     
+      DO member = 1, dim_ens
+        ens_p(off_fields(f_id%SiCUptakeRatio) + 1, member) = SiCUptakeRatio_ens(member)
+      END DO 
+      WRITE(*,*)"SiCUptakeRatio_ens:", SiCUptakeRatio_ens
     END IF 
 
     !  k_din
@@ -528,6 +540,10 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
   IF (f_id%NCUptakeRatio_d /= 0) &
     WRITE (*,*) 'NCUptakeRatio_d=', mean_state(off_fields(f_id%NCUptakeRatio_d)+1), &
                 'Spread=', varience_state(off_fields(f_id%NCUptakeRatio_d)+1)
+
+  IF (f_id%SiCUptakeRatio /= 0) &
+    WRITE (*,*) 'SiCUptakeRatio=', mean_state(off_fields(f_id%SiCUptakeRatio)+1), &
+                'Spread=', varience_state(off_fields(f_id%SiCUptakeRatio)+1)
 
   IF (f_id%k_din /= 0) &
     WRITE (*,*) 'k_din=', mean_state(off_fields(f_id%k_din)+1), &

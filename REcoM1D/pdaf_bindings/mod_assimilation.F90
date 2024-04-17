@@ -207,7 +207,9 @@ MODULE mod_assimilation
 
 
   
-
+  INTEGER     :: n_sweeps = 1             !< Number of sweeps in analysis loop
+  CHARACTER(len=3) :: type_sweep(2)   !< Type of sweep in local analysis loop
+  INTEGER :: isweep                   !< Index of sweep during the local analysis loop
 
 
 
@@ -236,6 +238,7 @@ MODULE mod_assimilation
 !     parameters 
       INTEGER :: NCuptakeRatio
       INTEGER :: NCUptakeRatio_d
+      INTEGER :: SiCUptakeRatio
       INTEGER :: k_din
       INTEGER :: k_din_d
       INTEGER :: alfa

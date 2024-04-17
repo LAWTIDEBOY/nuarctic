@@ -1,6 +1,7 @@
 &param_nml
   is_NCuptakeRatio = 1,
   is_NCUptakeRatio_d = 1,
+  is_SiCUptakeRatio = 0,
   is_k_din = 1,
   is_k_din_d = 1,
   is_alfa  = 1,

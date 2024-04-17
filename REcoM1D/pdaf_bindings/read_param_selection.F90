@@ -18,17 +18,18 @@ SUBROUTINE read_param_selection()
 
 ! *** Local variables ***
   INTEGER ::  index 
-  INTEGER ::  is_NCuptakeRatio, is_NCUptakeRatio_d, is_k_din, is_k_din_d,     &
-              is_alfa, is_alfa_d, is_P_cm, is_P_cm_d, is_Chl2N_max,           &
-              is_Chl2N_max_d, is_deg_Chl, is_deg_Chl_d, is_graz_max,          &
-              is_graz_max2, is_grazEff, is_grazEff2, is_lossN, is_lossN_d,    &
-              is_lossN_z, is_lossN_z2, is_lossC_z, is_lossC_z2, is_reminN,    &
-              is_reminC, is_VDet, is_VDet_zoo2
+  INTEGER ::  is_NCuptakeRatio, is_NCUptakeRatio_d, is_SiCUptakeRatio,        &
+              is_k_din, is_k_din_d, is_alfa, is_alfa_d, is_P_cm, is_P_cm_d,   &
+              is_Chl2N_max, is_Chl2N_max_d, is_deg_Chl, is_deg_Chl_d,         &
+              is_graz_max, is_graz_max2, is_grazEff, is_grazEff2, is_lossN,   &
+              is_lossN_d, is_lossN_z, is_lossN_z2, is_lossC_z, is_lossC_z2,   &
+              is_reminN, is_reminC, is_VDet, is_VDet_zoo2
 
 
 ! assign 0 to all index  
   f_id%NCuptakeRatio    = 0
   f_id%NCUptakeRatio_d  = 0
+  f_id%SiCUptakeRatio   = 0
   f_id%k_din            = 0
   f_id%k_din_d          = 0
   f_id%alfa             = 0
@@ -56,9 +57,9 @@ SUBROUTINE read_param_selection()
 
 
 ! read namelist file
-  NAMELIST /param_nml/is_NCuptakeRatio, is_NCUptakeRatio_d, is_k_din, is_k_din_d,   &
-              is_alfa, is_alfa_d, is_P_cm, is_P_cm_d, is_Chl2N_max,                 &
-              is_Chl2N_max_d, is_deg_Chl, is_deg_Chl_d, is_graz_max,                &
+  NAMELIST /param_nml/is_NCuptakeRatio, is_NCUptakeRatio_d, is_SiCUptakeRatio,      &
+              is_k_din, is_k_din_d, is_alfa, is_alfa_d, is_P_cm, is_P_cm_d,         &
+              is_Chl2N_max, is_Chl2N_max_d, is_deg_Chl, is_deg_Chl_d, is_graz_max,  &
               is_graz_max2, is_grazEff, is_grazEff2, is_lossN, is_lossN_d,          &
               is_lossN_z, is_lossN_z2, is_lossC_z, is_lossC_z2, is_reminN,          &
               is_reminC, is_VDet, is_VDet_zoo2
@@ -81,6 +82,12 @@ SUBROUTINE read_param_selection()
   IF (is_NCUptakeRatio_d /= 0) THEN
     index = index + 1
     f_id%NCUptakeRatio_d = index
+    n_params = n_params + 1
+  END IF 
+
+  IF (is_SiCUptakeRatio /= 0) THEN
+    index = index + 1
+    f_id%SiCUptakeRatio = index
     n_params = n_params + 1
   END IF 
 
@@ -234,6 +241,7 @@ SUBROUTINE read_param_selection()
     WRITE(*,*) "!! * * * * * * * * * * * * * * * * * * !!"
     WRITE(*,*) "f_id%NCuptakeRatio    =", f_id%NCuptakeRatio
     WRITE(*,*) "f_id%NCUptakeRatio_d  =", f_id%NCUptakeRatio_d
+    WRITE(*,*) "f_id%SiCUptakeRatio   =", f_id%SiCUptakeRatio
     WRITE(*,*) "f_id%k_din            =", f_id%k_din
     WRITE(*,*) "f_id%k_din_d          =", f_id%k_din_d
     WRITE(*,*) "f_id%alfa             =", f_id%alfa

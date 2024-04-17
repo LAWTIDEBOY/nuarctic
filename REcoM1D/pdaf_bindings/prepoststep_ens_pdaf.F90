@@ -643,6 +643,31 @@ SUBROUTINE prepoststep_ens_pdaf(step, dim_p, dim_ens, dim_ens_p, dim_obs_p, &
       END IF 
 
 
+      IF (f_id%SiCUptakeRatio /= 0) THEN
+
+        file_name = TRIM(out_dir)//'SiCUptakeRatio.dat'
+        iunit = get_unit()
+
+        IF (file_exist(file_name) ) THEN
+          OPEN(UNIT=iunit, FILE=file_name, STATUS='OLD', POSITION='APPEND', ACTION='WRITE', IOSTAT=io)
+        ELSE
+          OPEN(UNIT=iunit, FILE=file_name, STATUS='NEW', ACTION='WRITE', IOSTAT=io)
+        END IF
+
+        IF (io /= 0) THEN
+          WRITE(msgstring, * ) "cannot open (",io,") file ", TRIM(file_name)
+          CALL error_handler(e_warn, "prepoststep_ens_pdaf", msgstring )
+        ELSE
+          WRITE(iunit, *) 'SiCUptakeRatio  ', anastr, step, '=', &
+              state_p(off_fields(f_id%SiCUptakeRatio)+1)
+
+        END IF
+
+        CLOSE(UNIT=iunit)
+
+      END IF 
+
+
       IF (f_id%k_din /= 0) THEN
 
         file_name = TRIM(out_dir)//'k_din.dat'
@@ -1743,6 +1768,31 @@ SUBROUTINE prepoststep_ens_pdaf(step, dim_p, dim_ens, dim_ens_p, dim_obs_p, &
           ELSE
             WRITE(iunit, *) 'NCUptakeRatio_d  ', anastr, step, '=', &
                 ens_p(off_fields(f_id%NCUptakeRatio_d)+1, member)
+
+          END IF
+
+          CLOSE(UNIT=iunit)
+
+        END IF 
+
+
+        IF (f_id%SiCUptakeRatio /= 0) THEN
+
+          file_name = TRIM(out_dir)//'SiCUptakeRatio_'//TRIM(ensstr)//'.dat'
+          iunit = get_unit()
+
+          IF (file_exist(file_name) ) THEN
+            OPEN(UNIT=iunit, FILE=file_name, STATUS='OLD', POSITION='APPEND', ACTION='WRITE', IOSTAT=io)
+          ELSE
+            OPEN(UNIT=iunit, FILE=file_name, STATUS='NEW', ACTION='WRITE', IOSTAT=io)
+          END IF
+
+          IF (io /= 0) THEN
+            WRITE(msgstring, * ) "cannot open (",io,") file ", TRIM(file_name)
+            CALL error_handler(e_warn, "prepoststep_ens_pdaf", msgstring )
+          ELSE
+            WRITE(iunit, *) 'SiCUptakeRatio  ', anastr, step, '=', &
+                ens_p(off_fields(f_id%SiCUptakeRatio)+1, member)
 
           END IF
 

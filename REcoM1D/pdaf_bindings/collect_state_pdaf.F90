@@ -29,7 +29,7 @@ SUBROUTINE collect_state_pdaf(dim_p, state_p)
       ONLY: NCuptakeRatio, NCUptakeRatio_d, k_din, k_din_d, alfa, alfa_d, P_cm,     & 
       P_cm_d, Chl2N_max, Chl2N_max_d, deg_Chl, deg_Chl_d, graz_max, graz_max2,      &
       grazEff, grazEff2, lossN, lossN_d, lossN_z, lossC_z, lossN_z2, lossC_z2,      &
-      reminN, reminC,  VDet, VDet_zoo2
+      reminN, reminC,  VDet, VDet_zoo2, SiCUptakeRatio
 
   USE mod_assimilation, &
       ONLY: off_fields, dim_fields, dim_field_1d, f_id, tr_id
@@ -117,6 +117,8 @@ SUBROUTINE collect_state_pdaf(dim_p, state_p)
   IF (f_id%NCuptakeRatio /= 0) state_p(off_fields(f_id%NCuptakeRatio)+1) = NCuptakeRatio
   
   IF (f_id%NCUptakeRatio_d /= 0) state_p(off_fields(f_id%NCUptakeRatio_d)+1) = NCUptakeRatio_d
+  
+  IF (f_id%SiCUptakeRatio /= 0) state_p(off_fields(f_id%SiCUptakeRatio)+1) = SiCUptakeRatio
 
   IF (f_id%k_din /= 0) state_p(off_fields(f_id%k_din)+1) = k_din
 

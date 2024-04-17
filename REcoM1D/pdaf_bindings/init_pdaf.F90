@@ -30,7 +30,7 @@ SUBROUTINE init_pdaf()
        hyb_gamma, hyb_kappa, n_fields_1d, n_fields_0d, n_params, off_fields,  & 
        dim_fields, dim_field_1d, f_id, tr_id, step_null, perturb_scale,       &
        write_ens, parameter_estimation, n_fields, bgc_layer, step_assim,      &
-       obs_dir, write_state_variable
+       obs_dir
 
   USE mod_utils, &
       ONLY: file_exist, error_handler, get_unit,  e_warn, e_err
@@ -99,7 +99,6 @@ SUBROUTINE init_pdaf()
 
 
   parameter_estimation = .TRUE.
-  write_state_variable = .TRUE.
   step_null = 0
   step_assim = step_null
 
@@ -388,7 +387,6 @@ SUBROUTINE init_pdaf()
     WRITE (*,*) 'assim_dsi: ',      assim_dsi
     WRITE (*,*) 'rms_obs_dsi: ',    rms_obs_dsi
     WRITE (*,*) 'write_ens: ',      write_ens
-    WRITE (*,*) 'write_state_variable:', write_state_variable
     WRITE (*,*) '-- End of PDAF configuration -----------'
   ENDIF
 
@@ -520,8 +518,8 @@ SUBROUTINE init_pdaf()
 
   ENDIF
 
-  dim_step_din = 111
-  dim_step_dsi = 111
+  dim_step_din = 63
+  dim_step_dsi = 63
 
 
 
@@ -570,6 +568,10 @@ SUBROUTINE init_pdaf()
     CALL error_handler( e_err, "init_pdaf", msgstring )      
   ENDIF
 
+
+  
+  IF(mype_world==0) WRITE(*,*) 'chla_steps:', chla_steps
+  IF(mype_world==0) WRITE(*,*) 'chla_depths:', chla_depths
   
   IF(mype_world==0) WRITE(*,*) 'din_steps:', din_steps
   IF(mype_world==0) WRITE(*,*) 'din_depths:', din_depths
@@ -602,7 +604,7 @@ SUBROUTINE init_pdaf()
   endif
 
 
-  dsi_steps = din_steps
+
 
   ! Get variable ID 
   nc_status = NF90_INQ_VARID(ncid, "DSi", varid_dsi)
