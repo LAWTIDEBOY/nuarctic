@@ -34,7 +34,11 @@ The next step involves copying the contents from the `./pdaf_bindings` directory
 **Important Note:** The file REcoM1D_main.F90 in the ./pdaf_bindings directory will replace the existing REcoM1D_main.F90 in the ./src directory. The rest of the files from ./pdaf_bindings are user-supplied routines specifically for PDAF<!--, except `shell_pdaf`-->.
 
 ### 4. Adding PDAF Library to Environment and Build Configuration
-To integrate the PDAF library with your REcoM1D model, you need to update your environment settings and modify the build configuration. This involves editing the environment file and the CMake configuration.
+To integrate the PDAF library with your REcoM1D model, you need to update your environment settings and modify the build configuration. 
+
+In the `REcoM1D/env` folder, replace the `shell` file by the `shell_pdaf`.
+
+Then, edit the environment file and the CMake configuration.
 
 Add the following lines to `./env/albedo/shell`.
 `NC_LIB="-L${NETCDFFROOT}/lib -lnetcdff"`
@@ -51,7 +55,7 @@ Navigate to `nuarctic/REcoM1D/src` and open `CMakeLists.txt`. Modify this file t
 
 Again, ensure that `/path/to/PDAF/directory` is replaced with the correct path to your PDAF installation.
 
-For an example of how these configurations should look, refer to the file `nuarctic/REcoM1D/src/CMakeLists_pdaf.txt`.
+For an example of how these configurations should look, refer to the file `nuarctic/REcoM1D/pdaf_bindings/CMakeLists_pdaf.txt`.
 
 ### 5. Compiling the REcoM1D Model with PDAF Bindings
 
