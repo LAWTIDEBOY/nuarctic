@@ -58,6 +58,7 @@ SUBROUTINE init_ens_pdaf(filtertype, dim_p, dim_ens, state_p, Uinv, ens_p, flag)
   ! parameters ensemble       
   REAL(kind=8)  :: NCuptakeRatio_ens(dim_ens)
   REAL(kind=8)  :: NCUptakeRatio_d_ens(dim_ens)
+  REAL(kind=8)  :: SiCUptakeRatio_ens(dim_ens)
   REAL(kind=8)  :: k_din_ens(dim_ens)
   REAL(kind=8)  :: k_din_d_ens(dim_ens)
   REAL(kind=8)  :: alfa_ens(dim_ens)
